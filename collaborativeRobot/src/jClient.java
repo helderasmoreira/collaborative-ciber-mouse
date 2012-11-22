@@ -33,22 +33,24 @@ public class jClient {
 	public static final double mapPrecision = 10.0;
 	public static final int mapSizeY = 280;
 	public static final int mapSizeX = 560;
+	public static int pos;
 	static public double[][] map = new double[mapSizeY][mapSizeX];
 	int initialPosX, initialPosY;
 	int halfPosX, halfPosY;
+	
+	public static String[] dataToProcess = new String[5];
 	
 	ciberIF cif;
 
 	public static void main(String[] args) {
 
 		String host, robName;
-		int pos;
 		int arg;
 
 		// default values
 		host = "localhost";
 		robName = "Bla";
-		pos = 1;
+		pos = 2;
 
 		// parse command-line arguments
 		try {
@@ -123,6 +125,12 @@ public class jClient {
 	}
 
 	private void updateMap() {
+		
+		for(int i = 1; i <= 5; i++) {
+			dataToProcess[i-1] = cif.GetMessageFrom(i);
+			System.out.println("message from " + i + ": " + dataToProcess[i-1]);
+		}
+		
 		map[(int) (initialPosY - cif.GetY() * mapPrecision + halfPosY)][(int) (cif
 				.GetX() * mapPrecision - initialPosX + halfPosX)] = 1.0;
 	}
@@ -138,10 +146,12 @@ public class jClient {
 			ground = cif.GetGroundSensor();
 		if (cif.IsBeaconReady(beaconToFollow))
 			beacon = cif.GetBeaconSensor(beaconToFollow);
+		
+		cif.Say(cif.GetX() + "-" + cif.GetY() +";" + irSensor0 + ";" + irSensor1 + ";" + irSensor2);
 	}
 
 	public void requestInfo() {
-		cif.Say(robName);
+		
 		cif.RequestIRSensor(0);
 		cif.RequestIRSensor(1);
 		cif.RequestIRSensor(2);
