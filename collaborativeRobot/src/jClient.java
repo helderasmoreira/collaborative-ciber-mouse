@@ -119,13 +119,20 @@ public class jClient {
 		while (true) {
 			cif.ReadSensors();
 			decide();
-      frontSensorMapPosition(compass);
 		}
 	}
 
 	private void updateMap() {
-		map[(int) (initialPosY - cif.GetY() * mapPrecision + halfPosY)][(int) (cif
-				.GetX() * mapPrecision - initialPosX + halfPosX)] = 1.0;
+    int robotMapY = (int) (initialPosY - cif.GetY() * mapPrecision + halfPosY);
+    int robotMapX = (int) (cif.GetX() * mapPrecision - initialPosX + halfPosX);
+		map[robotMapY][robotMapX] = 1.0;
+    
+    int[] frontSensorPos = frontSensorMapPosition(robotMapX, robotMapY, compass);
+    System.out.println("Robot Map X: " + robotMapX);
+    System.out.println("Robot Map Y: " + robotMapY);
+    System.out.println("FrontSensorX: " + frontSensorPos[0]);
+    System.out.println("FrontSensorY: " + frontSensorPos[1]);
+    map[frontSensorPos[1]][frontSensorPos[0]] = -1.0;
 	}
 
 	public void getInfo() {
@@ -291,14 +298,12 @@ public class jClient {
   }
   
   //[x,y]
-  public int[] frontSensorMapPosition(double compass) {
+  public int[] frontSensorMapPosition(int robotMapX, int robotMapY, double compass) {
     double robotDirectionDeg = compassToDeg(compass);
-    double robotCenterX = cif.GetX();
-    double robotCenterY = cif.GetY();
     System.out.println("Compass treated: " + robotDirectionDeg);
     
-    double sensorPosX = robotCenterX + 4 * Math.cos(Math.toRadians(robotDirectionDeg));
-    double sensorPosY = robotCenterY + 4 * Math.sin(Math.toRadians(robotDirectionDeg));
+    double sensorPosX = robotMapX + 4 * Math.cos(Math.toRadians(robotDirectionDeg));
+    double sensorPosY = robotMapY - 4 * Math.sin(Math.toRadians(robotDirectionDeg));
     
     return new int[]{Math.round((float) sensorPosX), Math.round((float) sensorPosY)};
   }

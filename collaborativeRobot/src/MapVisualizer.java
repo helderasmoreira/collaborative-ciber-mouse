@@ -27,7 +27,10 @@ public class MapVisualizer extends Thread {
 					if (jClient.map[i][j] == 1.0) {
 						g.setColor(Color.RED);
 						g.fillRect(j, i, 1, 1);
-					}
+					} else if (jClient.map[i][j] == -1.0) {
+            g.setColor(Color.BLUE);
+						g.fillRect(j, i, 1, 1);
+          }
 			}
 			g.dispose();
 		}
