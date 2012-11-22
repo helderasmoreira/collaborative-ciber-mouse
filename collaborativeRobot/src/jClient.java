@@ -147,7 +147,7 @@ public class jClient {
 		if (cif.IsBeaconReady(beaconToFollow))
 			beacon = cif.GetBeaconSensor(beaconToFollow);
 		
-		cif.Say(cif.GetX() + "-" + cif.GetY() +";" + irSensor0 + ";" + irSensor1 + ";" + irSensor2);
+		cif.Say(cif.GetX() + ";" + cif.GetY() +";" + irSensor0 + ";" + irSensor1 + ";" + irSensor2);
 	}
 
 	public void requestInfo() {
