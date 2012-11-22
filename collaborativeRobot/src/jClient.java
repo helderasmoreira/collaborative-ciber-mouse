@@ -35,7 +35,7 @@ public class jClient {
 	public static final double mapPrecision = 10.0;
   public static final int mapSizeX = arenaSizeX*2 * (int)mapPrecision;
 	public static final int mapSizeY = arenaSizeY*2 * (int)mapPrecision;
-  public static final int robotInsideRadius = (int) mapPrecision/2 - 1;
+  public static final int robotRadius = (int) mapPrecision/2;
   
 	static public double[][] map = new double[mapSizeY][mapSizeX];
 	int initialPosX, initialPosY;
@@ -134,6 +134,10 @@ public class jClient {
     int[] frontSensorPos = frontSensorMapPosition(robotMapX, robotMapY, compass);
     int[] leftSensorPos = leftSensorMapPosition(robotMapX, robotMapY, compass);
     int[] rightSensorPos = rightSensorMapPosition(robotMapX, robotMapY, compass);
+    System.out.println("Left Sensor X: " + leftSensorPos[0]);
+    System.out.println("Left Sensor Y: " + leftSensorPos[1]);
+    System.out.println("Right Sensor X: " + rightSensorPos[0]);
+    System.out.println("Right Sensor Y: " + rightSensorPos[1]);
     map[frontSensorPos[1]][frontSensorPos[0]] = -1.0;
     map[leftSensorPos[1]][leftSensorPos[0]] = -1.1;
     map[rightSensorPos[1]][rightSensorPos[0]] = -1.2;
@@ -306,8 +310,8 @@ public class jClient {
    * returns [x,y]
    */
   private int[] sensorMapPosition(int robotMapX, int robotMapY, double sensorDir) {
-    double sensorPosX = robotMapX + robotInsideRadius * Math.cos(Math.toRadians(sensorDir));
-    double sensorPosY = robotMapY - robotInsideRadius * Math.sin(Math.toRadians(sensorDir));
+    double sensorPosX = robotMapX + robotRadius * Math.cos(Math.toRadians(sensorDir));
+    double sensorPosY = robotMapY - robotRadius * Math.sin(Math.toRadians(sensorDir));
     
     return new int[]{Math.round((float) sensorPosX), Math.round((float) sensorPosY)};
   }
