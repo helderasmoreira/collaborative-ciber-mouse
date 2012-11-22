@@ -19,12 +19,7 @@
  */
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -160,7 +155,6 @@ public class jClient {
 		cif.RequestIRSensor(2);
 		cif.RequestBeaconSensor(beaconToFollow);
 		cif.RequestGroundSensor();
-		//System.out.println(cif.GetX() + " " + cif.GetX() );
 	}
 	
 	public void original_wander(boolean followBeacon) {
@@ -237,19 +231,11 @@ public class jClient {
 	public void decide() {
 		getInfo();
 
-		//System.out.println("Measures: ir0=" + irSensor0 + " ir1=" + irSensor1 + " ir2=" + irSensor2 + "\n");
-		//System.out.println("Measures: x=" + x + " y=" + y + " dir=" + dir);
-
-		//System.out.println(robName + " state " + state);
-		
-		
-		
 		switch(state) {
 		case RUN:    /* Go */
 			if( cif.GetVisitingLed() ) state = State.WAIT;
 			if( ground == 0 ) {         /* Visit Target */
 				cif.SetVisitingLed(true);
-				//System.out.println(robName + " visited target at " + cif.GetTime() + "\n");
 			}
 
 			else {
@@ -296,49 +282,26 @@ class PrimeThread extends Thread {
     }
 
     public void run() {
-    	//Create a JPanel
-    	 JPanel panel=new JPanel();
-
-    	 //Create a JFrame that we will use to add the JPanel
-    	 JFrame frame=new JFrame("Create a JPanel");
-
-    	 //ADD JPanel INTO JFrame
-    	 frame.add(panel);
-
-    	 //Set default close operation for JFrame
+    	
+    	 JPanel panel=new JPanel();	 
+    	 JFrame frame=new JFrame("Map Visualizer");   	 
+    	 frame.add(panel);  
     	 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    	 //Set JFrame size to :
-    	 frame.setSize(jClient.mapSizeX,jClient.mapSizeY);
-    	 
+    	 frame.setSize(jClient.mapSizeX,jClient.mapSizeY); 	 
     	 panel.setBackground(Color.WHITE);
-
-    	 //Make JFrame visible. So we can see it
     	 frame.setVisible(true);
-    	 
-    	 frame.setResizable(true);
-    	 
-    	 
     	  
     	while(true) {
     		Graphics g = panel.getGraphics();
 	        for(int i = 0; i < jClient.map.length; i++)
 	        {
 	        	for(int j = 0; j< jClient.map[i].length; j++)
-	        		if(jClient.map[i][j] == 1.0) {
-	        			
-	        			
+	        		if(jClient.map[i][j] == 1.0) {			
 	        			g.setColor(Color.RED);
-	        			g.fillRect(j, i, 1, 1);
-	        			
+	        			g.fillRect(j, i, 1, 1);	
 	        		}
 	        }
-	        
 	        g.dispose();
-	        
     	}
     }
 }
-
-
-
