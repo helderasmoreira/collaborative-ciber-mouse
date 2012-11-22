@@ -119,6 +119,7 @@ public class jClient {
 		while (true) {
 			cif.ReadSensors();
 			decide();
+      frontSensorMapPosition(compass);
 		}
 	}
 
@@ -134,6 +135,8 @@ public class jClient {
 			irSensor1 = cif.GetObstacleSensor(1);
 		if (cif.IsObstacleReady(2))
 			irSensor2 = cif.GetObstacleSensor(2);
+    if (cif.IsCompassReady())
+      compass = cif.GetCompassSensor();
 		if (cif.IsGroundReady())
 			ground = cif.GetGroundSensor();
 		if (cif.IsBeaconReady(beaconToFollow))
@@ -272,6 +275,37 @@ public class jClient {
 
 		requestInfo();
 	}
+  
+  //Arduino map function: http://www.arduino.cc/en/Reference/map
+  public double map(double x, double in_min, double in_max, double out_min, double out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  }
+  
+  //compass range -180;180
+  public double compassToDeg(double compass){
+    if(compass>=0.0 && compass<=180){
+      return compass;
+    }else {
+      return map(compass,-180.0, 0.0, 180.0, 360.0);
+    }
+  }
+  
+  //[x,y]
+  public int[] frontSensorMapPosition(double compass) {
+    double robotDirectionDeg = compassToDeg(compass);
+    double robotCenterX = cif.GetX();
+    double robotCenterY = cif.GetY();
+    System.out.println("Compass treated: " + robotDirectionDeg);
+    
+    double sensorPosX = robotCenterX + 4 * Math.cos(Math.toRadians(robotDirectionDeg));
+    double sensorPosY = robotCenterY + 4 * Math.sin(Math.toRadians(robotDirectionDeg));
+    
+    return new int[]{Math.round((float) sensorPosX), Math.round((float) sensorPosY)};
+  }
+  
+  public double euclideanDistance(int x1, int y1, int x2, int y2) {
+    return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+  }
 
 	static void print_usage() {
 		System.out
@@ -280,6 +314,7 @@ public class jClient {
 
 	private String robName;
 	private double irSensor0, irSensor1, irSensor2;
+  private double compass;
 	private beaconMeasure beacon;
 	private int ground;
 	private State state;
