@@ -35,6 +35,7 @@ public class jClient {
 	public static final int mapSizeX = 560;
 	public static int pos;
 	static public double[][] map = new double[mapSizeY][mapSizeX];
+	static public double[][] beaconProbability = new double[mapSizeY][mapSizeX];
 	int initialPosX, initialPosY;
 	int halfPosX, halfPosY;
 	
@@ -117,6 +118,10 @@ public class jClient {
 		initialPosY = (int) (cif.GetY() * mapPrecision);
 
 		updateMap();
+		
+		for(int i=0;i<beaconProbability.length;i++)
+			for(int j=0;j<beaconProbability[i].length;j++)
+				beaconProbability[i][j] = i*j;
 
 		while (true) {
 			cif.ReadSensors();
@@ -135,6 +140,40 @@ public class jClient {
 				.GetX() * mapPrecision - initialPosX + halfPosX)] = 1.0;
 	}
 
+
+	private String getWallsNearBeacon(int numberOfPoints) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/* returns a string with the format:
+	 * "x-y-value;value;value;value;..."
+	 * values from top-left to bottom-right from left to right
+	 * in a normal case it would be 8(+1) values 
+	 * but we need to consider limit cases so they can be less than 8
+	 */
+	private String getProbableBeacon(int radius) {
+		
+		double max = 0.0;
+		int iMax = 0;
+		int jMax = 0;
+		for(int i = 0; i < beaconProbability.length; i++)
+			for(int j = 0; j< beaconProbability[i].length; j++)
+				if (beaconProbability[i][j] > max) {
+					iMax = i;
+					jMax = j;
+					max = beaconProbability[i][j];
+				}
+		
+		String ret = iMax + "-" + jMax + "-" + beaconProbability[iMax][jMax];
+		
+		for(int i = Math.max(iMax - radius, 0); i <= Math.min(iMax + radius, mapSizeY-1); i++)
+			for(int j = Math.max(jMax - radius, 0); j <= Math.min(jMax + radius, mapSizeX-1); j++)
+				ret += ";" + beaconProbability[i][j];
+			
+		return ret;
+	}
+
 	public void getInfo() {
 		if (cif.IsObstacleReady(0))
 			irSensor0 = cif.GetObstacleSensor(0);
@@ -146,6 +185,9 @@ public class jClient {
 			ground = cif.GetGroundSensor();
 		if (cif.IsBeaconReady(beaconToFollow))
 			beacon = cif.GetBeaconSensor(beaconToFollow);
+		
+		String probableBeacon = getProbableBeacon(1);
+		String probableWallsNearBeacon = getWallsNearBeacon(3);
 		
 		cif.Say(cif.GetX() + ";" + cif.GetY() +";" + irSensor0 + ";" + irSensor1 + ";" + irSensor2);
 	}
