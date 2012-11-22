@@ -27,7 +27,7 @@ public class GetMapArea {
 		frame.setResizable(true);
 		Graphics g = panel.getGraphics();
 		
-		double angleCenterI = Math.toRadians(-30);
+		double angleCenterI = Math.toRadians(-90);
 		double angleCenterF = Math.toRadians(30);
 
 		calculateArea(radius, matrix, centerPosX, centerPosY, panel,
@@ -42,7 +42,7 @@ public class GetMapArea {
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
 				
-				double anglePoint = Math.atan2(centerPosX - j, centerPosY - i);
+				double anglePoint = Math.atan2(j - centerPosX, centerPosY - i);
 				double distanceCenter = Math.sqrt(Math.abs(i - centerPosY)
 						* Math.abs(i - centerPosY) + Math.abs(j - centerPosX)
 						* Math.abs(j - centerPosX));
