@@ -30,9 +30,13 @@ public class jClient {
 		RUN, WAIT, RETURN
 	}
 	
+  public static final int arenaSizeX = 28;
+  public static final int arenaSizeY = 14;
 	public static final double mapPrecision = 10.0;
-	public static final int mapSizeY = 280;
-	public static final int mapSizeX = 560;
+  public static final int mapSizeX = arenaSizeX*2 * (int)mapPrecision;
+	public static final int mapSizeY = arenaSizeY*2 * (int)mapPrecision;
+  public static final int robotInsideRadius = (int) mapPrecision/2 - 1;
+  
 	static public double[][] map = new double[mapSizeY][mapSizeX];
 	int initialPosX, initialPosY;
 	int halfPosX, halfPosY;
@@ -128,11 +132,11 @@ public class jClient {
 		map[robotMapY][robotMapX] = 1.0;
     
     int[] frontSensorPos = frontSensorMapPosition(robotMapX, robotMapY, compass);
-    System.out.println("Robot Map X: " + robotMapX);
-    System.out.println("Robot Map Y: " + robotMapY);
-    System.out.println("FrontSensorX: " + frontSensorPos[0]);
-    System.out.println("FrontSensorY: " + frontSensorPos[1]);
+    int[] leftSensorPos = leftSensorMapPosition(robotMapX, robotMapY, compass);
+    int[] rightSensorPos = rightSensorMapPosition(robotMapX, robotMapY, compass);
     map[frontSensorPos[1]][frontSensorPos[0]] = -1.0;
+    map[leftSensorPos[1]][leftSensorPos[0]] = -1.1;
+    map[rightSensorPos[1]][rightSensorPos[0]] = -1.2;
 	}
 
 	public void getInfo() {
@@ -297,15 +301,30 @@ public class jClient {
     }
   }
   
-  //[x,y]
-  public int[] frontSensorMapPosition(int robotMapX, int robotMapY, double compass) {
-    double robotDirectionDeg = compassToDeg(compass);
-    System.out.println("Compass treated: " + robotDirectionDeg);
-    
-    double sensorPosX = robotMapX + 4 * Math.cos(Math.toRadians(robotDirectionDeg));
-    double sensorPosY = robotMapY - 4 * Math.sin(Math.toRadians(robotDirectionDeg));
+  /* 
+   * sensorDir is in Degrees
+   * returns [x,y]
+   */
+  private int[] sensorMapPosition(int robotMapX, int robotMapY, double sensorDir) {
+    double sensorPosX = robotMapX + robotInsideRadius * Math.cos(Math.toRadians(sensorDir));
+    double sensorPosY = robotMapY - robotInsideRadius * Math.sin(Math.toRadians(sensorDir));
     
     return new int[]{Math.round((float) sensorPosX), Math.round((float) sensorPosY)};
+  }
+  
+  public int[] frontSensorMapPosition(int robotMapX, int robotMapY, double compass) {
+    double frontSensorDirection = compassToDeg(compass);
+    return sensorMapPosition(robotMapX, robotMapY, frontSensorDirection);
+  }
+  
+  public int[] leftSensorMapPosition(int robotMapX, int robotMapY, double compass) {
+    double leftSensorDirection = compassToDeg(compass) + 60;
+    return sensorMapPosition(robotMapX, robotMapY, leftSensorDirection);
+  }
+  
+  public int[] rightSensorMapPosition(int robotMapX, int robotMapY, double compass) {
+    double rightSensorDirection = compassToDeg(compass) - 60;
+    return sensorMapPosition(robotMapX, robotMapY, rightSensorDirection);
   }
   
   public double euclideanDistance(int x1, int y1, int x2, int y2) {
