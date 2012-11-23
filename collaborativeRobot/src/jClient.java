@@ -118,16 +118,17 @@ public class jClient {
 		initialPosY = (int) (cif.GetY() * mapPrecision);
 
 		updateMap();
+		
 		if (pos == 1) {
-		beaconProbability[10][10] = 0.70;
-		beaconProbability[9][9] = 0.65;
-		beaconProbability[9][10] = 0.64;
-		beaconProbability[9][11] = 0.63;
-		beaconProbability[10][9] = 0.62;
-		beaconProbability[10][11] = 0.61;
-		beaconProbability[11][9] = 0.60;
-		beaconProbability[11][10] = 0.59;
-		beaconProbability[11][11] = 0.58;
+			beaconProbability[10][10] = 0.70;
+			beaconProbability[9][9] = 0.65;
+			beaconProbability[9][10] = 0.64;
+			beaconProbability[9][11] = 0.63;
+			beaconProbability[10][9] = 0.62;
+			beaconProbability[10][11] = 0.61;
+			beaconProbability[11][9] = 0.60;
+			beaconProbability[11][10] = 0.59;
+			beaconProbability[11][11] = 0.58;
 		}
 		while (true) {
 			cif.ReadSensors();
@@ -138,11 +139,14 @@ public class jClient {
 	private void updateMap() {
 
 		for (int i = 1; i <= 5; i++) {
+			if (i == pos)
+				continue;
 			dataToProcess[i - 1] = cif.GetMessageFrom(i);
-			if (dataToProcess[i - 1] != null)
-				decodeProbableBeaconMessage(dataToProcess[i - 1]);
-			System.out.println("message from " + i + ": "
-					+ dataToProcess[i - 1]);
+			if (dataToProcess[i - 1] != null) {
+				decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
+				System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+			}
+			
 		}
 
 		map[(int) (initialPosY - cif.GetY() * mapPrecision + halfPosY)][(int) (cif
@@ -185,17 +189,17 @@ public class jClient {
 		return ret;
 	}
 
-	private String decodeProbableBeaconMessage(String message) {
+	private void decodeAndApplyProbableBeaconMessage(String message) {
 
 		String[] lines = message.split("\\|");
 
-		// beaconMostProbablePoint[0] = y
-		// beaconMostProbablePoint[1] = x
-		// beaconMostProbablePoint[2] = value
 		String beaconMostProbablePoint[] = lines[0].split("-");
-		beaconProbability[Integer.parseInt(beaconMostProbablePoint[0])]
-				[Integer.parseInt(beaconMostProbablePoint[1])] =
-				Integer.parseInt(beaconMostProbablePoint[2]) / 100.0;
+		
+		int mostProbableY = Integer.parseInt(beaconMostProbablePoint[0]);
+		int mostProbableX = Integer.parseInt(beaconMostProbablePoint[1]);
+		double value = Integer.parseInt(beaconMostProbablePoint[2]) / 100.0;
+		
+		beaconProbability[mostProbableY][mostProbableX] = value;
 
 		if (lines.length == 3) { // corner case
 
@@ -203,35 +207,23 @@ public class jClient {
 			// corner of the matrix...
 
 		} else {
+			
 			String[] firstLine = lines[1].split(";");
-
-			// firstLine[0] = beaconMostProbablePoint[0] - 1 |
-			// beaconMostProbablePoint[1] - 1
-			// firstLine[1] = beaconMostProbablePoint[0] - 1 |
-			// beaconMostProbablePoint[1]
-			// firstLine[2] = beaconMostProbablePoint[0] - 1 |
-			// beaconMostProbablePoint[1] + 1
-
 			String[] secondLine = lines[2].split(";");
-			// secondLine[0] = beaconMostProbablePoint[0] |
-			// beaconMostProbablePoint[1] - 1
-			// secondLine[1] = beaconMostProbablePoint[0] |
-			// beaconMostProbablePoint[1]
-			// secondLine[2] = beaconMostProbablePoint[0] |
-			// beaconMostProbablePoint[1] + 1
-
 			String[] thirdLine = lines[3].split(";");
-			// secondLine[0] = beaconMostProbablePoint[0] + 1 |
-			// beaconMostProbablePoint[1] - 1
-			// secondLine[1] = beaconMostProbablePoint[0] + 1 |
-			// beaconMostProbablePoint[1]
-			// secondLine[2] = beaconMostProbablePoint[0] + 1 |
-			// beaconMostProbablePoint[1] + 1
 
+			// modify to use the update probability function 
+			beaconProbability[mostProbableY - 1][mostProbableX - 1] = Integer.parseInt(firstLine[0]) / 100.0;
+			beaconProbability[mostProbableY - 1][mostProbableX] = Integer.parseInt(firstLine[1]) / 100.0;
+			beaconProbability[mostProbableY - 1][mostProbableX + 1] = Integer.parseInt(firstLine[2]) / 100.0;
+
+			beaconProbability[mostProbableY][mostProbableX - 1] = Integer.parseInt(secondLine[0]) / 100.0;
+			beaconProbability[mostProbableY][mostProbableX + 1] = Integer.parseInt(secondLine[1]) / 100.0;
+
+			beaconProbability[mostProbableY + 1][mostProbableX - 1] = Integer.parseInt(thirdLine[0]) / 100.0;
+			beaconProbability[mostProbableY + 1][mostProbableX] = Integer.parseInt(thirdLine[1]) / 100.0;
+			beaconProbability[mostProbableY + 1][mostProbableX + 1] = Integer.parseInt(thirdLine[2]) / 100.0;
 		}
-
-		return "";
-
 	}
 
 	public void getInfo() {
