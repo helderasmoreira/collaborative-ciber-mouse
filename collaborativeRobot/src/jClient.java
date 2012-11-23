@@ -18,6 +18,8 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import java.io.UnsupportedEncodingException;
+
 import ciberIF.beaconMeasure;
 import ciberIF.ciberIF;
 
@@ -119,10 +121,16 @@ public class jClient {
 
 		updateMap();
 		
-		for(int i=0;i<beaconProbability.length;i++)
-			for(int j=0;j<beaconProbability[i].length;j++)
-				beaconProbability[i][j] = i*j;
-
+		beaconProbability[10][10] = 0.70;
+		beaconProbability[9][9] = 0.65;
+		beaconProbability[9][10] = 0.64;
+		beaconProbability[9][11] = 0.63;
+		beaconProbability[10][9] = 0.62;
+		beaconProbability[10][11] = 0.61;
+		beaconProbability[11][9] = 0.60;
+		beaconProbability[11][10] = 0.59;
+		beaconProbability[11][11] = 0.58;
+		
 		while (true) {
 			cif.ReadSensors();
 			decide();
@@ -147,8 +155,9 @@ public class jClient {
 	}
 	
 	/* returns a string with the format:
-	 * "x-y-value;value;value;value;..."
+	 * "x-y-value|value;value;value|value..."
 	 * values from top-left to bottom-right from left to right
+	 * | represents a row change, ; represents a column change
 	 * in a normal case it would be 8(+1) values 
 	 * but we need to consider limit cases so they can be less than 8
 	 */
@@ -165,13 +174,21 @@ public class jClient {
 					max = beaconProbability[i][j];
 				}
 		
-		String ret = iMax + "-" + jMax + "-" + beaconProbability[iMax][jMax];
+		String ret = iMax + "-" + jMax + "-" + ((int)(beaconProbability[iMax][jMax]*100)) + "|";
 		
-		for(int i = Math.max(iMax - radius, 0); i <= Math.min(iMax + radius, mapSizeY-1); i++)
-			for(int j = Math.max(jMax - radius, 0); j <= Math.min(jMax + radius, mapSizeX-1); j++)
-				ret += ";" + beaconProbability[i][j];
-			
+		for(int i = Math.max(iMax - radius, 0); i <= Math.min(iMax + radius, mapSizeY-1); i++) {
+			for(int j = Math.max(jMax - radius, 0); j <= Math.min(jMax + radius, mapSizeX-1); j++) {
+				if (i == iMax && j == jMax)
+					continue;
+				ret += ((int)(beaconProbability[i][j]*100)) + ";";
+			}
+			ret = ret.substring(0, ret.length()-1);
+			ret += "|";
+		}
+		
 		return ret;
+		
+		
 	}
 
 	public void getInfo() {
@@ -186,10 +203,10 @@ public class jClient {
 		if (cif.IsBeaconReady(beaconToFollow))
 			beacon = cif.GetBeaconSensor(beaconToFollow);
 		
-		String probableBeacon = getProbableBeacon(1);
+		String probableBeacon = getProbableBeacon(2);
 		String probableWallsNearBeacon = getWallsNearBeacon(3);
 		
-		cif.Say(cif.GetX() + ";" + cif.GetY() +";" + irSensor0 + ";" + irSensor1 + ";" + irSensor2);
+		cif.Say(probableBeacon);
 	}
 
 	public void requestInfo() {
