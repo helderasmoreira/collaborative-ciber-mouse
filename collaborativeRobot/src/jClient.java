@@ -18,6 +18,9 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import ciberIF.beaconMeasure;
 import ciberIF.ciberIF;
 
@@ -33,6 +36,7 @@ public class jClient {
 	public static final double mapPrecision = 10.0;
 	public static final int mapSizeY = 280;
 	public static final int mapSizeX = 560;
+	public static int order = 0;
 	public static int pos;
 	static public double[][] map = new double[mapSizeY][mapSizeX];
 	static public double[][] beaconProbability = new double[mapSizeY][mapSizeX];
@@ -119,7 +123,7 @@ public class jClient {
 
 		updateMap();
 		
-		if (pos == 1) {
+		if (pos == 2) {
 			beaconProbability[10][10] = 0.70;
 			beaconProbability[9][9] = 0.65;
 			beaconProbability[9][10] = 0.64;
@@ -129,6 +133,17 @@ public class jClient {
 			beaconProbability[11][9] = 0.60;
 			beaconProbability[11][10] = 0.59;
 			beaconProbability[11][11] = 0.58;
+			
+			
+			beaconProbability[20][20] = 0.90;
+			beaconProbability[19][19] = 0.85;
+			beaconProbability[19][20] = 0.84;
+			beaconProbability[19][21] = 0.83;
+			beaconProbability[20][19] = 0.82;
+			beaconProbability[20][21] = 0.81;
+			beaconProbability[21][19] = 0.80;
+			beaconProbability[21][20] = 0.79;
+			beaconProbability[21][21] = 0.78;
 		}
 		while (true) {
 			cif.ReadSensors();
@@ -146,7 +161,6 @@ public class jClient {
 				decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
 				System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
 			}
-			
 		}
 
 		map[(int) (initialPosY - cif.GetY() * mapPrecision + halfPosY)][(int) (cif
@@ -154,30 +168,41 @@ public class jClient {
 	}
 
 	/*
+	 * order represents which probable point we want (ie most probable, second most probable)
 	 * returns a string with the format: "x-y-value|value;value;value|value..."
 	 * values from top-left to bottom-right from left to right | represents a
 	 * row change, ; represents a column change in a normal case it would be
-	 * 8(+1) values but we need to consider limit cases so they can be less than
-	 * 8
+	 * 8(+1) values but we need to consider limit cases so they can be less than 8
 	 */
-	private String getProbableBeacon(int radius) {
+	private String getProbableBeacon(int order) {
 
-		double max = 0.0;
-		int iMax = 0;
-		int jMax = 0;
+		int maxValues[][] = new int[order][3];
+		
 		for (int i = 0; i < beaconProbability.length; i++)
-			for (int j = 0; j < beaconProbability[i].length; j++)
-				if (beaconProbability[i][j] > max) {
-					iMax = i;
-					jMax = j;
-					max = beaconProbability[i][j];
+			for (int j = 0; j < beaconProbability[i].length; j++) {
+				int minimum = getMinimum(maxValues);
+				if (beaconProbability[i][j] > (maxValues[minimum][0]/100.0)) {
+					maxValues[minimum][1] = i;
+					maxValues[minimum][0] = ((int)(beaconProbability[i][j] *100));
+					maxValues[minimum][2] = j;
 				}
+			}
+		
+		Arrays.sort(maxValues, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return ((Integer) o2[0]).compareTo(o1[0]);
+            }
+        });
 
+		int iMax = maxValues[order-1][1];
+		int jMax = maxValues[order-1][2];
+		
 		String ret = iMax + "-" + jMax + "-"
 				+ ((int) (beaconProbability[iMax][jMax] * 100)) + "|";
 
-		for (int i = Math.max(iMax - radius, 0); i <= Math.min(iMax + radius,mapSizeY - 1); i++) {
-			for (int j = Math.max(jMax - radius, 0); j <= Math.min(jMax+ radius, mapSizeX - 1); j++) {
+		for (int i = Math.max(iMax - 1, 0); i <= Math.min(iMax + 1,mapSizeY - 1); i++) {
+			for (int j = Math.max(jMax - 1, 0); j <= Math.min(jMax+ 1, mapSizeX - 1); j++) {
 				if (i == iMax && j == jMax)
 					continue;
 				ret += ((int) (beaconProbability[i][j] * 100)) + ";";
@@ -187,6 +212,17 @@ public class jClient {
 		}
 
 		return ret;
+	}
+
+	private int getMinimum(int[][] maxValues) {
+		int min = Integer.MAX_VALUE;
+		int iMin = 0;
+		for (int i=0;i<maxValues.length;i++)
+			if (maxValues[i][0] < min) {
+				min = maxValues[0][0];
+				iMin = i;
+			}
+		return iMin;
 	}
 
 	private void decodeAndApplyProbableBeaconMessage(String message) {
@@ -238,8 +274,7 @@ public class jClient {
 		if (cif.IsBeaconReady(beaconToFollow))
 			beacon = cif.GetBeaconSensor(beaconToFollow);
 
-		String probableBeacon = getProbableBeacon(1);
-
+		String probableBeacon = getProbableBeacon((order++ % 5)+1);
 		cif.Say(probableBeacon);
 	}
 
