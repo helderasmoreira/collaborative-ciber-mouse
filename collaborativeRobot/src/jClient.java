@@ -156,12 +156,12 @@ public class jClient {
   }
 
   private void updateMap() {
-    int robotMapY = (int) (initialPosY - cif.GetY() * mapPrecision + halfPosY);
-    int robotMapX = (int) (cif.GetX() * mapPrecision - initialPosX + halfPosX);
-    int intPosX = (int) PosX;
-    int intPosY = (int) PosY;
+    //int robotMapY = (int) (initialPosY - cif.GetY() * mapPrecision + halfPosY);
+    //int robotMapX = (int) (cif.GetX() * mapPrecision - initialPosX + halfPosX);
+    int robotMapX = (int) PosX;
+    int robotMapY = (int) PosY;
   
-    map[intPosY][intPosX] = 1.0;
+    map[robotMapY][robotMapX] = 1.0;
     
     //System.out.println("(X1,Y1)=(" + robotMapX + "," + robotMapY + ")");
     //System.out.println("(X2,Y2)=(" + PosX + "," + PosY + ")\n");
