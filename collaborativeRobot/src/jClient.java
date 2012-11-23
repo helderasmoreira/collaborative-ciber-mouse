@@ -106,6 +106,8 @@ public class jClient {
 		state = State.RUN;
 		halfPosX = mapSizeX / 2;
 		halfPosY = mapSizeY / 2;
+		for(int i=0;i<dataToProcess.length;i++)
+			dataToProcess[i] = "";
 	}
 
 	/**
@@ -154,10 +156,12 @@ public class jClient {
 	private void updateMap() {
 
 		for (int i = 1; i <= 5; i++) {
-			if (i == pos)
+			if (i == pos || cif.GetMessageFrom(i) == null)
 				continue;
-			dataToProcess[i - 1] = cif.GetMessageFrom(i);
-			if (dataToProcess[i - 1] != null) {
+			if (dataToProcess[i-1].equals(cif.GetMessageFrom(i)))
+				continue;
+			else {
+				dataToProcess[i - 1] = cif.GetMessageFrom(i);
 				decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
 				System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
 			}
