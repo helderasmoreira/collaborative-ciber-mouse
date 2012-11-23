@@ -18,8 +18,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-import java.io.UnsupportedEncodingException;
-
 import ciberIF.beaconMeasure;
 import ciberIF.ciberIF;
 
@@ -31,7 +29,7 @@ public class jClient {
 	enum State {
 		RUN, WAIT, RETURN
 	}
-	
+
 	public static final double mapPrecision = 10.0;
 	public static final int mapSizeY = 280;
 	public static final int mapSizeX = 560;
@@ -40,9 +38,9 @@ public class jClient {
 	static public double[][] beaconProbability = new double[mapSizeY][mapSizeX];
 	int initialPosX, initialPosY;
 	int halfPosX, halfPosY;
-	
+
 	public static String[] dataToProcess = new String[5];
-	
+
 	ciberIF cif;
 
 	public static void main(String[] args) {
@@ -111,8 +109,8 @@ public class jClient {
 	 */
 	public void mainLoop() {
 
-		MapVisualizer visualizer = new MapVisualizer();
-		visualizer.start();
+	//	MapVisualizer visualizer = new MapVisualizer();
+	//	visualizer.start();
 
 		cif.ReadSensors();
 
@@ -120,7 +118,7 @@ public class jClient {
 		initialPosY = (int) (cif.GetY() * mapPrecision);
 
 		updateMap();
-		
+		if (pos == 1) {
 		beaconProbability[10][10] = 0.70;
 		beaconProbability[9][9] = 0.65;
 		beaconProbability[9][10] = 0.64;
@@ -130,7 +128,7 @@ public class jClient {
 		beaconProbability[11][9] = 0.60;
 		beaconProbability[11][10] = 0.59;
 		beaconProbability[11][11] = 0.58;
-		
+		}
 		while (true) {
 			cif.ReadSensors();
 			decide();
@@ -138,57 +136,102 @@ public class jClient {
 	}
 
 	private void updateMap() {
-		
-		for(int i = 1; i <= 5; i++) {
-			dataToProcess[i-1] = cif.GetMessageFrom(i);
-			System.out.println("message from " + i + ": " + dataToProcess[i-1]);
+
+		for (int i = 1; i <= 5; i++) {
+			dataToProcess[i - 1] = cif.GetMessageFrom(i);
+			if (dataToProcess[i - 1] != null)
+				decodeProbableBeaconMessage(dataToProcess[i - 1]);
+			System.out.println("message from " + i + ": "
+					+ dataToProcess[i - 1]);
 		}
-		
+
 		map[(int) (initialPosY - cif.GetY() * mapPrecision + halfPosY)][(int) (cif
 				.GetX() * mapPrecision - initialPosX + halfPosX)] = 1.0;
 	}
 
-
-	private String getWallsNearBeacon(int numberOfPoints) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	/* returns a string with the format:
-	 * "x-y-value|value;value;value|value..."
-	 * values from top-left to bottom-right from left to right
-	 * | represents a row change, ; represents a column change
-	 * in a normal case it would be 8(+1) values 
-	 * but we need to consider limit cases so they can be less than 8
+	/*
+	 * returns a string with the format: "x-y-value|value;value;value|value..."
+	 * values from top-left to bottom-right from left to right | represents a
+	 * row change, ; represents a column change in a normal case it would be
+	 * 8(+1) values but we need to consider limit cases so they can be less than
+	 * 8
 	 */
 	private String getProbableBeacon(int radius) {
-		
+
 		double max = 0.0;
 		int iMax = 0;
 		int jMax = 0;
-		for(int i = 0; i < beaconProbability.length; i++)
-			for(int j = 0; j< beaconProbability[i].length; j++)
+		for (int i = 0; i < beaconProbability.length; i++)
+			for (int j = 0; j < beaconProbability[i].length; j++)
 				if (beaconProbability[i][j] > max) {
 					iMax = i;
 					jMax = j;
 					max = beaconProbability[i][j];
 				}
-		
-		String ret = iMax + "-" + jMax + "-" + ((int)(beaconProbability[iMax][jMax]*100)) + "|";
-		
-		for(int i = Math.max(iMax - radius, 0); i <= Math.min(iMax + radius, mapSizeY-1); i++) {
-			for(int j = Math.max(jMax - radius, 0); j <= Math.min(jMax + radius, mapSizeX-1); j++) {
+
+		String ret = iMax + "-" + jMax + "-"
+				+ ((int) (beaconProbability[iMax][jMax] * 100)) + "|";
+
+		for (int i = Math.max(iMax - radius, 0); i <= Math.min(iMax + radius,mapSizeY - 1); i++) {
+			for (int j = Math.max(jMax - radius, 0); j <= Math.min(jMax+ radius, mapSizeX - 1); j++) {
 				if (i == iMax && j == jMax)
 					continue;
-				ret += ((int)(beaconProbability[i][j]*100)) + ";";
+				ret += ((int) (beaconProbability[i][j] * 100)) + ";";
 			}
-			ret = ret.substring(0, ret.length()-1);
+			ret = ret.substring(0, ret.length() - 1);
 			ret += "|";
 		}
-		
+
 		return ret;
-		
-		
+	}
+
+	private String decodeProbableBeaconMessage(String message) {
+
+		String[] lines = message.split("\\|");
+
+		// beaconMostProbablePoint[0] = y
+		// beaconMostProbablePoint[1] = x
+		// beaconMostProbablePoint[2] = value
+		String beaconMostProbablePoint[] = lines[0].split("-");
+		beaconProbability[Integer.parseInt(beaconMostProbablePoint[0])]
+				[Integer.parseInt(beaconMostProbablePoint[1])] =
+				Integer.parseInt(beaconMostProbablePoint[2]) / 100.0;
+
+		if (lines.length == 3) { // corner case
+
+			// ignore? not worth the work, besides the beacon won't be at the
+			// corner of the matrix...
+
+		} else {
+			String[] firstLine = lines[1].split(";");
+
+			// firstLine[0] = beaconMostProbablePoint[0] - 1 |
+			// beaconMostProbablePoint[1] - 1
+			// firstLine[1] = beaconMostProbablePoint[0] - 1 |
+			// beaconMostProbablePoint[1]
+			// firstLine[2] = beaconMostProbablePoint[0] - 1 |
+			// beaconMostProbablePoint[1] + 1
+
+			String[] secondLine = lines[2].split(";");
+			// secondLine[0] = beaconMostProbablePoint[0] |
+			// beaconMostProbablePoint[1] - 1
+			// secondLine[1] = beaconMostProbablePoint[0] |
+			// beaconMostProbablePoint[1]
+			// secondLine[2] = beaconMostProbablePoint[0] |
+			// beaconMostProbablePoint[1] + 1
+
+			String[] thirdLine = lines[3].split(";");
+			// secondLine[0] = beaconMostProbablePoint[0] + 1 |
+			// beaconMostProbablePoint[1] - 1
+			// secondLine[1] = beaconMostProbablePoint[0] + 1 |
+			// beaconMostProbablePoint[1]
+			// secondLine[2] = beaconMostProbablePoint[0] + 1 |
+			// beaconMostProbablePoint[1] + 1
+
+		}
+
+		return "";
+
 	}
 
 	public void getInfo() {
@@ -202,15 +245,14 @@ public class jClient {
 			ground = cif.GetGroundSensor();
 		if (cif.IsBeaconReady(beaconToFollow))
 			beacon = cif.GetBeaconSensor(beaconToFollow);
-		
-		String probableBeacon = getProbableBeacon(2);
-		String probableWallsNearBeacon = getWallsNearBeacon(3);
-		
+
+		String probableBeacon = getProbableBeacon(1);
+
 		cif.Say(probableBeacon);
 	}
 
 	public void requestInfo() {
-		
+
 		cif.RequestIRSensor(0);
 		cif.RequestIRSensor(1);
 		cif.RequestIRSensor(2);
@@ -233,7 +275,7 @@ public class jClient {
 			cif.DriveMotors(0.1, 0.0);
 		else
 			cif.DriveMotors(0.1, 0.1);
-		
+
 		updateMap();
 	}
 
@@ -355,4 +397,3 @@ public class jClient {
 
 	private int beaconToFollow;
 };
-
