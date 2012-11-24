@@ -52,7 +52,7 @@ public class jClient {
     // default values
     host = "localhost";
     robName = "Bla";
-    pos = 1;
+    pos = 2;
 
     // parse command-line arguments
     try {
@@ -114,6 +114,8 @@ public class jClient {
     MapVisualizer visualizer = new MapVisualizer();
     visualizer.start();
 
+    Communication.init();
+    
     cif.ReadSensors();
 
     initialPosX = (int) (cif.GetX() * mapPrecision);
@@ -228,7 +230,6 @@ public class jClient {
   }
 
   public void requestInfo() {
-    cif.Say(robName);
     cif.RequestIRSensor(0);
     cif.RequestIRSensor(1);
     cif.RequestIRSensor(2);

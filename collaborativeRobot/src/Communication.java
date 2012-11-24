@@ -7,7 +7,7 @@ public class Communication {
 	public static String[] dataToProcess = new String[5];
 	public static int order = 0;
 	
-	Communication() {
+	public static void init() {
 		for(int i=0;i<dataToProcess.length;i++)
 			dataToProcess[i] = "";
 	}
