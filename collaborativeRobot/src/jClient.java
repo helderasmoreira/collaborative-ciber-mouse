@@ -33,16 +33,13 @@ public class jClient {
 	public static final double mapPrecision = 10.0;
 	public static final int mapSizeY = 280;
 	public static final int mapSizeX = 560;
-	public static int order = 0;
 	public static int pos;
 	static public double[][] map = new double[mapSizeY][mapSizeX];
 	static public double[][] beaconProbability = new double[mapSizeY][mapSizeX];
 	int initialPosX, initialPosY;
 	int halfPosX, halfPosY;
 
-	public static String[] dataToProcess = new String[5];
-
-	ciberIF cif;
+	static ciberIF cif;
 
 	public static void main(String[] args) {
 
@@ -87,7 +84,7 @@ public class jClient {
 		client.robName = robName;
 
 		// register robot in simulator
-		client.cif.InitRobot(robName, pos, host);
+		cif.InitRobot(robName, pos, host);
 
 		// main loop
 		client.mainLoop();
@@ -103,8 +100,6 @@ public class jClient {
 		state = State.RUN;
 		halfPosX = mapSizeX / 2;
 		halfPosY = mapSizeY / 2;
-		for(int i=0;i<dataToProcess.length;i++)
-			dataToProcess[i] = "";
 	}
 
 	/**
@@ -122,6 +117,7 @@ public class jClient {
 
 		updateMap();
 		
+		//testing purposes only
 		if (pos == 2) {
 			beaconProbability[10][10] = 0.70;
 			beaconProbability[9][9] = 0.65;
@@ -151,18 +147,8 @@ public class jClient {
 
 	private void updateMap() {
 
-		for (int i = 1; i <= 5; i++) {
-			if (i == pos || cif.GetMessageFrom(i) == null)
-				continue;
-			if (dataToProcess[i-1].equals(cif.GetMessageFrom(i)))
-				continue;
-			else {
-				dataToProcess[i - 1] = cif.GetMessageFrom(i);
-				Communication.decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
-				System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
-			}
-		}
-
+		Communication.receive();
+	
 		map[(int) (initialPosY - cif.GetY() * mapPrecision + halfPosY)][(int) (cif
 				.GetX() * mapPrecision - initialPosX + halfPosX)] = 1.0;
 	}
@@ -179,8 +165,8 @@ public class jClient {
 		if (cif.IsBeaconReady(beaconToFollow))
 			beacon = cif.GetBeaconSensor(beaconToFollow);
 
-		String probableBeacon = Communication.getProbableBeacon((order++ % 5)+1);
-		cif.Say(probableBeacon);
+		Communication.say();
+		
 	}
 
 	public void requestInfo() {

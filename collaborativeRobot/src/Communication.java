@@ -4,6 +4,14 @@ import java.util.Comparator;
 
 public class Communication {
 
+	public static String[] dataToProcess = new String[5];
+	public static int order = 0;
+	
+	Communication() {
+		for(int i=0;i<dataToProcess.length;i++)
+			dataToProcess[i] = "";
+	}
+	
 	/*
 	 * order represents which probable point we want (ie most probable, second most probable)
 	 * returns a string with the format: "x-y-value|value;value;value|value..."
@@ -98,5 +106,23 @@ public class Communication {
 			jClient.beaconProbability[mostProbableY + 1][mostProbableX + 1] = Integer.parseInt(thirdLine[2]) / 100.0;
 		}
 	}
-	
+
+	public static void say() {
+		String probableBeacon = Communication.getProbableBeacon((order++ % 5)+1);
+		jClient.cif.Say(probableBeacon);
+	}
+
+	public static void receive() {
+		for (int i = 1; i <= 5; i++) {
+			if (i == jClient.pos || jClient.cif.GetMessageFrom(i) == null)
+				continue;
+			if (dataToProcess[i-1].equals(jClient.cif.GetMessageFrom(i)))
+				continue;
+			else {
+				dataToProcess[i - 1] = jClient.cif.GetMessageFrom(i);
+				Communication.decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
+				System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+			}
+		}	
+	}
 }
