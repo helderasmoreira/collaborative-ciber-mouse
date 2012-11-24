@@ -15,9 +15,11 @@ public class Communication {
 	/*
 	 * order represents which probable point we want (ie most probable, second most probable)
 	 * returns a string with the format: "x-y-value|value;value;value|value..."
-	 * values from top-left to bottom-right from left to right | represents a
-	 * row change, ; represents a column change in a normal case it would be
-	 * 8(+1) values but we need to consider limit cases so they can be less than 8
+	 * values from top-left to bottom-right from left to right 
+	 * | represents a row change
+	 * ; represents a column change 
+	 * in a normal case it would be 8(+1) values 
+	 * but we need to consider limit cases so they can be less than 8
 	 */
 	public static String getProbableBeacon(int order) {
 
@@ -59,6 +61,9 @@ public class Communication {
 		return ret;
 	}
 	
+	/*
+	 * returns the index of the minimum value of maxValues[x][0]
+	 */
 	private static int getMinimum(int[][] maxValues) {
 		int min = Integer.MAX_VALUE;
 		int iMin = 0;
@@ -70,6 +75,10 @@ public class Communication {
 		return iMin;
 	}
 	
+	/*
+	 * decodes the message received and applies it to the current map
+	 * message should be like: "x-y-value|value;value;value|value..."
+	 */
 	public static void decodeAndApplyProbableBeaconMessage(String message) {
 
 		String[] lines = message.split("\\|");
@@ -107,11 +116,18 @@ public class Communication {
 		}
 	}
 
+	/*
+	 * creates and sends the correct message to the simulator
+	 */
 	public static void say() {
 		String probableBeacon = Communication.getProbableBeacon((order++ % 5)+1);
 		jClient.cif.Say(probableBeacon);
 	}
 
+	/*
+	 * receives all the messages from the simulator
+	 * ignores messages from itself, null and repeated messages
+	 */
 	public static void receive() {
 		for (int i = 1; i <= 5; i++) {
 			if (i == jClient.pos || jClient.cif.GetMessageFrom(i) == null)
