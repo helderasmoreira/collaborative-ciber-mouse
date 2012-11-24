@@ -27,9 +27,9 @@ import ciberIF.ciberIF;
 public class jClient {
 
   enum State {
-
     RUN, WAIT, RETURN
   }
+  
   public static final int arenaSizeX = 28;
   public static final int arenaSizeY = 14;
   public static final double mapPrecision = 10.0;
@@ -37,15 +37,16 @@ public class jClient {
   public static final int mapSizeY = arenaSizeY * 2 * (int) mapPrecision;
   public static final int robotRadius = (int) mapPrecision / 2;
   static public double[][] map = new double[mapSizeY][mapSizeX];
+	static public double[][] beaconProbability = new double[mapSizeY][mapSizeX];
   int initialPosX, initialPosY;
   double PosX, PosY;
   int halfPosX, halfPosY;
-  ciberIF cif;
+  static ciberIF cif;
+  static int pos;
 
   public static void main(String[] args) {
 
     String host, robName;
-    int pos;
     int arg;
 
     // default values
@@ -87,7 +88,7 @@ public class jClient {
     client.robName = robName;
 
     // register robot in simulator
-    client.cif.InitRobot(robName, pos, host);
+    cif.InitRobot(robName, pos, host);
 
     // main loop
     client.mainLoop();
@@ -122,6 +123,27 @@ public class jClient {
 
     updateMap();
 
+    if (pos == 2) {
+		beaconProbability[10][10] = 0.70;
+		beaconProbability[9][9] = 0.65;
+		beaconProbability[9][10] = 0.64;
+		beaconProbability[9][11] = 0.63;
+		beaconProbability[10][9] = 0.62;
+		beaconProbability[10][11] = 0.61;
+		beaconProbability[11][9] = 0.60;
+		beaconProbability[11][10] = 0.59;
+		beaconProbability[11][11] = 0.58;
+		
+		beaconProbability[20][20] = 0.90;
+		beaconProbability[19][19] = 0.85;
+		beaconProbability[19][20] = 0.84;
+		beaconProbability[19][21] = 0.83;
+		beaconProbability[20][19] = 0.82;
+		beaconProbability[20][21] = 0.81;
+		beaconProbability[21][19] = 0.80;
+		beaconProbability[21][20] = 0.79;
+		beaconProbability[21][21] = 0.78;
+	}
 
     while (true) {
       cif.ReadSensors();
@@ -178,6 +200,8 @@ public class jClient {
     map[frontSensorPos[1]][frontSensorPos[0]] = -1.0;
     map[leftSensorPos[1]][leftSensorPos[0]] = -1.1;
     map[rightSensorPos[1]][rightSensorPos[0]] = -1.2;
+    
+    Communication.say();
   }
 
   public void getInfo() {
@@ -199,6 +223,8 @@ public class jClient {
     if (cif.IsBeaconReady(beaconToFollow)) {
       beacon = cif.GetBeaconSensor(beaconToFollow);
     }
+    
+    Communication.receive();
   }
 
   public void requestInfo() {
@@ -393,4 +419,5 @@ public class jClient {
   private int ground;
   private State state;
   private int beaconToFollow;
+
 };
