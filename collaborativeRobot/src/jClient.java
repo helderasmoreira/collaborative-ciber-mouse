@@ -26,23 +26,30 @@ import ciberIF.ciberIF;
  */
 public class jClient {
 
-  enum State {
-    RUN, WAIT, RETURN
-  }
-  
-  public static final int arenaSizeX = 28;
-  public static final int arenaSizeY = 14;
-  public static final double mapPrecision = 10.0;
-  public static final int mapSizeX = arenaSizeX * 2 * (int) mapPrecision;
-  public static final int mapSizeY = arenaSizeY * 2 * (int) mapPrecision;
-  public static final int robotRadius = (int) mapPrecision / 2;
-  static public double[][] map = new double[mapSizeY][mapSizeX];
+	enum State {
+		RUN, WAIT, RETURN
+	}
+
+	public static final int arenaSizeX = 28;
+	public static final int arenaSizeY = 14;
+	public static final double mapPrecision = 10.0;
+	public static final int mapSizeX = arenaSizeX * 2 * (int) mapPrecision;
+	public static final int mapSizeY = arenaSizeY * 2 * (int) mapPrecision;
+	public static final int robotRadius = (int) mapPrecision / 2;
+	static public double[][] map = new double[mapSizeY][mapSizeX];
 	static public double[][] beaconProbability = new double[mapSizeY][mapSizeX];
-  int initialPosX, initialPosY;
-  double PosX, PosY;
-  int halfPosX, halfPosY;
-  static ciberIF cif;
-  static int pos;
+	int initialPosX, initialPosY;
+	public static double PosX;
+	public static double PosY;
+	int halfPosX, halfPosY;
+	static int frontSensorPosX;
+	static int frontSensorPosY;
+	static int leftSensorPosX;
+	static int leftSensorPosY;
+	static int rightSensorPosX;
+	static int rightSensorPosY;
+	static ciberIF cif;
+	static int pos;
 
   public static void main(String[] args) {
 
@@ -202,6 +209,15 @@ public class jClient {
     map[frontSensorPos[1]][frontSensorPos[0]] = -1.0;
     map[leftSensorPos[1]][leftSensorPos[0]] = -1.1;
     map[rightSensorPos[1]][rightSensorPos[0]] = -1.2;
+    
+    frontSensorPosX = frontSensorPos[0];
+    frontSensorPosY = frontSensorPos[1];
+    
+    leftSensorPosX = leftSensorPos[0];
+    leftSensorPosY = leftSensorPos[1];
+    
+    rightSensorPosX = rightSensorPos[0];
+    rightSensorPosY = rightSensorPos[1];
     
     Communication.say();
   }
@@ -366,12 +382,12 @@ public class jClient {
   }
 
   //Arduino map function: http://www.arduino.cc/en/Reference/map
-  public double map(double x, double in_min, double in_max, double out_min, double out_max) {
+  public static double map(double x, double in_min, double in_max, double out_min, double out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
   }
 
   //compass range -180;180
-  public double compassToDeg(double compass) {
+  public static double compassToDeg(double compass) {
     if (compass >= 0.0 && compass <= 180) {
       return compass;
     } else {
@@ -415,7 +431,7 @@ public class jClient {
   }
   private String robName;
   private double irSensor0, irSensor1, irSensor2;
-  private double compass;
+  static double compass;
   private beaconMeasure beacon;
   private int ground;
   private State state;
