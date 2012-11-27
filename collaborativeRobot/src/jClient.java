@@ -44,10 +44,13 @@ public class jClient {
 	int halfPosX, halfPosY;
 	static int frontSensorPosX;
 	static int frontSensorPosY;
+	static double frontSensor;
 	static int leftSensorPosX;
 	static int leftSensorPosY;
+	static double leftSensor;
 	static int rightSensorPosX;
 	static int rightSensorPosY;
+	static double rightSensor;
 	static ciberIF cif;
 	static int pos;
 
@@ -59,7 +62,7 @@ public class jClient {
     // default values
     host = "localhost";
     robName = "Bla";
-    pos = 2;
+    pos = 1;
 
     // parse command-line arguments
     try {
@@ -212,12 +215,15 @@ public class jClient {
     
     frontSensorPosX = frontSensorPos[0];
     frontSensorPosY = frontSensorPos[1];
+    frontSensor = irSensor0;
     
     leftSensorPosX = leftSensorPos[0];
     leftSensorPosY = leftSensorPos[1];
+    leftSensor = irSensor1;
     
     rightSensorPosX = rightSensorPos[0];
     rightSensorPosY = rightSensorPos[1];
+    rightSensor = irSensor2;
     
     Communication.say();
   }
