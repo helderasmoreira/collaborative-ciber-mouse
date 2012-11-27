@@ -135,28 +135,6 @@ public class jClient {
 
     updateMap();
 
-    if (pos == 2) {
-		beaconProbability[10][10] = 0.70;
-		beaconProbability[9][9] = 0.65;
-		beaconProbability[9][10] = 0.64;
-		beaconProbability[9][11] = 0.63;
-		beaconProbability[10][9] = 0.62;
-		beaconProbability[10][11] = 0.61;
-		beaconProbability[11][9] = 0.60;
-		beaconProbability[11][10] = 0.59;
-		beaconProbability[11][11] = 0.58;
-		
-		beaconProbability[20][20] = 0.90;
-		beaconProbability[19][19] = 0.85;
-		beaconProbability[19][20] = 0.84;
-		beaconProbability[19][21] = 0.83;
-		beaconProbability[20][19] = 0.82;
-		beaconProbability[20][21] = 0.81;
-		beaconProbability[21][19] = 0.80;
-		beaconProbability[21][20] = 0.79;
-		beaconProbability[21][21] = 0.78;
-	}
-
     while (true) {
       cif.ReadSensors();
 

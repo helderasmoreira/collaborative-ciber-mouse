@@ -103,16 +103,16 @@ public class Communication {
 			String[] thirdLine = lines[3].split(";");
 
 			// modify to use the update probability function 
-			jClient.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Integer.parseInt(firstLine[0]) / 100.0;
-			jClient.beaconProbability[mostProbableY - 1][mostProbableX] = Integer.parseInt(firstLine[1]) / 100.0;
-			jClient.beaconProbability[mostProbableY - 1][mostProbableX + 1] = Integer.parseInt(firstLine[2]) / 100.0;
+			jClient.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]) / 100.0, jClient.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
+			jClient.beaconProbability[mostProbableY - 1][mostProbableX] = Math.max(Integer.parseInt(firstLine[1]) / 100.0, jClient.beaconProbability[mostProbableY - 1][mostProbableX]);
+			jClient.beaconProbability[mostProbableY - 1][mostProbableX + 1] = Math.max(Integer.parseInt(firstLine[2]) / 100.0, jClient.beaconProbability[mostProbableY - 1][mostProbableX + 1]);
 
-			jClient.beaconProbability[mostProbableY][mostProbableX - 1] = Integer.parseInt(secondLine[0]) / 100.0;
-			jClient.beaconProbability[mostProbableY][mostProbableX + 1] = Integer.parseInt(secondLine[1]) / 100.0;
+			jClient.beaconProbability[mostProbableY][mostProbableX - 1] = Math.max(Integer.parseInt(secondLine[0]) / 100.0, jClient.beaconProbability[mostProbableY][mostProbableX - 1]);
+			jClient.beaconProbability[mostProbableY][mostProbableX + 1] = Math.max(Integer.parseInt(secondLine[1]) / 100.0, jClient.beaconProbability[mostProbableY][mostProbableX + 1]);
 
-			jClient.beaconProbability[mostProbableY + 1][mostProbableX - 1] = Integer.parseInt(thirdLine[0]) / 100.0;
-			jClient.beaconProbability[mostProbableY + 1][mostProbableX] = Integer.parseInt(thirdLine[1]) / 100.0;
-			jClient.beaconProbability[mostProbableY + 1][mostProbableX + 1] = Integer.parseInt(thirdLine[2]) / 100.0;
+			jClient.beaconProbability[mostProbableY + 1][mostProbableX - 1] = Math.max(Integer.parseInt(thirdLine[0]) / 100.0, jClient.beaconProbability[mostProbableY + 1][mostProbableX - 1]);
+			jClient.beaconProbability[mostProbableY + 1][mostProbableX] = Math.max(Integer.parseInt(thirdLine[1]) / 100.0, jClient.beaconProbability[mostProbableY + 1][mostProbableX]);
+			jClient.beaconProbability[mostProbableY + 1][mostProbableX + 1] = Math.max(Integer.parseInt(thirdLine[2]) / 100.0, jClient.beaconProbability[mostProbableY + 1][mostProbableX + 1]);
 		}
 	}
 
