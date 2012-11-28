@@ -16,7 +16,7 @@ public class MapProbabilitiesVisualizer extends Thread {
 		JFrame frame = new JFrame("Map Probabilities Visualizer");
 		frame.add(panel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(jClient.mapSizeX, jClient.mapSizeY);
+		frame.setSize(Constants.mapSizeX, Constants.mapSizeY);
 		panel.setBackground(Color.WHITE);
 		frame.setVisible(true);
 

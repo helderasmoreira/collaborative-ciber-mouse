@@ -33,15 +33,10 @@ public class jClient extends Observable {
 	enum State {
 		RUN, WAIT, RETURN
 	}
-
-	public static final int arenaSizeX = 28;
-	public static final int arenaSizeY = 14;
-	public static final int mapSizeX = arenaSizeX * 2 * (int) Constants.MAP_PRECISION;
-	public static final int mapSizeY = arenaSizeY * 2 * (int) Constants.MAP_PRECISION;
 	public static final int robotRadius = (int) Constants.MAP_PRECISION / 2;
-	static public double[][] map = new double[mapSizeY][mapSizeX];
-	static public double[][] probabilitiesMap = new double[mapSizeY][mapSizeX];
-	static public double[][] beaconProbability = new double[mapSizeY][mapSizeX];
+	static public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
+	static public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
+	static public double[][] beaconProbability = new double[Constants.mapSizeY][Constants.mapSizeX];
 	int initialPosX, initialPosY;
 	public static double PosX;
 	public static double PosY;
@@ -126,8 +121,8 @@ public class jClient extends Observable {
     beaconToFollow = 0;
     ground = -1;
     state = State.RUN;
-    halfPosX = mapSizeX / 2;
-    halfPosY = mapSizeY / 2;
+    halfPosX = Constants.mapSizeX / 2;
+    halfPosY = Constants.mapSizeY / 2;
   }
 
   /**

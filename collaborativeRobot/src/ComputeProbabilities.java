@@ -19,9 +19,9 @@ public class ComputeProbabilities implements Observer {
 				maxy = (int) (jClient.PosY + robotSize);
 		
 		minx = minx > 0 ? minx : 0;
-		maxx = (int) (maxx < jClient.arenaSizeX*2*Constants.MAP_PRECISION ? maxx : jClient.arenaSizeX*2*Constants.MAP_PRECISION - 1);
+		maxx = (int) (maxx < Constants.arenaSizeX*2*Constants.MAP_PRECISION ? maxx : Constants.arenaSizeX*2*Constants.MAP_PRECISION - 1);
 		miny = miny > 0 ? miny : 0;
-		maxy = (int) (maxy < jClient.arenaSizeY*2*Constants.MAP_PRECISION ? maxy : jClient.arenaSizeY*2*Constants.MAP_PRECISION - 1);
+		maxy = (int) (maxy < Constants.arenaSizeY*2*Constants.MAP_PRECISION ? maxy : Constants.arenaSizeY*2*Constants.MAP_PRECISION - 1);
 		
 		double prob = 0.0;
 		
@@ -56,9 +56,9 @@ public class ComputeProbabilities implements Observer {
 		maxy = (int) (jClient.PosY + griddelta);
 		
 		minx = minx > 0 ? minx : 0;
-		maxx = (int) (maxx < jClient.arenaSizeX*2*Constants.MAP_PRECISION ? maxx : jClient.arenaSizeX*2*Constants.MAP_PRECISION - 1);
+		maxx = (int) (maxx < Constants.arenaSizeX*2*Constants.MAP_PRECISION ? maxx : Constants.arenaSizeX*2*Constants.MAP_PRECISION - 1);
 		miny = miny > 0 ? miny : 0;
-		maxy = (int) (maxy < jClient.arenaSizeY*2*Constants.MAP_PRECISION ? maxy : jClient.arenaSizeY*2*Constants.MAP_PRECISION - 1);
+		maxy = (int) (maxy < Constants.arenaSizeY*2*Constants.MAP_PRECISION ? maxy : Constants.arenaSizeY*2*Constants.MAP_PRECISION - 1);
 		
 		for (int i = miny; i < maxy; i++) {
 			for (int j = minx; j < maxx; j++) {

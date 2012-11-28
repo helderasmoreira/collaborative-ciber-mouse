@@ -48,8 +48,8 @@ public class Communication {
 		String ret = iMax + "-" + jMax + "-"
 				+ ((int) (jClient.beaconProbability[iMax][jMax] * 100)) + "|";
 
-		for (int i = Math.max(iMax - 1, 0); i <= Math.min(iMax + 1,jClient.mapSizeY - 1); i++) {
-			for (int j = Math.max(jMax - 1, 0); j <= Math.min(jMax+ 1, jClient.mapSizeX - 1); j++) {
+		for (int i = Math.max(iMax - 1, 0); i <= Math.min(iMax + 1,Constants.mapSizeY - 1); i++) {
+			for (int j = Math.max(jMax - 1, 0); j <= Math.min(jMax+ 1, Constants.mapSizeX - 1); j++) {
 				if (i == iMax && j == jMax)
 					continue;
 				ret += ((int) (jClient.beaconProbability[i][j] * 100)) + ";";
