@@ -121,7 +121,7 @@ public class Communication {
 	 */
 	public static void say() {
 		String probableBeacon = Communication.getProbableBeacon((order++ % 5)+1);
-		System.out.println("sending : " + probableBeacon);
+		//System.out.println("sending : " + probableBeacon);
 		jClient.cif.Say(probableBeacon);
 	}
 
@@ -134,13 +134,13 @@ public class Communication {
 			if (i == jClient.pos || jClient.cif.GetMessageFrom(i) == null)
 				continue;
 			if (dataToProcess[i-1].equals(jClient.cif.GetMessageFrom(i))) {
-				System.out.println("repeated message from " + i);
+				//System.out.println("repeated message from " + i);
 				continue;
 			}
 			else {
 				dataToProcess[i - 1] = jClient.cif.GetMessageFrom(i);
 				Communication.decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
-				System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+				//System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
 			}
 		}	
 	}

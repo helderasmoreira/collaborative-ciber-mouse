@@ -40,7 +40,7 @@ public class MapVisualizer extends Thread {
 			}
 			
 			double compassRadians = Math.toRadians(jClient.compass);
-			double angleCenterI = angleDifference(compassRadians, Math.toRadians(60));
+			double angleCenterI = Util.angleDifference(compassRadians, Math.toRadians(60));
 			double angleCenterF = angleCenterI + Math.toRadians(60);
 			
 			calculateArea(10.3, jClient.map, jClient.frontSensorPosX, jClient.frontSensorPosY, 
@@ -110,20 +110,5 @@ public class MapVisualizer extends Thread {
 		}
 	}
 	
-	public static double angleDifference(double alpha, double beta) {
-
-		double deltatheta = 0;
-
-		if ((alpha < 0 && beta < 0) || (alpha > 0 && beta > 0)) {
-			deltatheta = beta - alpha;
-		} else {
-			if (Math.abs(alpha) + Math.abs(beta) <= Math.PI)
-				deltatheta = (Math.abs(alpha) + Math.abs(beta));
-			else
-				deltatheta = -Math.abs(2 * Math.PI - Math.abs(alpha - beta));
-			if (beta < alpha)
-				deltatheta *= -1;
-		}
-		return deltatheta;
-	}
+	
 }

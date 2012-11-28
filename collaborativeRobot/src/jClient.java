@@ -18,13 +18,17 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.Observable;
+
 import ciberIF.beaconMeasure;
 import ciberIF.ciberIF;
 
 /**
  * example of a basic agent implemented using the java interface library.
  */
-public class jClient {
+public class jClient extends Observable {
 
 	enum State {
 		RUN, WAIT, RETURN
@@ -32,16 +36,16 @@ public class jClient {
 
 	public static final int arenaSizeX = 28;
 	public static final int arenaSizeY = 14;
-	public static final double mapPrecision = 10.0;
-	public static final int mapSizeX = arenaSizeX * 2 * (int) mapPrecision;
-	public static final int mapSizeY = arenaSizeY * 2 * (int) mapPrecision;
-	public static final int robotRadius = (int) mapPrecision / 2;
+	public static final int mapSizeX = arenaSizeX * 2 * (int) Constants.MAP_PRECISION;
+	public static final int mapSizeY = arenaSizeY * 2 * (int) Constants.MAP_PRECISION;
+	public static final int robotRadius = (int) Constants.MAP_PRECISION / 2;
 	static public double[][] map = new double[mapSizeY][mapSizeX];
+	static public double[][] probabilitiesMap = new double[mapSizeY][mapSizeX];
 	static public double[][] beaconProbability = new double[mapSizeY][mapSizeX];
 	int initialPosX, initialPosY;
 	public static double PosX;
 	public static double PosY;
-	int halfPosX, halfPosY;
+	public static int halfPosX, halfPosY;
 	static int frontSensorPosX;
 	static int frontSensorPosY;
 	static double frontSensor;
@@ -53,6 +57,8 @@ public class jClient {
 	static double rightSensor;
 	static ciberIF cif;
 	static int pos;
+	
+
 
   public static void main(String[] args) {
 
@@ -96,10 +102,18 @@ public class jClient {
     jClient client = new jClient();
 
     client.robName = robName;
-
+    
+    final double[] sensorPositions = { 0.0,
+			-45.0, 45.0,
+			0.0 };
+    
     // register robot in simulator
+    //cif.InitRobot2(robName, pos, sensorPositions, host);
     cif.InitRobot(robName, pos, host);
-
+    
+    ComputeProbabilities observing = new ComputeProbabilities();
+    client.addObserver(observing);
+    
     // main loop
     client.mainLoop();
 
@@ -120,16 +134,25 @@ public class jClient {
    * reads a new message, decides what to do and sends action to simulator
    */
   public void mainLoop() {
-
+	  
+	for(int i = 0; i < probabilitiesMap.length; i++)
+		for(int j = 0; j < probabilitiesMap[i].length; j++)
+			probabilitiesMap[i][j] = 0.5;
+	
+	
+	
     MapVisualizer visualizer = new MapVisualizer();
     visualizer.start();
+    
+    MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
+    probabilitiesVisualizer.start();
 
     Communication.init();
     
     cif.ReadSensors();
 
-    initialPosX = (int) (cif.GetX() * mapPrecision);
-    initialPosY = (int) (cif.GetY() * mapPrecision);
+    initialPosX = (int) (cif.GetX() * Constants.MAP_PRECISION);
+    initialPosY = (int) (cif.GetY() * Constants.MAP_PRECISION);
     PosX = halfPosX;
     PosY = halfPosY;
 
@@ -140,7 +163,7 @@ public class jClient {
 
       double time = cif.GetTime();
       if (time > 0) {
-        System.out.println("Time: " + time);
+       // System.out.println("Time: " + time);
         decide();
       }
     }
@@ -151,8 +174,8 @@ public class jClient {
     
     double compassRadians = Math.toRadians(compassToDeg(compass));
     double L = (rightMotorForce + leftMotorForce) / 2.0;
-    double iX = ((Math.cos(compassRadians) * L))*mapPrecision;
-    double iY = ((Math.sin(compassRadians) * L))*mapPrecision;
+    double iX = ((Math.cos(compassRadians) * L))*Constants.MAP_PRECISION;
+    double iY = ((Math.sin(compassRadians) * L))*Constants.MAP_PRECISION;
     double robotMapX2 = (PosX + iX);
     double robotMapY2 = (PosY - iY);
     
@@ -168,8 +191,8 @@ public class jClient {
   }
 
   private void updateMap() {
-    //int robotMapY = (int) (initialPosY - cif.GetY() * mapPrecision + halfPosY);
-    //int robotMapX = (int) (cif.GetX() * mapPrecision - initialPosX + halfPosX);
+    //int robotMapY = (int) (initialPosY - cif.GetY() * Constants.MAP_PRECISION + halfPosY);
+    //int robotMapX = (int) (cif.GetX() * Constants.MAP_PRECISION - initialPosX + halfPosX);
     int robotMapX = (int) PosX;
     int robotMapY = (int) PosY;
   
@@ -204,7 +227,13 @@ public class jClient {
     rightSensor = irSensor2;
     
     Communication.say();
+    setChanged();
+    notifyObservers();
+	
   }
+  
+  
+ 
 
   public void getInfo() {
     if (cif.IsObstacleReady(0)) {
