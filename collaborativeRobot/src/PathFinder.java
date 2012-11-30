@@ -7,8 +7,8 @@ import java.util.PriorityQueue;
 public class PathFinder {
 
     final double ISWALL = 0.75;
-    PriorityQueue<PathFinder.Node> open = new PriorityQueue<>();
-    ArrayList<PathFinder.Node> closed = new ArrayList();
+    PriorityQueue<PathFinder.Node> open = new PriorityQueue<PathFinder.Node>();
+    ArrayList<PathFinder.Node> closed = new ArrayList<PathFinder.Node>();
     //int expandedCounter = 0;
     //double lastCost = 0.0;
     private double[][] map;
@@ -80,8 +80,8 @@ public class PathFinder {
         return new Double(cost * Math.sqrt(line));
     }
 
-    protected List<Node> generateSuccessors(Node node) {
-        List<Node> ret = new LinkedList<>();
+    protected List<Node> generateSuccessors(Node node) { //considerando apenas 4 dir.
+        List<Node> ret = new LinkedList<Node>();
         int x = node.x;
         int y = node.y;
         if (y < map.length - 1 && map[y + 1][x] == 0.0) {
@@ -142,7 +142,7 @@ public class PathFinder {
             }
         }
         
-        List<Node> path = new LinkedList<>();
+        List<Node> path = new LinkedList<Node>();
         goal = open.poll();
         Node n = goal;        
         while(n.parent != null){
@@ -181,7 +181,7 @@ public class PathFinder {
 
         long begin = System.currentTimeMillis();
         System.out.println(".");
-        List<Node> nodes = pf.calculate(map[0].length - 1, map.length - 1, 0, 0);
+        List<Node> nodes = pf.calculate(0, 0,map[0].length - 1, map.length - 1);
         System.out.println(".");
         long end = System.currentTimeMillis();
 
