@@ -27,11 +27,11 @@ public class ComputeProbabilities implements Observer {
 		
 		for (int i = miny; i < maxy; i++) {
 			for (int j = minx; j < maxx; j++) {
-				/*double distanceCenter = Math.sqrt(Math.abs(i - jClient.PosY)
+				double distanceCenter = Math.sqrt(Math.abs(i - jClient.PosY)
 						* Math.abs(i - jClient.PosY) + Math.abs(j - jClient.PosX)
-						* Math.abs(j - jClient.PosX));*/
+						* Math.abs(j - jClient.PosX));
 				
-				//if(distanceCenter <= 2.0*Constants.ROBOT_RADIUS*Constants.MAP_PRECISION)
+				if(distanceCenter <= 2.0*Constants.ROBOT_RADIUS*Constants.MAP_PRECISION)
 					jClient.probabilitiesMap[i][j] = (prob * jClient.probabilitiesMap[i][j])
 						/ ((prob * jClient.probabilitiesMap[i][j]) + ((1 - prob) * (1 - jClient.probabilitiesMap[i][j])));
 			}
