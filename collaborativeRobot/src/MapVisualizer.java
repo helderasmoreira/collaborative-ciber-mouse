@@ -40,15 +40,28 @@ public class MapVisualizer extends Thread {
 			}
 			
 			double compassRadians = Math.toRadians(jClient.compass);
-			double angleCenterI = Util.angleDifference(compassRadians, Math.toRadians(60));
-			double angleCenterF = angleCenterI + Math.toRadians(60);
+			double angleCenterI = compassRadians + Math.toRadians(-30);
+			double angleCenterF = compassRadians + Math.toRadians(30);
+			
+			angleCenterI = normalizeAngle(angleCenterI);
+			angleCenterF = normalizeAngle(angleCenterF);
+			
+			double angleCenterI2 = angleCenterI+Math.toRadians(60);
+			double angleCenterF2 = angleCenterF+Math.toRadians(60);
+			angleCenterI2 = normalizeAngle(angleCenterI2);
+			angleCenterF2 = normalizeAngle(angleCenterF2);
+			
+			double angleCenterI3 = angleCenterI-Math.toRadians(60);
+			double angleCenterF3 = angleCenterF-Math.toRadians(60);
+			angleCenterI3 = normalizeAngle(angleCenterI3);
+			angleCenterF3 = normalizeAngle(angleCenterF3);
 			
 			calculateArea(10.3, jClient.map, jClient.frontSensorPosX, jClient.frontSensorPosY, 
 					jClient.leftSensorPosX, jClient.leftSensorPosY,
 					jClient.rightSensorPosX, jClient.rightSensorPosY, panel,
 					angleCenterI, angleCenterF, 
-					angleCenterI-Math.toRadians(60), angleCenterF-Math.toRadians(60),
-					angleCenterI+Math.toRadians(60), angleCenterF+Math.toRadians(60),
+					angleCenterI2, angleCenterF2,
+					angleCenterI3, angleCenterF3,
 					g, jClient.frontSensor, jClient.leftSensor, jClient.rightSensor);
 			
 			g.dispose();
@@ -62,6 +75,15 @@ public class MapVisualizer extends Thread {
 			double angleCenterI2, double angleCenterF2, 
 			double angleCenterI3, double angleCenterF3, 
 			Graphics g, double sensorValue, double sensorValue2, double sensorValue3) {
+		
+		g.setColor(Color.BLUE);
+		g.fillRect(centerPosX, centerPosY, 2, 2);
+		
+		g.setColor(Color.BLUE);
+		g.fillRect(centerPosX2, centerPosY2, 2, 2);
+		
+		g.setColor(Color.BLUE);
+		g.fillRect(centerPosX3, centerPosY3, 2, 2);
 		
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
@@ -97,18 +119,28 @@ public class MapVisualizer extends Thread {
 		
 		double anglePoint;
 		double distanceCenter;
-		anglePoint = Math.atan2(j - centerPosX2, centerPosY2 - i);
+		anglePoint = Math.atan2(centerPosY2 - i, j - centerPosX2);
 		
 		distanceCenter = Math.sqrt(Math.abs(i - centerPosY2)
 				* Math.abs(i - centerPosY2) + Math.abs(j - centerPosX2)
 				* Math.abs(j - centerPosX2));
 
 		if (distanceCenter < radius && anglePoint > angleCenterI
-				&& anglePoint < angleCenterF  && distanceCenter >= obstacleDistance ) {
+				&& anglePoint < angleCenterF  ) {
 			g.setColor(Color.GREEN);
 			g.fillRect(j, i, 1, 1);
 		}
 	}
 	
+	double normalizeAngle(double angle) {
+	    double newAngle = angle;
+	    while (newAngle <= -Math.PI) {
+	      newAngle += 2 * Math.PI;
+	    }
+	    while (newAngle > Math.PI) {
+	      newAngle -= 2 * Math.PI;
+	    }
+	    return newAngle;
+	  }
 	
 }

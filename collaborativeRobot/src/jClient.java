@@ -20,6 +20,7 @@
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Locale;
 import java.util.Observable;
 
 import ciberIF.beaconMeasure;
@@ -148,7 +149,7 @@ public class jClient extends Observable {
 		PosY = halfPosY;
 
 		updateMap();
-
+		
 		while (true) {
 			cif.ReadSensors();
 

@@ -23,7 +23,7 @@ public class ComputeProbabilities implements Observer {
 		miny = miny > 0 ? miny : 0;
 		maxy = (int) (maxy < Constants.arenaSizeY*2*Constants.MAP_PRECISION ? maxy : Constants.arenaSizeY*2*Constants.MAP_PRECISION - 1);
 		
-		double prob = 0.0;
+		double prob = A_PROB;
 		
 		for (int i = miny; i < maxy; i++) {
 			for (int j = minx; j < maxx; j++) {
@@ -31,7 +31,7 @@ public class ComputeProbabilities implements Observer {
 						* Math.abs(i - jClient.PosY) + Math.abs(j - jClient.PosX)
 						* Math.abs(j - jClient.PosX));
 				
-				if(distanceCenter <= 2.0*Constants.ROBOT_RADIUS*Constants.MAP_PRECISION)
+				if(distanceCenter < 2.0*Constants.ROBOT_RADIUS*Constants.MAP_PRECISION)
 					jClient.probabilitiesMap[i][j] = (prob * jClient.probabilitiesMap[i][j])
 						/ ((prob * jClient.probabilitiesMap[i][j]) + ((1 - prob) * (1 - jClient.probabilitiesMap[i][j])));
 			}
@@ -39,14 +39,21 @@ public class ComputeProbabilities implements Observer {
 		
 		
 		double compassRadians = Math.toRadians(jClient.compass);
-		double angleCenterI = Util.angleDifference(compassRadians, Math.toRadians(60));
-		double angleCenterF = angleCenterI + Math.toRadians(60);
+		double angleCenterI = compassRadians + Math.toRadians(-30);
+		double angleCenterF = compassRadians + Math.toRadians(30);
 		
-		double angleCenterI2 = angleCenterI-Math.toRadians(60);
-		double angleCenterF2 = angleCenterF-Math.toRadians(60);
+		angleCenterI = normalizeAngle(angleCenterI);
+		angleCenterF = normalizeAngle(angleCenterF);
 		
-		double angleCenterI3 = angleCenterI+Math.toRadians(60);
-		double angleCenterF3 = angleCenterF+Math.toRadians(60);
+		double angleCenterI2 = angleCenterI+Math.toRadians(60);
+		double angleCenterF2 = angleCenterF+Math.toRadians(60);
+		angleCenterI2 = normalizeAngle(angleCenterI2);
+		angleCenterF2 = normalizeAngle(angleCenterF2);
+		
+		double angleCenterI3 = angleCenterI-Math.toRadians(60);
+		double angleCenterF3 = angleCenterF-Math.toRadians(60);
+		angleCenterI3 = normalizeAngle(angleCenterI3);
+		angleCenterF3 = normalizeAngle(angleCenterF3);
 		
 		final double griddelta = 2*(1/Constants.SENSOR_MINIMUM_VALUE)*Constants.MAP_PRECISION;
 		
@@ -69,6 +76,7 @@ public class ComputeProbabilities implements Observer {
 							angleCenterI, angleCenterF, jClient.leftSensor, i, j);
 				}
 				
+				
 				// LEFT
 				if(jClient.leftSensor >= Constants.SENSOR_MINIMUM_VALUE) {
 					calculateVisibleArea(jClient.leftSensorPosX, jClient.leftSensorPosY,
@@ -80,9 +88,22 @@ public class ComputeProbabilities implements Observer {
 					calculateVisibleArea(jClient.rightSensorPosX, jClient.rightSensorPosY,
 							angleCenterI3, angleCenterF3, jClient.rightSensor, i, j);
 				}
+				
 			}
 		}
 	}
+	
+	double normalizeAngle(double angle) {
+	    double newAngle = angle;
+	    while (newAngle <= -Math.PI) {
+	      newAngle += 2 * Math.PI;
+	    }
+	    while (newAngle > Math.PI) {
+	      newAngle -= 2 * Math.PI;
+	    }
+	    return newAngle;
+	  }
+
 	
 	private static void calculateVisibleArea(int centerPosX2,
 			int centerPosY2, double angleCenterI, double angleCenterF,
@@ -91,7 +112,7 @@ public class ComputeProbabilities implements Observer {
 		double anglePoint;
 		double distanceCenter;
 		
-		anglePoint = Math.atan2(j - centerPosX2, centerPosY2 - i);
+		anglePoint = Math.atan2(centerPosY2 - i, j - centerPosX2);
 		
 		if (anglePoint >= angleCenterI
 				&& anglePoint <= angleCenterF) {
