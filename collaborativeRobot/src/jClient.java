@@ -141,6 +141,8 @@ public class jClient extends Observable {
     
     MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
     probabilitiesVisualizer.start();
+    BeaconVisualizer bv = new BeaconVisualizer();
+    bv.start();
 
     Communication.init();
     
@@ -167,7 +169,7 @@ public class jClient extends Observable {
   private void DriveMotors(double leftMotorForce, double rightMotorForce) {
     cif.DriveMotors(leftMotorForce, rightMotorForce);
     
-    double compassRadians = Math.toRadians(compassToDeg(compass));
+    double compassRadians = Math.toRadians(compass);
     double L = (rightMotorForce + leftMotorForce) / 2.0;
     double iX = ((Math.cos(compassRadians) * L))*Constants.MAP_PRECISION;
     double iY = ((Math.sin(compassRadians) * L))*Constants.MAP_PRECISION;
@@ -440,7 +442,7 @@ public class jClient extends Observable {
   private String robName;
   private double irSensor0, irSensor1, irSensor2;
   static double compass;
-  private beaconMeasure beacon;
+  static public beaconMeasure beacon;
   private int ground;
   private State state;
   private int beaconToFollow;

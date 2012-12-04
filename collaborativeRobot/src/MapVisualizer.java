@@ -50,7 +50,7 @@ public class MapVisualizer extends Thread {
 					angleCenterI-Math.toRadians(60), angleCenterF-Math.toRadians(60),
 					angleCenterI+Math.toRadians(60), angleCenterF+Math.toRadians(60),
 					g, jClient.frontSensor, jClient.leftSensor, jClient.rightSensor);
-			
+      
 			g.dispose();
 		}
 		
