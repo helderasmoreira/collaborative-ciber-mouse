@@ -54,6 +54,7 @@ public class jClient extends Observable {
 	static double rightSensor;
 	static ciberIF cif;
 	static int pos;
+<<<<<<< HEAD
 	public static int sensorRequest = 0;
 	public static double turnAround = -1.0;
 	
@@ -145,6 +146,9 @@ public class jClient extends Observable {
 
 		MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
 		probabilitiesVisualizer.start();
+    
+    BeaconVisualizer bv = new BeaconVisualizer();
+    bv.start();
 
 		Communication.init();
 
