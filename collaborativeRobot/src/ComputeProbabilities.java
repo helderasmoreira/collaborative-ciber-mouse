@@ -31,11 +31,18 @@ public class ComputeProbabilities implements Observer {
 						* Math.abs(i - jClient.PosY) + Math.abs(j - jClient.PosX)
 						* Math.abs(j - jClient.PosX));
 				
-				if(distanceCenter < 2.0*Constants.ROBOT_RADIUS*Constants.MAP_PRECISION)
+				if(distanceCenter < robotSize)
 					jClient.probabilitiesMap[i][j] = (prob * jClient.probabilitiesMap[i][j])
 						/ ((prob * jClient.probabilitiesMap[i][j]) + ((1 - prob) * (1 - jClient.probabilitiesMap[i][j])));
 			}
 		}
+		
+		/*double prob = A_PROB;
+		int y = (int) jClient.PosY;
+		int x = (int) jClient.PosX;
+		
+		jClient.probabilitiesMap[y][x] = (prob * jClient.probabilitiesMap[y][x])
+				/ ((prob * jClient.probabilitiesMap[y][x]) + ((1 - prob) * (1 - jClient.probabilitiesMap[y][x])));*/
 		
 		
 		double compassRadians = Math.toRadians(jClient.compass);

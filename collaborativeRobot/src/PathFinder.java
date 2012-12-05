@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class PathFinder {        
-    PriorityQueue<PathFinder.Node> open = new PriorityQueue<PathFinder.Node>();
-    ArrayList<PathFinder.Node> closed = new ArrayList<PathFinder.Node>();
+    PriorityQueue<Node> open = new PriorityQueue<Node>();
+    ArrayList<Node> closed = new ArrayList<Node>();
     public int explored = 0;
     private double maxExpected;
     Node start;
@@ -151,48 +151,7 @@ public class PathFinder {
     }
     
     
-    public static class Node implements Comparable {
-
-        public int x;
-        public int y;
-        public Node parent;
-        public double g;
-        public double f;
-
-        Node(int x, int y) {
-            this.x = x;
-            this.y = y;
-            g = f = 0;
-            parent = null;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + x + ", " + y + ") ";
-        }
-
-        /**
-         * Compare to another object using the total cost f.
-         *
-         * @param o The object to compare to.
-         * @see Comparable#compareTo()
-         * @return <code>less than 0</code> This object is smaller * * *          * than <code>0</code>; <code>0</code> Object are the * *
-         * same. <code>bigger than 0</code> This object is bigger than o.
-         */
-        @Override
-        public int compareTo(Object o) {
-            Node p = (Node) o;
-            return (int) (this.f - p.f);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            Node p = (Node) other;
-            return p.x == this.x && p.y == this.y;
-        }
-    }
-    
-    
+   
 
     //just to test
     public static void main(String[] args) {
@@ -322,4 +281,44 @@ public class PathFinder {
         }
 
     }
+    
+    public static List<Node> calculate(double[][] map, int oX, int oY, int goalX, int goalY) {
+    	
+      PathFinder pf = new PathFinder(map);
+      
+      List<Node> nodes = pf.calculate(oX, oY, goalX, goalY);
+      
+      System.out.println(map[oY][oX]);
+      System.out.println(map[goalY][goalX]);
+      
+      if (nodes == null) {
+          System.out.println("No path");
+      } else {
+          System.out.print("Path = ");
+          for (Node n : nodes) {
+              map[n.y][n.x] = 7.7;
+              System.out.print(n);
+          }
+          System.out.println();
+      }
+      
+      return nodes;
+
+      /*for (int i = 0; i < map.length; i++) {
+          System.out.print("|");
+          for (int j = 0; j < map[0].length; j++) {
+              if (map[i][j] <= pf.ISWALL) {
+                  System.out.print(" ");
+              } else {
+                  if (map[i][j] == 7.7) {
+                      System.out.print("r");
+                  } else {
+                      System.out.print(".");
+                  }
+              }
+          }
+          System.out.println("|");
+      }*/
+
+  }
 }

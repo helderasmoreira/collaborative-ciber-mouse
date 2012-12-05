@@ -18,9 +18,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.Locale;
+import java.util.List;
 import java.util.Observable;
 
 import ciberIF.beaconMeasure;
@@ -39,7 +37,9 @@ public class jClient extends Observable {
 	static public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] beaconProbability = new double[Constants.mapSizeY][Constants.mapSizeX];
+	static public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
 	int initialPosX, initialPosY;
+	private boolean firstReturn = true;
 	public static double PosX;
 	public static double PosY;
 	public static int halfPosX, halfPosY;
@@ -55,6 +55,9 @@ public class jClient extends Observable {
 	static ciberIF cif;
 	static int pos;
 	public static int sensorRequest = 0;
+	public static double turnAround = -1.0;
+	
+	List<Node> nodes;
 
 	public static void main(String[] args) {
 
@@ -94,6 +97,10 @@ public class jClient extends Observable {
 			return;
 		}
 
+		for(int i = 0; i < aStarMatrix.length; i++)
+			for(int j = 0; j < aStarMatrix[i].length; j++)
+				aStarMatrix[i][j] = 1.0;
+		
 		// create client
 		jClient client = new jClient();
 
@@ -147,12 +154,16 @@ public class jClient extends Observable {
 		initialPosY = (int) (cif.GetY() * Constants.MAP_PRECISION);
 		PosX = halfPosX;
 		PosY = halfPosY;
-
+		
+		aStarMatrix[(int) PosY][(int) PosX] = 0.0;
+		
 		updateMap();
+		
+		System.out.println(PosX + " " + PosY);
 		
 		while (true) {
 			cif.ReadSensors();
-
+			
 			double time = cif.GetTime();
 			if (time > 0) {
 				// System.out.println("Time: " + time);
@@ -165,9 +176,12 @@ public class jClient extends Observable {
 		cif.DriveMotors(leftMotorForce, rightMotorForce);
 
 		double compassRadians = Math.toRadians(compassToDeg(compass));
+		
 		double L = (rightMotorForce + leftMotorForce) / 2.0;
+		
 		double iX = ((Math.cos(compassRadians) * L)) * Constants.MAP_PRECISION;
 		double iY = ((Math.sin(compassRadians) * L)) * Constants.MAP_PRECISION;
+		
 		double robotMapX2 = (PosX + iX);
 		double robotMapY2 = (PosY - iY);
 
@@ -180,6 +194,22 @@ public class jClient extends Observable {
 
 		PosX = robotMapX2;
 		PosY = robotMapY2;
+		updateAStarMatrix();
+
+	}
+
+	private void updateAStarMatrix() {
+		int y = (int) PosY;
+		int x = (int) PosX;
+		aStarMatrix[y][x] = 0.0;
+		aStarMatrix[y][x+1] = 0.0;
+		aStarMatrix[y][x-1] = 0.0;
+		aStarMatrix[y+1][x] = 0.0;
+		aStarMatrix[y-1][x] = 0.0;
+		aStarMatrix[y+1][x+1] = 0.0;
+		aStarMatrix[y-1][x-1] = 0.0;
+		aStarMatrix[y+1][x-1] = 0.0;
+		aStarMatrix[y-1][x+1] = 0.0;
 	}
 
 	private void updateMap() {
@@ -268,6 +298,53 @@ public class jClient extends Observable {
 		default:
 			cif.RequestCompassSensor();
 		}
+	}
+	
+	private void goHome() {
+		if(nodes.size() == 1)
+			return;
+		
+		nodes.remove(nodes.size() - 1);
+		Node n = nodes.get(nodes.size() - 1);
+		
+		int x = (int) PosX;
+		int y = (int) PosY;
+		
+		double anglePoint = makePositive(Math.atan2(y - n.y, n.x - x));
+		double angleNow = makePositive(Math.toRadians(compassToDeg(jClient.compass)));
+
+		while(Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
+			alignRobot(anglePoint, angleNow);
+			angleNow = makePositive(Math.toRadians(compassToDeg(jClient.compass)));
+		}
+		
+		DriveMotors(0.1, 0.1);
+		updateMap();
+		
+		x = (int) PosX;
+		y = (int) PosY;
+		
+		if(x != n.x || y != n.y) {
+			nodes.add(new Node(n.x, n.y));
+		}
+		//System.out.println(n.x + " " + n.y + " " + x + " " + y);
+	}
+
+	private void alignRobot(double anglePoint, double angleNow) {
+		if(angleNow > anglePoint)
+			turnAround = 1.0;
+		else
+			turnAround = -1.0;
+		
+		requestInfo();
+		cif.ReadSensors();
+		getInfo();
+		DriveMotors(0.1*turnAround, -0.1*turnAround);
+		updateMap();
+	}
+	
+	public static double makePositive(double angle) {
+		return angle >= 0 ? angle : angle + 2 * Math.PI;
 	}
 
 	public void original_wander(boolean followBeacon) {
@@ -380,7 +457,10 @@ public class jClient extends Observable {
 			DriveMotors(0.0, 0.0);
 			break;
 		case RETURN: /* Return to home area */
-
+			if(firstReturn) {
+				nodes = PathFinder.calculate(aStarMatrix, (int) PosX, (int) PosY, halfPosX, halfPosY);
+				firstReturn = false;
+			}
 			if (cif.GetFinished()) {
 				System.exit(0); /* Terminate agent */
 			}
@@ -389,7 +469,8 @@ public class jClient extends Observable {
 				System.out.println(robName + " found home at " + cif.GetTime()
 						+ "\n");
 			} else {
-				original_wander(false);
+				//original_wander(false);
+				goHome();
 			}
 			break;
 
