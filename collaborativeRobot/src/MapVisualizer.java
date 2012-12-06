@@ -67,7 +67,7 @@ public class MapVisualizer extends Thread {
 					angleCenterI2, angleCenterF2,
 					angleCenterI3, angleCenterF3,
 					g, jClient.frontSensor, jClient.leftSensor, jClient.rightSensor);
-			
+      
 			g.dispose();
 		}
 		

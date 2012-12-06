@@ -36,7 +36,7 @@ public class jClient extends Observable {
 	public static final int robotRadius = (int) Constants.MAP_PRECISION / 2;
 	static public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
-	static public double[][] beaconProbability = new double[Constants.mapSizeY][Constants.mapSizeX];
+	static public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
 	int initialPosX, initialPosY;
 	private boolean firstReturn = true;
@@ -54,6 +54,7 @@ public class jClient extends Observable {
 	static double rightSensor;
 	static ciberIF cif;
 	static int pos;
+
 	public static int sensorRequest = 0;
 	public static double turnAround = -1.0;
 	
@@ -142,12 +143,15 @@ public class jClient extends Observable {
 		for (int i = 0; i < probabilitiesMap.length; i++)
 			for (int j = 0; j < probabilitiesMap[i].length; j++)
 				probabilitiesMap[i][j] = 0.5;
-
+/*
 		MapVisualizer visualizer = new MapVisualizer();
 		visualizer.start();
 
 		MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
 		probabilitiesVisualizer.start();
+    */
+    BeaconVisualizer bv = new BeaconVisualizer();
+    bv.start();
 
 		Communication.init();
 
@@ -564,7 +568,7 @@ public class jClient extends Observable {
 	private String robName;
 	private double irSensor0, irSensor1, irSensor2;
 	static double compass;
-	private beaconMeasure beacon;
+	static public beaconMeasure beacon;
 	private int ground;
 	private State state;
 	private int beaconToFollow;
