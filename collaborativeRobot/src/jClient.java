@@ -140,13 +140,13 @@ public class jClient extends Observable {
 		for (int i = 0; i < probabilitiesMap.length; i++)
 			for (int j = 0; j < probabilitiesMap[i].length; j++)
 				probabilitiesMap[i][j] = 0.5;
-
+/*
 		MapVisualizer visualizer = new MapVisualizer();
 		visualizer.start();
 
 		MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
 		probabilitiesVisualizer.start();
-    
+    */
     BeaconVisualizer bv = new BeaconVisualizer();
     bv.start();
 
