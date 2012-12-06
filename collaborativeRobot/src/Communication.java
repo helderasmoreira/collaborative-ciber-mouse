@@ -133,8 +133,23 @@ public class Communication {
 	 */
 	public static void say() {
 		String probableBeacon = Communication.getProbableBeacon(1);
-		System.out.println("sending : " + probableBeacon);
-		jClient.cif.Say(probableBeacon);
+		String sensors = Communication.getSensors();
+		
+		if (jClient.cif.GetTime() % 2.0 == 0) { 
+			jClient.cif.Say(probableBeacon);
+			//System.out.println("sending : " + probableBeacon);
+		}
+		else {
+			jClient.cif.Say(sensors);
+			//System.out.println("sending : " + sensors);
+		}
+	}
+
+	/* gets the sensors of the robot in a string in the following format:
+	 * x|y|sensor1|sensor2|sensor3
+	 */
+	private static String getSensors() {
+		return "sensors|" + ((int)jClient.PosX * 100) + "|" + ((int)jClient.PosY * 100) + "|" + jClient.frontSensor + "|" + jClient.leftSensor + "|" + jClient.rightSensor; 
 	}
 
 	/*
@@ -151,9 +166,17 @@ public class Communication {
 			}
 			else {
 				dataToProcess[i - 1] = jClient.cif.GetMessageFrom(i);
-				Communication.decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
-				System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+				if (dataToProcess[i-1].contains("sensors"))
+					Communication.decodeAndApplySensorsMessage();
+				else
+					Communication.decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
+				//System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
 			}
 		}	
+	}
+
+	private static void decodeAndApplySensorsMessage() {
+		// TODO Auto-generated method stub
+		
 	}
 }
