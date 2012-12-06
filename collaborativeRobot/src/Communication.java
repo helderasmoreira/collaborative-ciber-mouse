@@ -114,7 +114,6 @@ public class Communication {
 			if (firstLine.length < 3 || thirdLine.length < 3 || secondLine.length < 2) //point near the wall
 				return; 
 			
-			// modify to use the update probability function 
 			jClient.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]), jClient.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
 			jClient.beaconProbability[mostProbableY - 1][mostProbableX] = Math.max(Integer.parseInt(firstLine[1]), jClient.beaconProbability[mostProbableY - 1][mostProbableX]);
 			jClient.beaconProbability[mostProbableY - 1][mostProbableX + 1] = Math.max(Integer.parseInt(firstLine[2]), jClient.beaconProbability[mostProbableY - 1][mostProbableX + 1]);
