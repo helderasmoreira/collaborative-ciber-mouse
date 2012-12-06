@@ -57,6 +57,9 @@ public class jClient extends Observable {
 	public static int sensorRequest = 0;
 	public static double turnAround = -1.0;
 	
+	public double previousMotorPowL = -1.0;
+	public double previousMotorPowR = -1.0;
+	
 	List<Node> nodes;
 
 	public static void main(String[] args) {
@@ -155,7 +158,7 @@ public class jClient extends Observable {
 		PosX = halfPosX;
 		PosY = halfPosY;
 		
-		aStarMatrix[(int) PosY][(int) PosX] = 0.0;
+		aStarMatrix[(int) Math.round(PosY)][(int) Math.round(PosX)] = 0.0;
 		
 		updateMap();
 		
@@ -174,6 +177,17 @@ public class jClient extends Observable {
 
 	private void DriveMotors(double leftMotorForce, double rightMotorForce) {
 		cif.DriveMotors(leftMotorForce, rightMotorForce);
+		
+		if(previousMotorPowL == -1.0) {
+			previousMotorPowL = leftMotorForce;
+			previousMotorPowR = rightMotorForce;
+		}
+		
+		leftMotorForce = (leftMotorForce + previousMotorPowL) / 2.0;
+		rightMotorForce = (rightMotorForce + previousMotorPowR) / 2.0;
+		
+		previousMotorPowL = leftMotorForce;
+		previousMotorPowR = rightMotorForce;
 
 		double compassRadians = Math.toRadians(compassToDeg(compass));
 		
@@ -199,8 +213,9 @@ public class jClient extends Observable {
 	}
 
 	private void updateAStarMatrix() {
-		int y = (int) PosY;
-		int x = (int) PosX;
+		int y = (int) Math.round(PosY);
+		int x = (int) Math.round(PosX);
+	
 		aStarMatrix[y][x] = 0.0;
 		aStarMatrix[y][x+1] = 0.0;
 		aStarMatrix[y][x-1] = 0.0;
@@ -217,8 +232,8 @@ public class jClient extends Observable {
 		// Constants.MAP_PRECISION + halfPosY);
 		// int robotMapX = (int) (cif.GetX() * Constants.MAP_PRECISION -
 		// initialPosX + halfPosX);
-		int robotMapX = (int) PosX;
-		int robotMapY = (int) PosY;
+		int robotMapX = (int) Math.round(PosX);
+		int robotMapY = (int) Math.round(PosY);
 
 		map[robotMapY][robotMapX] = 1.0;
 
@@ -307,25 +322,28 @@ public class jClient extends Observable {
 		nodes.remove(nodes.size() - 1);
 		Node n = nodes.get(nodes.size() - 1);
 		
-		int x = (int) PosX;
-		int y = (int) PosY;
-		
-		double anglePoint = makePositive(Math.atan2(y - n.y, n.x - x));
+		double anglePoint = makePositive(Math.atan2(PosY - n.y, n.x - PosX));
 		double angleNow = makePositive(Math.toRadians(compassToDeg(jClient.compass)));
-
-		while(Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
-			alignRobot(anglePoint, angleNow);
-			angleNow = makePositive(Math.toRadians(compassToDeg(jClient.compass)));
+		
+		if(Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
+		
+			while(Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
+				alignRobot(anglePoint, angleNow);
+				angleNow = makePositive(Math.toRadians(compassToDeg(jClient.compass)));
+			}
+		
+		}
+		else {
+			DriveMotors(0.1, 0.1);
 		}
 		
-		DriveMotors(0.1, 0.1);
 		updateMap();
 		
-		x = (int) PosX;
-		y = (int) PosY;
+		int x = (int) Math.round(PosX);
+		int y = (int) Math.round(PosY);
 		
 		if(x != n.x || y != n.y) {
-			nodes.add(new Node(n.x, n.y));
+			//nodes.add(new Node(n.x, n.y));
 		}
 		//System.out.println(n.x + " " + n.y + " " + x + " " + y);
 	}
@@ -339,7 +357,12 @@ public class jClient extends Observable {
 		requestInfo();
 		cif.ReadSensors();
 		getInfo();
-		DriveMotors(0.1*turnAround, -0.1*turnAround);
+		
+		if(turnAround == 1.0)
+			DriveMotors(0.04*Math.abs(angleNow - anglePoint), -0.04*Math.abs(angleNow - anglePoint));
+		else
+			DriveMotors(-0.04*Math.abs(angleNow - anglePoint), 0.04*Math.abs(angleNow - anglePoint));
+		
 		updateMap();
 	}
 	
@@ -458,8 +481,11 @@ public class jClient extends Observable {
 			break;
 		case RETURN: /* Return to home area */
 			if(firstReturn) {
-				nodes = PathFinder.calculate(aStarMatrix, (int) PosX, (int) PosY, halfPosX, halfPosY);
+				nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY);
 				firstReturn = false;
+				for(int i = 0; i < nodes.size(); i++) {
+					map[nodes.get(i).y][nodes.get(i).x] = -3.0;
+				}
 			}
 			if (cif.GetFinished()) {
 				System.exit(0); /* Terminate agent */

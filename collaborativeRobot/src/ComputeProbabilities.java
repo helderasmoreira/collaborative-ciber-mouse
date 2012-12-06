@@ -31,9 +31,9 @@ public class ComputeProbabilities implements Observer {
 						* Math.abs(i - jClient.PosY) + Math.abs(j - jClient.PosX)
 						* Math.abs(j - jClient.PosX));
 				
-				if(distanceCenter < robotSize)
+				/*if(distanceCenter < robotSize)
 					jClient.probabilitiesMap[i][j] = (prob * jClient.probabilitiesMap[i][j])
-						/ ((prob * jClient.probabilitiesMap[i][j]) + ((1 - prob) * (1 - jClient.probabilitiesMap[i][j])));
+						/ ((prob * jClient.probabilitiesMap[i][j]) + ((1 - prob) * (1 - jClient.probabilitiesMap[i][j])));*/
 			}
 		}
 		

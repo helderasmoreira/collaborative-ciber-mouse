@@ -37,6 +37,10 @@ public class MapVisualizer extends Thread {
             g.setColor(Color.ORANGE);
 						//g.fillRect(j, i, 1, 1);
           }
+          else if(jClient.map[i][j] == -3.0) {
+        	  g.setColor(Color.ORANGE);
+        	  g.fillRect(j, i, 1, 1);
+          }
 			}
 			
 			double compassRadians = Math.toRadians(jClient.compass);
