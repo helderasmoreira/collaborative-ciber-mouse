@@ -175,6 +175,10 @@ public class Communication {
 		}	
 	}
 
+	/*
+	 * decodes the message received from the other mouse about their sensors
+	 * format: x|y|frontsensor|leftsensor|rightsensor
+	 */
 	private static void decodeAndApplySensorsMessage() {
 		// TODO Auto-generated method stub
 		
