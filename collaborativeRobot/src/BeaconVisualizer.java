@@ -17,7 +17,6 @@ public class BeaconVisualizer extends Thread {
     panel.setBackground(Color.WHITE);
     frame.setVisible(true);
 
-    int index = 0;
     while (true) {
       Graphics g = panel.getGraphics();
       if (jClient.beacon.beaconVisible) {

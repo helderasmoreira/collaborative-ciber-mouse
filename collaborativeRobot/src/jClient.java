@@ -54,7 +54,7 @@ public class jClient extends Observable {
 	static double rightSensor;
 	static ciberIF cif;
 	static int pos;
-<<<<<<< HEAD
+
 	public static int sensorRequest = 0;
 	public static double turnAround = -1.0;
 	
@@ -542,7 +542,7 @@ public class jClient extends Observable {
 	private String robName;
 	private double irSensor0, irSensor1, irSensor2;
 	static double compass;
-	private beaconMeasure beacon;
+	static public beaconMeasure beacon;
 	private int ground;
 	private State state;
 	private int beaconToFollow;
