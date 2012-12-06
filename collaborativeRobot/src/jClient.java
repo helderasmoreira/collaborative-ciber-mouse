@@ -36,7 +36,7 @@ public class jClient extends Observable {
 	public static final int robotRadius = (int) Constants.MAP_PRECISION / 2;
 	static public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
-	static public double[][] beaconProbability = new double[Constants.mapSizeY][Constants.mapSizeX];
+	static public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
 	int initialPosX, initialPosY;
 	private boolean firstReturn = true;

@@ -3,7 +3,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import sun.text.normalizer.UBiDiProps;
 
 public class BeaconVisualizer extends Thread {
 
@@ -24,7 +23,7 @@ public class BeaconVisualizer extends Thread {
         double robotDir = jClient.compass;
         double beaconRelDir = jClient.beacon.beaconDir;
         double beaconDir = robotDir + beaconRelDir;
-        System.out.println("beacon dir:" + beaconDir);
+
         double angleI = Math.toRadians(beaconDir - 1);
         double angleF = angleI + Math.toRadians(1);
 
@@ -62,17 +61,21 @@ public class BeaconVisualizer extends Thread {
     anglePoint = Math.atan2(cy - y, x - cx);
 
     if (anglePoint >= ai && anglePoint <= af) {
-      jClient.beaconProbability[y][x] += 0.1;
-      if (jClient.beaconProbability[y][x] > 0.3 &&
-              jClient.beaconProbability[y][x] <= 0.4) {
+      jClient.beaconProbability[y][x] += 1;
+      if (jClient.beaconProbability[y][x] > 3 &&
+              jClient.beaconProbability[y][x] <= 4) {
         g.setColor(Color.YELLOW);
         g.fillRect(x, y, 1, 1);
-      } else if(jClient.beaconProbability[y][x] > 0.8 &&
-              jClient.beaconProbability[y][x] <= 1.2) {
+      } else if(jClient.beaconProbability[y][x] > 8 &&
+              jClient.beaconProbability[y][x] <= 12) {
         g.setColor(Color.ORANGE);
         g.fillRect(x, y, 1, 1);
-      } else if(jClient.beaconProbability[y][x] > 1.2) {
+      } else if(jClient.beaconProbability[y][x] > 12 &&
+              jClient.beaconProbability[y][x] <= 100) {
         g.setColor(Color.RED);
+        g.fillRect(x, y, 1, 1);
+      } else if(jClient.beaconProbability[y][x] > 100) {
+        g.setColor(Color.BLACK);
         g.fillRect(x, y, 1, 1);
       }
     }
