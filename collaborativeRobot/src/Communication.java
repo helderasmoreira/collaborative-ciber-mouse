@@ -111,7 +111,7 @@ public class Communication {
 			if (mostProbableY > Constants.mapSizeY || mostProbableX > Constants.mapSizeX)
 				return;
 
-			if (firstLine.length < 3) //ponto junto à parede 
+			if (firstLine.length < 3 || thirdLine.length < 3 || secondLine.length < 2) //point near the wall
 				return; 
 			
 			// modify to use the update probability function 
