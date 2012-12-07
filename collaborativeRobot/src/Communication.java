@@ -151,10 +151,10 @@ public class Communication {
 	}
 
 	/* gets the sensors of the robot in a string in the following format:
-	 * x|y|sensor1|sensor2|sensor3
+	 * sensors|x|offsetX|y|offsetY|frontsensor|leftsensor|rightsensor
 	 */
 	private static String getSensors() {
-		return "sensors|" + ((int)jClient.PosX * 100) + "|" + ((int)jClient.PosY * 100) + "|" + jClient.frontSensor + "|" + jClient.leftSensor + "|" + jClient.rightSensor; 
+		return "sensors|" + ((int)jClient.PosX * 100) + "|" + jClient.initialPosX + "|" + ((int)jClient.PosY * 100) + "|" + jClient.initialPosY + "|" + jClient.frontSensor + "|" + jClient.leftSensor + "|" + jClient.rightSensor; 
 	}
 
 	/*
@@ -182,7 +182,7 @@ public class Communication {
 
 	/*
 	 * decodes the message received from the other mouse about their sensors
-	 * format: x|y|frontsensor|leftsensor|rightsensor
+	 * format: x|offsetX|y|offsetY|frontsensor|leftsensor|rightsensor
 	 */
 	private static void decodeAndApplySensorsMessage() {
 		// TODO Auto-generated method stub
