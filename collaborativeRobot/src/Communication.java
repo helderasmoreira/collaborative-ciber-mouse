@@ -14,7 +14,7 @@ public class Communication {
 	
 	/*
 	 * order represents which probable point we want (ie most probable, second most probable)
-	 * returns a string with the format: "x-y-value|value;value;value|value..."
+	 * returns a string with the format: "y-offsetY-x-offsetX-value|value;value;value|value..."
 	 * values from top-left to bottom-right from left to right 
 	 * | represents a row change
 	 * ; represents a column change 
@@ -48,7 +48,7 @@ public class Communication {
 		if (jClient.beaconProbability[iMax][jMax] == 0)
 			return "";
 		
-		String ret = iMax + "-" + jMax + "-"
+		String ret = iMax + "-" + jClient.initialPosY + "-" + jMax + "-" + jClient.initialPosX + "-" + 
 				+ jClient.beaconProbability[iMax][jMax] + "|";
 
 		for (int i = Math.max(iMax - 1, 0); i <= Math.min(iMax + 1,Constants.mapSizeY - 1); i++) {
@@ -80,7 +80,7 @@ public class Communication {
 	
 	/*
 	 * decodes the message received and applies it to the current map
-	 * message should be like: "x-y-value|value;value;value|value..."
+	 * message should be like: "y-offsetY-x-offsetX-value|value;value;value|value..."
 	 */
 	public static void decodeAndApplyProbableBeaconMessage(String message) {
 
@@ -92,8 +92,14 @@ public class Communication {
 		String beaconMostProbablePoint[] = lines[0].split("-");
 		
 		int mostProbableY = Integer.parseInt(beaconMostProbablePoint[0]);
-		int mostProbableX = Integer.parseInt(beaconMostProbablePoint[1]);
-		int value = Integer.parseInt(beaconMostProbablePoint[2]);
+		int mostProbableX = Integer.parseInt(beaconMostProbablePoint[2]);
+		int value = Integer.parseInt(beaconMostProbablePoint[4]);
+		
+		int offsetY = Integer.parseInt(beaconMostProbablePoint[1]);
+		int offsetX = Integer.parseInt(beaconMostProbablePoint[3]);
+		
+		mostProbableY = mostProbableY + jClient.initialPosY - offsetY;
+		mostProbableX = mostProbableX + jClient.initialPosX - offsetX;
 		
 		jClient.beaconProbability[mostProbableY][mostProbableX] = Math.max(value, jClient.beaconProbability[mostProbableY][mostProbableX]);
 
@@ -108,7 +114,7 @@ public class Communication {
 			String[] secondLine = lines[2].split(";");
 			String[] thirdLine = lines[3].split(";");
 			
-			if (mostProbableY > Constants.mapSizeY || mostProbableX > Constants.mapSizeX)
+			if (mostProbableY > Constants.mapSizeY || mostProbableX > Constants.mapSizeX) 
 				return;
 
 			if (firstLine.length < 3 || thirdLine.length < 3 || secondLine.length < 2) //point near the wall

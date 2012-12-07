@@ -38,7 +38,7 @@ public class jClient extends Observable {
 	static public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
-	int initialPosX, initialPosY;
+	public static int initialPosX, initialPosY;
 	private boolean firstReturn = true;
 	public static double PosX;
 	public static double PosY;
@@ -143,13 +143,13 @@ public class jClient extends Observable {
 		for (int i = 0; i < probabilitiesMap.length; i++)
 			for (int j = 0; j < probabilitiesMap[i].length; j++)
 				probabilitiesMap[i][j] = 0.5;
-/*
-		MapVisualizer visualizer = new MapVisualizer();
-		visualizer.start();
 
-		MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
-		probabilitiesVisualizer.start();
-    */
+	MapVisualizer visualizer = new MapVisualizer();
+	visualizer.start();
+
+	MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
+	probabilitiesVisualizer.start();
+
     BeaconVisualizer bv = new BeaconVisualizer();
     bv.start();
 
