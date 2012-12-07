@@ -97,10 +97,10 @@ public class Communication {
 		
 		int offsetY = Integer.parseInt(beaconMostProbablePoint[1]);
 		int offsetX = Integer.parseInt(beaconMostProbablePoint[3]);
-		
+		/*
 		mostProbableY = mostProbableY + jClient.initialPosY - offsetY;
 		mostProbableX = mostProbableX + jClient.initialPosX - offsetX;
-		
+		*/
 		jClient.beaconProbability[mostProbableY][mostProbableX] = Math.max(value, jClient.beaconProbability[mostProbableY][mostProbableX]);
 
 		if (lines.length == 3) { // corner case
