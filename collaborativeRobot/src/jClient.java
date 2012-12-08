@@ -292,7 +292,7 @@ public class jClient extends Observable {
 		for(int i = 0; i < probabilitiesMap.length; i++)
 			for(int j = 0; j < probabilitiesMap[i].length; j++)
 				if(probabilitiesMap[i][j] > 0.75)
-					aStarMatrix[i][j] = 1.0;
+					aStarMatrix[i][j] = 0.70;
 	}
 
 	private void updateMap() {
