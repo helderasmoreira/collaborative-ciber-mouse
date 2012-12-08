@@ -247,23 +247,14 @@ public class jClient extends Observable {
 				 initialPosX + halfPosX);
 		
 		if(firstReturn) {
-			
-			double tempPosX = PosX_aStar;
-			double tempPosY = PosY_aStar;
-			
 			int y = (int) (PosY_aStar > previousPosY ? PosY_aStar : previousPosY) + 1;
 			int x = (int) (PosX_aStar > previousPosX ? PosX_aStar : previousPosX) + 1;
 			double matrix[][] = new double[y][x];
 			
 			List<Node> nodes = PathFinder.calculate(matrix, (int) PosX_aStar, (int) PosY_aStar, (int) previousPosX, (int) previousPosY);
 			for(Node n: nodes) {
-				PosX_aStar = n.x;
-				PosY_aStar = n.y;
-				updateAStarMatrix((int)PosX_aStar, (int)PosY_aStar);
+				updateAStarMatrix(n.x, n.y);
 			}
-			
-			PosX_aStar = tempPosX;
-			PosY_aStar = tempPosY;
 		}
 		
 		previousMotorPowL = leftMotorForce;
@@ -277,9 +268,8 @@ public class jClient extends Observable {
 		if(emergency) {
 			if(!firstReturn)
 				nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar), halfPosX, halfPosY);
-			if(nodes == null || nodes.size() == 0) {
+			if(!firstReturn && (nodes == null || nodes.size() == 0)) {
 				cif.DriveMotors(0.0, 0.0);
-				System.out.println("ACABOU");
 				System.exit(0); /* Terminate agent */
 			}
 		}
@@ -301,7 +291,7 @@ public class jClient extends Observable {
 		for(int i = 0; i < probabilitiesMap.length; i++)
 			for(int j = 0; j < probabilitiesMap[i].length; j++)
 				if(probabilitiesMap[i][j] > 0.75)
-					aStarMatrix[i][j] = 1.0;
+					aStarMatrix[i][j] = 0.70;
 	}
 
 	private void updateMap() {
