@@ -97,10 +97,10 @@ public class Communication {
 		
 		int offsetY = Integer.parseInt(beaconMostProbablePoint[1]);
 		int offsetX = Integer.parseInt(beaconMostProbablePoint[3]);
-		/*
-		mostProbableY = mostProbableY + jClient.initialPosY - offsetY;
-		mostProbableX = mostProbableX + jClient.initialPosX - offsetX;
-		*/
+
+		mostProbableY = mostProbableY - (offsetY - jClient.initialPosY);
+		mostProbableX = mostProbableX + (offsetX - jClient.initialPosX);
+    
 		jClient.beaconProbability[mostProbableY][mostProbableX] = Math.max(value, jClient.beaconProbability[mostProbableY][mostProbableX]);
 
 		if (lines.length == 3) { // corner case
@@ -173,9 +173,10 @@ public class Communication {
 				dataToProcess[i - 1] = jClient.cif.GetMessageFrom(i);
 				if (dataToProcess[i-1].contains("sensors"))
 					Communication.decodeAndApplySensorsMessage();
-				else
+        else{
+          //System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
 					Communication.decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
-				//System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+        }
 			}
 		}	
 	}

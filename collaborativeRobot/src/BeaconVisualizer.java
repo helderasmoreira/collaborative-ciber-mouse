@@ -9,7 +9,7 @@ public class BeaconVisualizer extends Thread {
   @Override
   public void run() {
     JPanel panel = new JPanel();
-    JFrame frame = new JFrame("Beacon Visualizer");
+    JFrame frame = new JFrame("Beacon Visualizer - " + jClient.pos);
     frame.add(panel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(Constants.mapSizeX, Constants.mapSizeY);
@@ -36,6 +36,22 @@ public class BeaconVisualizer extends Thread {
         for (int y = 0; y < jClient.beaconProbability.length; y++) {
           for (int x = 0; x < jClient.beaconProbability[y].length; x++) {
             calculateVisibleArea(centerPosX, centerPosY, angleI, angleF, g, x, y);
+            if (jClient.beaconProbability[y][x] > 3
+                    && jClient.beaconProbability[y][x] <= 4) {
+              g.setColor(Color.YELLOW);
+              g.fillRect(x, y, 1, 1);
+            } else if (jClient.beaconProbability[y][x] > 8
+                    && jClient.beaconProbability[y][x] <= 12) {
+              g.setColor(Color.ORANGE);
+              g.fillRect(x, y, 1, 1);
+            } else if (jClient.beaconProbability[y][x] > 12
+                    && jClient.beaconProbability[y][x] <= 100) {
+              g.setColor(Color.RED);
+              g.fillRect(x, y, 1, 1);
+            } else if (jClient.beaconProbability[y][x] > 100) {
+              g.setColor(Color.BLACK);
+              g.fillRect(x, y, 1, 1);
+            }
           }
         }
       }
@@ -62,22 +78,6 @@ public class BeaconVisualizer extends Thread {
 
     if (anglePoint >= ai && anglePoint <= af) {
       jClient.beaconProbability[y][x] += 1;
-      if (jClient.beaconProbability[y][x] > 3 &&
-              jClient.beaconProbability[y][x] <= 4) {
-        g.setColor(Color.YELLOW);
-        g.fillRect(x, y, 1, 1);
-      } else if(jClient.beaconProbability[y][x] > 8 &&
-              jClient.beaconProbability[y][x] <= 12) {
-        g.setColor(Color.ORANGE);
-        g.fillRect(x, y, 1, 1);
-      } else if(jClient.beaconProbability[y][x] > 12 &&
-              jClient.beaconProbability[y][x] <= 100) {
-        g.setColor(Color.RED);
-        g.fillRect(x, y, 1, 1);
-      } else if(jClient.beaconProbability[y][x] > 100) {
-        g.setColor(Color.BLACK);
-        g.fillRect(x, y, 1, 1);
-      }
     }
   }
 }
