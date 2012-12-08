@@ -268,10 +268,9 @@ public class jClient extends Observable {
 		if(emergency) {
 			if(!firstReturn)
 				nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar), halfPosX, halfPosY);
-			if(nodes == null || nodes.size() == 0) {
+			if(!firstReturn && (nodes == null || nodes.size() == 0)) {
 				cif.DriveMotors(0.0, 0.0);
-				System.out.println("ACABOU");
-				//System.exit(0); /* Terminate agent */
+				System.exit(0); /* Terminate agent */
 			}
 		}
 		
