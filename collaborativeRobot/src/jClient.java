@@ -207,8 +207,6 @@ public class jClient extends Observable {
 		// System.out.println("lM="+ leftMotorForce );
 		// System.out.println("L="+ L );
 		// System.out.println("compassRadians="+ compassRadians);
-		// System.out.println("iX="+ iX);
-		// System.out.println("iY="+ iY);
 
 		PosX = robotMapX2;
 		PosY = robotMapY2;
@@ -221,14 +219,15 @@ public class jClient extends Observable {
 		int x = (int) Math.round(PosX);
 	
 		aStarMatrix[y][x] = 0.0;
-		aStarMatrix[y][x+1] = 0.0;
-		aStarMatrix[y][x-1] = 0.0;
-		aStarMatrix[y+1][x] = 0.0;
-		aStarMatrix[y-1][x] = 0.0;
-		aStarMatrix[y+1][x+1] = 0.0;
-		aStarMatrix[y-1][x-1] = 0.0;
-		aStarMatrix[y+1][x-1] = 0.0;
-		aStarMatrix[y-1][x+1] = 0.0;
+//        System.out.println(x +" | "+ y);       
+//		aStarMatrix[y][x+1] = 0.0;
+//		aStarMatrix[y][x-1] = 0.0;
+//		aStarMatrix[y+1][x] = 0.0;
+//		aStarMatrix[y-1][x] = 0.0;
+//		aStarMatrix[y+1][x+1] = 0.0;
+//		aStarMatrix[y-1][x-1] = 0.0;
+//		aStarMatrix[y+1][x-1] = 0.0;
+//		aStarMatrix[y-1][x+1] = 0.0;
 	}
 
 	private void updateMap() {
