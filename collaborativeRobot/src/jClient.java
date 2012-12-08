@@ -153,11 +153,11 @@ public class jClient extends Observable {
 	MapVisualizer visualizer = new MapVisualizer();
 	visualizer.start();
 
-	/*MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
+	MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
 	probabilitiesVisualizer.start();
 
     BeaconVisualizer bv = new BeaconVisualizer();
-    bv.start();*/
+    bv.start();
 
 		Communication.init();
 
@@ -342,10 +342,24 @@ public class jClient extends Observable {
 		rightSensorPosX = rightSensorPos[0];
 		rightSensorPosY = rightSensorPos[1];
 		rightSensor = irSensor2;
+    
+    SensorProbBean sb = new SensorProbBean();
+    sb.compass = compass;
+    sb.frontSensor = jClient.frontSensor;
+    sb.frontSensorPosX = frontSensorPosX;
+    sb.frontSensorPosY = frontSensorPosY;
+    sb.leftSensor = leftSensor;
+    sb.leftSensorPosX = leftSensorPosX;
+    sb.leftSensorPosY = leftSensorPosY;
+    sb.rightSensor = rightSensor;
+    sb.rightSensorPosX = rightSensorPosX;
+    sb.rightSensorPosY = rightSensorPosY;
+    sb.mapX = PosX;
+    sb.mapY = PosY;
 
 		Communication.say();
 		setChanged();
-		notifyObservers();
+		notifyObservers(sb);
 
 	}
 
