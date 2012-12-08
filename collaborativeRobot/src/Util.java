@@ -20,6 +20,46 @@ public class Util {
     return deltatheta;
   }
 
+  // Arduino map function: http://www.arduino.cc/en/Reference/map
+  public static double map(double x, double in_min, double in_max,
+          double out_min, double out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  }
+
+  // compass range -180;180
+  public static double compassToDeg(double compass) {
+    if (compass >= 0.0 && compass <= 180) {
+      return compass;
+    } else {
+      return map(compass, -180.0, 0.0, 180.0, 360.0);
+    }
+  }
+
+  public static double normalizeAngle(double angle) {
+
+    if (angle < -Math.PI) {
+      angle = 2 * Math.PI + angle;
+    } else if (angle > Math.PI) {
+      angle = -1 * (2 * Math.PI - angle);
+    }
+
+    return angle;
+  }
+
+  public static double constrain(double value, double min, double max) {
+    if (value < min) {
+      return min;
+    } else if (value > max) {
+      return max;
+    } else {
+      return value;
+    }
+  }
+
+  public static double makePositive(double angle) {
+    return angle >= 0 ? angle : angle + 2 * Math.PI;
+  }
+
   /*
    * sensorDir is in Degrees returns [x,y]
    */
