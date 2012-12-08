@@ -33,7 +33,6 @@ public class jClient extends Observable {
 		RUN, WAIT, RETURN
 	}
 
-	public static final int robotRadius = (int) Constants.MAP_PRECISION / 2;
 	static public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
@@ -307,11 +306,11 @@ public class jClient extends Observable {
 		// System.out.println("(X1,Y1)=(" + robotMapX + "," + robotMapY + ")");
 		// System.out.println("(X2,Y2)=(" + PosX + "," + PosY + ")\n");
 
-		int[] frontSensorPos = frontSensorMapPosition(robotMapX, robotMapY,
+		int[] frontSensorPos = Util.frontSensorMapPosition(robotMapX, robotMapY,
 				compass);
-		int[] leftSensorPos = leftSensorMapPosition(robotMapX, robotMapY,
+		int[] leftSensorPos = Util.leftSensorMapPosition(robotMapX, robotMapY,
 				compass);
-		int[] rightSensorPos = rightSensorMapPosition(robotMapX, robotMapY,
+		int[] rightSensorPos = Util.rightSensorMapPosition(robotMapX, robotMapY,
 				compass);
 		// System.out.println("Left Sensor X: " + leftSensorPos[0]);
 		// System.out.println("Left Sensor Y: " + leftSensorPos[1]);
@@ -661,41 +660,6 @@ public class jClient extends Observable {
 		}
 	}
 
-	/*
-	 * sensorDir is in Degrees returns [x,y]
-	 */
-	private int[] sensorMapPosition(int robotMapX, int robotMapY,
-			double sensorDir) {
-		double sensorPosX = robotMapX + robotRadius
-				* Math.cos(Math.toRadians(sensorDir));
-		double sensorPosY = robotMapY - robotRadius
-				* Math.sin(Math.toRadians(sensorDir));
-
-		return new int[] { Math.round((float) sensorPosX),
-				Math.round((float) sensorPosY) };
-	}
-
-	public int[] frontSensorMapPosition(int robotMapX, int robotMapY,
-			double compass) {
-		double frontSensorDirection = compassToDeg(compass);
-		return sensorMapPosition(robotMapX, robotMapY, frontSensorDirection);
-	}
-
-	public int[] leftSensorMapPosition(int robotMapX, int robotMapY,
-			double compass) {
-		double leftSensorDirection = compassToDeg(compass) + 60;
-		return sensorMapPosition(robotMapX, robotMapY, leftSensorDirection);
-	}
-
-	public int[] rightSensorMapPosition(int robotMapX, int robotMapY,
-			double compass) {
-		double rightSensorDirection = compassToDeg(compass) - 60;
-		return sensorMapPosition(robotMapX, robotMapY, rightSensorDirection);
-	}
-
-	public double euclideanDistance(int x1, int y1, int x2, int y2) {
-		return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-	}
 
 	static void print_usage() {
 		System.out
