@@ -25,12 +25,12 @@ public class Communication {
 
 		int maxValues[][] = new int[order][3];
 		
-		for (int i = 0; i < jClient.beaconProbability.length; i++)
-			for (int j = 0; j < jClient.beaconProbability[i].length; j++) {
+		for (int i = 0; i < CollaborativeRobot.beaconProbability.length; i++)
+			for (int j = 0; j < CollaborativeRobot.beaconProbability[i].length; j++) {
 				int minimum = getMinimum(maxValues);
-				if (jClient.beaconProbability[i][j] > (maxValues[minimum][0])) {
+				if (CollaborativeRobot.beaconProbability[i][j] > (maxValues[minimum][0])) {
 					maxValues[minimum][1] = i;
-					maxValues[minimum][0] = (jClient.beaconProbability[i][j]);
+					maxValues[minimum][0] = (CollaborativeRobot.beaconProbability[i][j]);
 					maxValues[minimum][2] = j;
 				}
 			}
@@ -45,17 +45,17 @@ public class Communication {
 		int iMax = maxValues[order-1][1];
 		int jMax = maxValues[order-1][2];
 		
-		if (jClient.beaconProbability[iMax][jMax] == 0)
+		if (CollaborativeRobot.beaconProbability[iMax][jMax] == 0)
 			return "";
 		
-		String ret = iMax + "-" + jClient.initialPosY + "-" + jMax + "-" + jClient.initialPosX + "-" + 
-				+ jClient.beaconProbability[iMax][jMax] + "|";
+		String ret = iMax + "-" + CollaborativeRobot.initialPosY + "-" + jMax + "-" + CollaborativeRobot.initialPosX + "-" + 
+				+ CollaborativeRobot.beaconProbability[iMax][jMax] + "|";
 
 		for (int i = Math.max(iMax - 1, 0); i <= Math.min(iMax + 1,Constants.mapSizeY - 1); i++) {
 			for (int j = Math.max(jMax - 1, 0); j <= Math.min(jMax+ 1, Constants.mapSizeX - 1); j++) {
 				if (i == iMax && j == jMax)
 					continue;
-				ret += jClient.beaconProbability[i][j] + ";";
+				ret += CollaborativeRobot.beaconProbability[i][j] + ";";
 			}
 			ret = ret.substring(0, ret.length() - 1);
 			ret += "|";
@@ -98,10 +98,10 @@ public class Communication {
 		int offsetY = Integer.parseInt(beaconMostProbablePoint[1]);
 		int offsetX = Integer.parseInt(beaconMostProbablePoint[3]);
 
-		mostProbableY = mostProbableY - (offsetY - jClient.initialPosY);
-		mostProbableX = mostProbableX + (offsetX - jClient.initialPosX);
+		mostProbableY = mostProbableY - (offsetY - CollaborativeRobot.initialPosY);
+		mostProbableX = mostProbableX + (offsetX - CollaborativeRobot.initialPosX);
     
-		jClient.beaconProbability[mostProbableY][mostProbableX] = Math.max(value, jClient.beaconProbability[mostProbableY][mostProbableX]);
+		CollaborativeRobot.beaconProbability[mostProbableY][mostProbableX] = Math.max(value, CollaborativeRobot.beaconProbability[mostProbableY][mostProbableX]);
 
 		if (lines.length == 3) { // corner case
 
@@ -120,16 +120,16 @@ public class Communication {
 			if (firstLine.length < 3 || thirdLine.length < 3 || secondLine.length < 2) //point near the wall
 				return; 
 			
-			jClient.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]), jClient.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
-			jClient.beaconProbability[mostProbableY - 1][mostProbableX] = Math.max(Integer.parseInt(firstLine[1]), jClient.beaconProbability[mostProbableY - 1][mostProbableX]);
-			jClient.beaconProbability[mostProbableY - 1][mostProbableX + 1] = Math.max(Integer.parseInt(firstLine[2]), jClient.beaconProbability[mostProbableY - 1][mostProbableX + 1]);
+			CollaborativeRobot.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]), CollaborativeRobot.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
+			CollaborativeRobot.beaconProbability[mostProbableY - 1][mostProbableX] = Math.max(Integer.parseInt(firstLine[1]), CollaborativeRobot.beaconProbability[mostProbableY - 1][mostProbableX]);
+			CollaborativeRobot.beaconProbability[mostProbableY - 1][mostProbableX + 1] = Math.max(Integer.parseInt(firstLine[2]), CollaborativeRobot.beaconProbability[mostProbableY - 1][mostProbableX + 1]);
 
-			jClient.beaconProbability[mostProbableY][mostProbableX - 1] = Math.max(Integer.parseInt(secondLine[0]), jClient.beaconProbability[mostProbableY][mostProbableX - 1]);
-			jClient.beaconProbability[mostProbableY][mostProbableX + 1] = Math.max(Integer.parseInt(secondLine[1]), jClient.beaconProbability[mostProbableY][mostProbableX + 1]);
+			CollaborativeRobot.beaconProbability[mostProbableY][mostProbableX - 1] = Math.max(Integer.parseInt(secondLine[0]), CollaborativeRobot.beaconProbability[mostProbableY][mostProbableX - 1]);
+			CollaborativeRobot.beaconProbability[mostProbableY][mostProbableX + 1] = Math.max(Integer.parseInt(secondLine[1]), CollaborativeRobot.beaconProbability[mostProbableY][mostProbableX + 1]);
 
-			jClient.beaconProbability[mostProbableY + 1][mostProbableX - 1] = Math.max(Integer.parseInt(thirdLine[0]), jClient.beaconProbability[mostProbableY + 1][mostProbableX - 1]);
-			jClient.beaconProbability[mostProbableY + 1][mostProbableX] = Math.max(Integer.parseInt(thirdLine[1]), jClient.beaconProbability[mostProbableY + 1][mostProbableX]);
-			jClient.beaconProbability[mostProbableY + 1][mostProbableX + 1] = Math.max(Integer.parseInt(thirdLine[2]), jClient.beaconProbability[mostProbableY + 1][mostProbableX + 1]);
+			CollaborativeRobot.beaconProbability[mostProbableY + 1][mostProbableX - 1] = Math.max(Integer.parseInt(thirdLine[0]), CollaborativeRobot.beaconProbability[mostProbableY + 1][mostProbableX - 1]);
+			CollaborativeRobot.beaconProbability[mostProbableY + 1][mostProbableX] = Math.max(Integer.parseInt(thirdLine[1]), CollaborativeRobot.beaconProbability[mostProbableY + 1][mostProbableX]);
+			CollaborativeRobot.beaconProbability[mostProbableY + 1][mostProbableX + 1] = Math.max(Integer.parseInt(thirdLine[2]), CollaborativeRobot.beaconProbability[mostProbableY + 1][mostProbableX + 1]);
 		}
 	}
 
@@ -140,12 +140,12 @@ public class Communication {
 		String probableBeacon = Communication.getProbableBeacon(1);
 		String sensors = Communication.getSensors();
 		
-		if (jClient.cif.GetTime() % 2.0 == 0) { 
-			jClient.cif.Say(probableBeacon);
+		if (CollaborativeRobot.cif.GetTime() % 2.0 == 0) { 
+			CollaborativeRobot.cif.Say(probableBeacon);
 			//System.out.println("sending : " + probableBeacon);
 		}
 		else {
-			jClient.cif.Say(sensors);
+			CollaborativeRobot.cif.Say(sensors);
 			//System.out.println("sending : " + sensors);
 		}
 	}
@@ -154,7 +154,7 @@ public class Communication {
 	 * sensors|x|offsetX|y|offsetY|frontsensor|leftsensor|rightsensor|compass
 	 */
 	private static String getSensors() {
-		return "sensors|" + ((int)jClient.PosX) + "|" + jClient.initialPosX + "|" + ((int)jClient.PosY) + "|" + jClient.initialPosY + "|" + jClient.frontSensor + "|" + jClient.leftSensor + "|" + jClient.rightSensor + "|" + jClient.compass; 
+		return "sensors|" + ((int)CollaborativeRobot.PosX) + "|" + CollaborativeRobot.initialPosX + "|" + ((int)CollaborativeRobot.PosY) + "|" + CollaborativeRobot.initialPosY + "|" + CollaborativeRobot.frontSensor + "|" + CollaborativeRobot.leftSensor + "|" + CollaborativeRobot.rightSensor + "|" + CollaborativeRobot.compass; 
 	}
 
 	/*
@@ -163,14 +163,14 @@ public class Communication {
 	 */
 	public static void receive() {
 		for (int i = 1; i <= 5; i++) {
-			if (i == jClient.pos || jClient.cif.GetMessageFrom(i) == null)
+			if (i == CollaborativeRobot.pos || CollaborativeRobot.cif.GetMessageFrom(i) == null)
 				continue;
-			if (dataToProcess[i-1].equals(jClient.cif.GetMessageFrom(i))) {
+			if (dataToProcess[i-1].equals(CollaborativeRobot.cif.GetMessageFrom(i))) {
 				//System.out.println("repeated message from " + i);
 				continue;
 			}
 			else {
-				dataToProcess[i - 1] = jClient.cif.GetMessageFrom(i);
+				dataToProcess[i - 1] = CollaborativeRobot.cif.GetMessageFrom(i);
 				if (dataToProcess[i-1].contains("sensors"))
 					Communication.decodeAndApplySensorsMessage(dataToProcess[i - 1]);
         else{
@@ -198,8 +198,8 @@ public class Communication {
     int otherRoboY = Integer.parseInt(contents[3]);
     int otherRoboYoffset = Integer.parseInt(contents[4]);
     
-    sb.mapX = otherRoboX + (otherRoboXoffset - jClient.initialPosX);
-    sb.mapY = otherRoboY - (otherRoboYoffset - jClient.initialPosX);
+    sb.mapX = otherRoboX + (otherRoboXoffset - CollaborativeRobot.initialPosX);
+    sb.mapY = otherRoboY - (otherRoboYoffset - CollaborativeRobot.initialPosX);
 		
     int[] fsp = Util.frontSensorMapPosition((int) sb.mapX, (int) sb.mapY, sb.compass);
     sb.frontSensorPosX = fsp[0];

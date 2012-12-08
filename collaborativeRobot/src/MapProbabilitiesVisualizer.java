@@ -22,14 +22,14 @@ public class MapProbabilitiesVisualizer extends Thread {
 
 		while (true) {
 			Graphics g = panel.getGraphics();
-			for (int i = 0; i < jClient.probabilitiesMap.length; i++) {
-				for (int j = 0; j < jClient.probabilitiesMap[i].length; j++)
+			for (int i = 0; i < CollaborativeRobot.probabilitiesMap.length; i++) {
+				for (int j = 0; j < CollaborativeRobot.probabilitiesMap[i].length; j++)
 				{
-					if (jClient.probabilitiesMap[i][j] > 0.50) {
+					if (CollaborativeRobot.probabilitiesMap[i][j] > 0.50) {
 						g.setColor(Color.RED);
 						g.fillRect(j, i, 1, 1);
 					}
-					else if (jClient.probabilitiesMap[i][j] < 0.5){
+					else if (CollaborativeRobot.probabilitiesMap[i][j] < 0.5){
 						g.setColor(Color.BLUE);
 						g.fillRect(j, i, 1, 1);
 					}

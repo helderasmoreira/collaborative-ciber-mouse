@@ -22,28 +22,28 @@ public class MapVisualizer extends Thread {
 
 		while (true) {
 			Graphics g = panel.getGraphics();
-			for (int i = 0; i < jClient.map.length; i++) {
-				for (int j = 0; j < jClient.map[i].length; j++)
-					if (jClient.map[i][j] == 1.0) {
+			for (int i = 0; i < CollaborativeRobot.map.length; i++) {
+				for (int j = 0; j < CollaborativeRobot.map[i].length; j++)
+					if (CollaborativeRobot.map[i][j] == 1.0) {
 						g.setColor(Color.RED);
 						g.fillRect(j, i, 1, 1);
-					} else if (jClient.map[i][j] == -1.0) {
+					} else if (CollaborativeRobot.map[i][j] == -1.0) {
             g.setColor(Color.BLUE);
 						//g.fillRect(j, i, 1, 1);
-          } else if (jClient.map[i][j] == -1.1) {
+          } else if (CollaborativeRobot.map[i][j] == -1.1) {
             g.setColor(Color.GREEN);
 						//g.fillRect(j, i, 1, 1);
-          } else if (jClient.map[i][j] == -1.2) {
+          } else if (CollaborativeRobot.map[i][j] == -1.2) {
             g.setColor(Color.ORANGE);
 						//g.fillRect(j, i, 1, 1);
           }
-          else if(jClient.map[i][j] == -3.0) {
+          else if(CollaborativeRobot.map[i][j] == -3.0) {
         	  g.setColor(Color.ORANGE);
         	  g.fillRect(j, i, 1, 1);
           }
 			}
 			
-			double compassRadians = Math.toRadians(jClient.compass);
+			double compassRadians = Math.toRadians(CollaborativeRobot.compass);
 			double angleCenterI = compassRadians + Math.toRadians(-30);
 			double angleCenterF = compassRadians + Math.toRadians(30);
 			
@@ -60,13 +60,13 @@ public class MapVisualizer extends Thread {
 			angleCenterI3 = normalizeAngle(angleCenterI3);
 			angleCenterF3 = normalizeAngle(angleCenterF3);
 			
-			calculateArea(10.3, jClient.map, jClient.frontSensorPosX, jClient.frontSensorPosY, 
-					jClient.leftSensorPosX, jClient.leftSensorPosY,
-					jClient.rightSensorPosX, jClient.rightSensorPosY, panel,
+			calculateArea(10.3, CollaborativeRobot.map, CollaborativeRobot.frontSensorPosX, CollaborativeRobot.frontSensorPosY, 
+					CollaborativeRobot.leftSensorPosX, CollaborativeRobot.leftSensorPosY,
+					CollaborativeRobot.rightSensorPosX, CollaborativeRobot.rightSensorPosY, panel,
 					angleCenterI, angleCenterF, 
 					angleCenterI2, angleCenterF2,
 					angleCenterI3, angleCenterF3,
-					g, jClient.frontSensor, jClient.leftSensor, jClient.rightSensor);
+					g, CollaborativeRobot.frontSensor, CollaborativeRobot.leftSensor, CollaborativeRobot.rightSensor);
       
 			g.dispose();
 		}

@@ -1,33 +1,10 @@
-/*
- This file is part of ciberRatoToolsSrc.
-
- Copyright (C) 2001-2011 Universidade de Aveiro
-
- ciberRatoToolsSrc is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- ciberRatoToolsSrc is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with Foobar; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
-import java.util.List;
-import java.util.Observable;
 
 import ciberIF.beaconMeasure;
 import ciberIF.ciberIF;
+import java.util.List;
+import java.util.Observable;
 
-/**
- * example of a basic agent implemented using the java interface library.
- */
-public class jClient extends Observable {
+public class CollaborativeRobot extends Observable {
 
   enum State {
 
@@ -57,12 +34,16 @@ public class jClient extends Observable {
   static double rightSensor;
   static ciberIF cif;
   static int pos;
-  public static int sensorRequest = 0;
   public static double turnAround = -1.0;
   public double previousMotorPowL = 0.0;
   public double previousMotorPowR = 0.0;
   public double orientation = 0;
   List<Node> nodes;
+  private String robName;
+  static double compass;
+  static public beaconMeasure beacon;
+  private int ground;
+  private State state;
 
   public static void main(String[] args) {
 
@@ -71,7 +52,7 @@ public class jClient extends Observable {
 
     // default values
     host = "localhost";
-    robName = "Bla";
+    robName = "Collabot";
     pos = 1;
 
     // parse command-line arguments
@@ -109,14 +90,10 @@ public class jClient extends Observable {
     }
 
     // create client
-    jClient client = new jClient();
+    CollaborativeRobot client = new CollaborativeRobot();
 
     client.robName = robName;
 
-    final double[] sensorPositions = {0.0, -45.0, 45.0, 0.0};
-
-    // register robot in simulator
-    // cif.InitRobot2(robName, pos, sensorPositions, host);
     cif.InitRobot(robName, pos, host);
 
     ComputeProbabilities observing = new ComputeProbabilities();
@@ -128,10 +105,9 @@ public class jClient extends Observable {
   }
 
   // Constructor
-  jClient() {
+  CollaborativeRobot() {
     cif = new ciberIF();
     beacon = new beaconMeasure();
-    beaconToFollow = 0;
     ground = -1;
     state = State.RUN;
     halfPosX = Constants.mapSizeX / 2;
@@ -179,13 +155,13 @@ public class jClient extends Observable {
 
     System.out.println(PosX + " " + PosY);
 
-    double compass = Util.makePositive(this.compass);
+    double cpass = Util.makePositive(this.compass);
 
-    if (compass > 80 && compass < 100) {
+    if (cpass > 80 && cpass < 100) {
       orientation = Math.toRadians(90);
-    } else if (compass > 170 && compass < 190) {
+    } else if (cpass > 170 && cpass < 190) {
       orientation = Math.toRadians(180);
-    } else if (compass > 260 && compass < 280) {
+    } else if (cpass > 260 && cpass < 280) {
       orientation = Math.toRadians(270);
     } else {
       orientation = Math.toRadians(0);
@@ -207,7 +183,7 @@ public class jClient extends Observable {
   private void DriveMotors(double leftMotorForce, double rightMotorForce) {
     boolean emergency = false;
 
-    if (irSensor0 > 9.0 || irSensor1 > 9.0 || irSensor2 > 9.0 || cif.GetBumperSensor()) {
+    if (frontSensor > 9.0 || leftSensor > 9.0 || rightSensor > 9.0 || cif.GetBumperSensor()) {
       leftMotorForce = -0.15;
       rightMotorForce = -0.15;
       emergency = true;
@@ -260,7 +236,7 @@ public class jClient extends Observable {
       if (!firstReturn) {
         nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar), halfPosX, halfPosY);
       }
-      if (!firstReturn && (nodes == null || nodes.size() == 0)) {
+      if (!firstReturn && (nodes == null || nodes.isEmpty())) {
         cif.DriveMotors(0.0, 0.0);
         System.exit(0); /* Terminate agent */
       }
@@ -318,19 +294,16 @@ public class jClient extends Observable {
 
     frontSensorPosX = frontSensorPos[0];
     frontSensorPosY = frontSensorPos[1];
-    frontSensor = irSensor0;
 
     leftSensorPosX = leftSensorPos[0];
     leftSensorPosY = leftSensorPos[1];
-    leftSensor = irSensor1;
 
     rightSensorPosX = rightSensorPos[0];
     rightSensorPosY = rightSensorPos[1];
-    rightSensor = irSensor2;
 
     SensorProbBean sb = new SensorProbBean();
     sb.compass = compass;
-    sb.frontSensor = jClient.frontSensor;
+    sb.frontSensor = CollaborativeRobot.frontSensor;
     sb.frontSensorPosX = frontSensorPosX;
     sb.frontSensorPosY = frontSensorPosY;
     sb.leftSensor = leftSensor;
@@ -350,13 +323,13 @@ public class jClient extends Observable {
 
   public void getInfo() {
     if (cif.IsObstacleReady(0)) {
-      irSensor0 = cif.GetObstacleSensor(0);
+      frontSensor = cif.GetObstacleSensor(0);
     }
     if (cif.IsObstacleReady(1)) {
-      irSensor1 = cif.GetObstacleSensor(1);
+      leftSensor = cif.GetObstacleSensor(1);
     }
     if (cif.IsObstacleReady(2)) {
-      irSensor2 = cif.GetObstacleSensor(2);
+      rightSensor = cif.GetObstacleSensor(2);
     }
     if (cif.IsCompassReady()) {
       compass = cif.GetCompassSensor();
@@ -364,8 +337,8 @@ public class jClient extends Observable {
     if (cif.IsGroundReady()) {
       ground = cif.GetGroundSensor();
     }
-    if (cif.IsBeaconReady(beaconToFollow)) {
-      beacon = cif.GetBeaconSensor(beaconToFollow);
+    if (cif.IsBeaconReady(Constants.BEACON)) {
+      beacon = cif.GetBeaconSensor(Constants.BEACON);
     }
 
     Communication.receive();
@@ -379,9 +352,9 @@ public class jClient extends Observable {
     cif.RequestIRSensor(2);
 
     // em cada ciclo pedimos um diferente
-    switch (sensorRequest++ % 3) {
+    switch ((int) cif.GetTime() % 3) {
       case 1:
-        cif.RequestBeaconSensor(beaconToFollow);
+        cif.RequestBeaconSensor(Constants.BEACON);
         break;
       case 2:
         cif.RequestGroundSensor();
@@ -402,14 +375,14 @@ public class jClient extends Observable {
 
     double anglePoint = Util.makePositive(Math.atan2(PosY_aStar - n.y, n.x - PosX_aStar));
     /*double angleNow = makePositive(orientation);*/
-    double angleNow = Util.makePositive(Math.toRadians(jClient.compass));
+    double angleNow = Util.makePositive(Math.toRadians(CollaborativeRobot.compass));
 
     if (Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
 
       while (Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
         alignRobot(anglePoint, angleNow);
         /*angleNow = makePositive(orientation);*/
-        angleNow = Util.makePositive(Math.toRadians(jClient.compass));
+        angleNow = Util.makePositive(Math.toRadians(CollaborativeRobot.compass));
       }
 
     } else {
@@ -473,7 +446,7 @@ public class jClient extends Observable {
 
   public void wander(boolean followBeacon) {
     // verifica se há algum obstáculo a evitar
-    if (irSensor0 > 2.0 || irSensor1 > 2.0 || irSensor2 > 2.0) {
+    if (frontSensor > 2.0 || leftSensor > 2.0 || rightSensor > 2.0) {
       processWall();
     } // se não houver obstáculos e o beacon não estiver enquandrado, roda
     else if (followBeacon && beacon.beaconVisible
@@ -507,13 +480,13 @@ public class jClient extends Observable {
       getInfo();
 
       // se estiver numa esquina, roda no sentido do relógio
-      if (irSensor2 < 1.5 && irSensor0 < 1.5 && irSensor2 < 2.0) {
+      if (rightSensor < 1.5 && frontSensor < 1.5 && rightSensor < 2.0) {
         DriveMotors(0.1, -0.1);
         // se estiver num canto, roda no sentido contrário ao do relógio
-      } else if (irSensor0 <= 1.5 && irSensor1 <= 1.5 && irSensor2 <= 3.0) {
+      } else if (frontSensor <= 1.5 && leftSensor <= 1.5 && rightSensor <= 3.0) {
         DriveMotors(0.1, 0.1);
         // caso não haja obstáculo ou esteja perto da parede, anda
-      } else if (irSensor0 >= 1.5 || irSensor2 > 3.0) {
+      } else if (frontSensor >= 1.5 || rightSensor > 3.0) {
         DriveMotors(-0.1, 0.1);
       }
 
@@ -523,13 +496,13 @@ public class jClient extends Observable {
 
     // se o beacon estiver visível, tenta desviar-se dos obstáculos
     if (beacon.beaconVisible) {
-      if (irSensor0 > 1.5 && irSensor1 >= irSensor2) {
+      if (frontSensor > 1.5 && leftSensor >= rightSensor) {
         DriveMotors(0.1, -0.1);
-      } else if (irSensor0 > 2.0 && irSensor1 < irSensor2) {
+      } else if (frontSensor > 2.0 && leftSensor < rightSensor) {
         DriveMotors(-0.1, 0.1);
-      } else if (irSensor1 > 2.0) {
+      } else if (leftSensor > 2.0) {
         DriveMotors(0.1, 0.0);
-      } else if (irSensor2 > 2.0) {
+      } else if (rightSensor > 2.0) {
         DriveMotors(0.0, 0.1);
       }
     }
@@ -595,14 +568,7 @@ public class jClient extends Observable {
   }
 
   static void print_usage() {
-    System.out
-            .println("Usage: java jClient [-robname <robname>] [-pos <pos>] [-host <hostname>[:<port>]]");
+    System.out.println(
+            "Usage: java jClient [-robname <robname>] [-pos <pos>] [-host <hostname>[:<port>]]");
   }
-  private String robName;
-  private double irSensor0, irSensor1, irSensor2;
-  static double compass;
-  static public beaconMeasure beacon;
-  private int ground;
-  private State state;
-  private int beaconToFollow;
 };

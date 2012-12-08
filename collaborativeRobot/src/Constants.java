@@ -7,6 +7,8 @@ public class Constants {
   public static final double SENSOR_MINIMUM_VALUE = 1.0;
   public static final double ROBOT_RADIUS = 0.5;
   public static final double MAX_ANGLE_DEGREES_DEVIATION = 5.0;
+  public static final int BEACON = 0;
+  
   public static final int arenaSizeY = 14;
   public static final int mapSizeY = arenaSizeY * 2 * (int) MAP_PRECISION;
   public static final int arenaSizeX = 28;

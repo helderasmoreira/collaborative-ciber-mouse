@@ -95,7 +95,7 @@ public class ComputeProbabilities implements Observer {
           }
 
           // RIGHT
-          if (jClient.rightSensor >= Constants.SENSOR_MINIMUM_VALUE) {
+          if (CollaborativeRobot.rightSensor >= Constants.SENSOR_MINIMUM_VALUE) {
             calculateVisibleArea(sb.rightSensorPosX, sb.rightSensorPosY,
                     angleCenterI3, angleCenterF3, sb.rightSensor, i, j);
           }
@@ -138,8 +138,8 @@ public class ComputeProbabilities implements Observer {
       }
 
       // Teorema de Bayes
-      jClient.probabilitiesMap[i][j] = (prob * jClient.probabilitiesMap[i][j])
-              / ((prob * jClient.probabilitiesMap[i][j]) + ((1 - prob) * (1 - jClient.probabilitiesMap[i][j])));
+      CollaborativeRobot.probabilitiesMap[i][j] = (prob * CollaborativeRobot.probabilitiesMap[i][j])
+              / ((prob * CollaborativeRobot.probabilitiesMap[i][j]) + ((1 - prob) * (1 - CollaborativeRobot.probabilitiesMap[i][j])));
     }
   }
 

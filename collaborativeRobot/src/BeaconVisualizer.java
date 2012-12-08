@@ -9,7 +9,7 @@ public class BeaconVisualizer extends Thread {
   @Override
   public void run() {
     JPanel panel = new JPanel();
-    JFrame frame = new JFrame("Beacon Visualizer - " + jClient.pos);
+    JFrame frame = new JFrame("Beacon Visualizer - " + CollaborativeRobot.pos);
     frame.add(panel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(Constants.mapSizeX, Constants.mapSizeY);
@@ -18,10 +18,10 @@ public class BeaconVisualizer extends Thread {
 
     while (true) {
       Graphics g = panel.getGraphics();
-      if (jClient.beacon.beaconVisible) {
+      if (CollaborativeRobot.beacon.beaconVisible) {
 
-        double robotDir = jClient.compass;
-        double beaconRelDir = jClient.beacon.beaconDir;
+        double robotDir = CollaborativeRobot.compass;
+        double beaconRelDir = CollaborativeRobot.beacon.beaconDir;
         double beaconDir = robotDir + beaconRelDir;
 
         double angleI = Math.toRadians(beaconDir - 1);
@@ -30,25 +30,25 @@ public class BeaconVisualizer extends Thread {
         angleI = normalizeAngle(angleI);
         angleF = normalizeAngle(angleF);
 
-        int centerPosX = (int) jClient.PosX;
-        int centerPosY = (int) jClient.PosY;
+        int centerPosX = (int) CollaborativeRobot.PosX;
+        int centerPosY = (int) CollaborativeRobot.PosY;
 
-        for (int y = 0; y < jClient.beaconProbability.length; y++) {
-          for (int x = 0; x < jClient.beaconProbability[y].length; x++) {
+        for (int y = 0; y < CollaborativeRobot.beaconProbability.length; y++) {
+          for (int x = 0; x < CollaborativeRobot.beaconProbability[y].length; x++) {
             calculateVisibleArea(centerPosX, centerPosY, angleI, angleF, g, x, y);
-            if (jClient.beaconProbability[y][x] > 3
-                    && jClient.beaconProbability[y][x] <= 4) {
+            if (CollaborativeRobot.beaconProbability[y][x] > 3
+                    && CollaborativeRobot.beaconProbability[y][x] <= 4) {
               g.setColor(Color.YELLOW);
               g.fillRect(x, y, 1, 1);
-            } else if (jClient.beaconProbability[y][x] > 8
-                    && jClient.beaconProbability[y][x] <= 12) {
+            } else if (CollaborativeRobot.beaconProbability[y][x] > 8
+                    && CollaborativeRobot.beaconProbability[y][x] <= 12) {
               g.setColor(Color.ORANGE);
               g.fillRect(x, y, 1, 1);
-            } else if (jClient.beaconProbability[y][x] > 12
-                    && jClient.beaconProbability[y][x] <= 100) {
+            } else if (CollaborativeRobot.beaconProbability[y][x] > 12
+                    && CollaborativeRobot.beaconProbability[y][x] <= 100) {
               g.setColor(Color.RED);
               g.fillRect(x, y, 1, 1);
-            } else if (jClient.beaconProbability[y][x] > 100) {
+            } else if (CollaborativeRobot.beaconProbability[y][x] > 100) {
               g.setColor(Color.BLACK);
               g.fillRect(x, y, 1, 1);
             }
@@ -77,7 +77,7 @@ public class BeaconVisualizer extends Thread {
     anglePoint = Math.atan2(cy - y, x - cx);
 
     if (anglePoint >= ai && anglePoint <= af) {
-      jClient.beaconProbability[y][x] += 1;
+      CollaborativeRobot.beaconProbability[y][x] += 1;
     }
   }
 }
