@@ -40,29 +40,27 @@ public class PathFinder {
 
     protected Double h(Node from, Node to) {
         /*Using Linear Distance Heuristic as in:
-         http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html 
+         http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html */
          double cost = 1; //cost from one place to the adjacent
          double line = (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y);
          double h = cost * Math.sqrt(line);
-         */
+         
 
         /*Using Manhattan distance as in:
-         http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html */
+         http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
         double cost = 1; //cost from one place to the adjacent
         double line = Math.abs(from.x - to.x) + Math.abs(from.y - to.y);
         double h = cost * line;
+        */
+         
+         /*Using Chebyshev distance as in: h(n) = D * max(abs(n.x-goal.x), abs(n.y-goal.y))
+         http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html 
+        double cost = 1; //cost from one place to the adjacent
+        double line = Math.max(Math.abs(from.x - to.x), Math.abs(from.y - to.y));
+        double h = cost * line; */
 
-        /* Tie breaker 1
-         double dx1 = from.x - to.x;
-         double dy1 = from.y - to.y;
-         double dx2 = start.x - to.x;
-         double dy2 = start.y - to.y;
-         double cross = Math.abs(dx1 * dy2 - dx2 * dy1);
-         h += cross * 0.001;
-         */
 
-//        h *= (1.0 + 1 / maxExpected);  Tie breaker 2
-        //System.out.println("h:" + h);
+
         return h;
     }
 
@@ -70,22 +68,51 @@ public class PathFinder {
         List<Node> ret = new LinkedList<Node>();
         int x = node.x;
         int y = node.y;
+        
+        //baixo
         if (y < map.length - 1 && map[y + 1][x] <= ISWALL) {
             ret.add(new Node(x, y + 1));
         }
 
+        //direita
         if (x < map[0].length - 1 && map[y][x + 1] <= ISWALL) {
             ret.add(new Node(x + 1, y));
         }
 
+        //cima
         if (y > 0 && map[y - 1][x] <= ISWALL) {
             ret.add(new Node(x, y - 1));
         }
 
+        //esquerda
         if (x > 0 && map[y][x - 1] <= ISWALL) {
             ret.add(new Node(x - 1, y));
         }
+        
+        //cima direita
+        if (y > 0 &&  x < map[0].length - 1 && map[y - 1][x + 1] <= ISWALL) {
+            ret.add(new Node(x + 1, y - 1));
+        }
+        
+        //cima esquerda
+        if (y > 0 && x > 0 && map[y - 1][x - 1] <= ISWALL) {
+            ret.add(new Node(x - 1, y - 1));
+        }
+        
+        //baixo direita
+        if (y < map.length - 1 && x < map[0].length - 1 && map[y + 1][x + 1] <= ISWALL) {
+            ret.add(new Node(x + 1, y + 1));
+        }
+        
+        //baixo esquerda
+        if (y < map.length - 1 && x > 0 && map[y + 1][x - 1] <= ISWALL) {
+            ret.add(new Node(x - 1, y + 1));
+        }
+        
 
+        if(ret.isEmpty()){
+            System.out.println("No sucessors of "+node);
+        }
         return ret;
     }
 
@@ -103,7 +130,7 @@ public class PathFinder {
     public List<Node> calculate(int oX, int oY, int goalX, int goalY) {
         this.goal = new Node(goalX, goalY);
         this.start = new Node(oX, oY);
-
+        
         return this.compute(this.start);
     }
 
@@ -126,13 +153,13 @@ public class PathFinder {
 //            System.out.println("Closed:" +closed);
 
                 List<Node> sucessors = generateSuccessors(current);
-//            System.out.println("Successors:" +sucessors);
-//            System.out.println();
-
+//                System.out.println("Sucessors:" + sucessors);
+//                System.out.println();
+                
                 for (Node n : sucessors) {
                     double cost = current.g + movementcost(current, n);
 
-                    if (open.contains(n) && cost < n.g) { //verificar o <=
+                    if (open.contains(n) && cost < n.g) {
                         open.remove(n);
                     }
                     if (closed.contains(n) && cost < n.g) {
@@ -148,6 +175,29 @@ public class PathFinder {
             }
         }
         return path;
+    }
+    
+    public static List<Node> calculate(double[][] map, int oX, int oY, int goalX, int goalY) {
+
+        PathFinder pf = new PathFinder(map);
+
+        List<Node> nodes = pf.calculate(oX, oY, goalX, goalY);
+
+        System.out.println(map[oY][oX]);
+        System.out.println(map[goalY][goalX]);
+
+        if (nodes == null) {
+            System.out.println("No path");
+        } else {
+            System.out.print("Path = ");
+            for (Node n : nodes) {
+                System.out.print(n);
+            }
+            System.out.println();
+        }
+
+        return nodes;
+
     }
     
     
@@ -247,7 +297,7 @@ public class PathFinder {
 
         long begin = System.currentTimeMillis();
         System.out.println();
-        List<Node> nodes = pf.calculate(0, map.length -1, map[0].length - 1, map.length - 1);
+        List<Node> nodes = pf.calculate(map[0].length - 1, map.length - 1, 0, 0);
         System.out.println("Explored:" + pf.explored);
         long end = System.currentTimeMillis();
 
@@ -281,44 +331,4 @@ public class PathFinder {
         }
 
     }
-    
-    public static List<Node> calculate(double[][] map, int oX, int oY, int goalX, int goalY) {
-    	
-      PathFinder pf = new PathFinder(map);
-      
-      List<Node> nodes = pf.calculate(oX, oY, goalX, goalY);
-      
-     /* System.out.println(map[oY][oX]);
-      System.out.println(map[goalY][goalX]);
-      
-      if (nodes == null) {
-          System.out.println("No path");
-      } else {
-          System.out.print("Path = ");
-          for (Node n : nodes) {
-              map[n.y][n.x] = 7.7;
-              System.out.print(n);
-          }
-          System.out.println();
-      }*/
-      
-      return nodes;
-
-      /*for (int i = 0; i < map.length; i++) {
-          System.out.print("|");
-          for (int j = 0; j < map[0].length; j++) {
-              if (map[i][j] <= pf.ISWALL) {
-                  System.out.print(" ");
-              } else {
-                  if (map[i][j] == 7.7) {
-                      System.out.print("r");
-                  } else {
-                      System.out.print(".");
-                  }
-              }
-          }
-          System.out.println("|");
-      }*/
-
-  }
 }

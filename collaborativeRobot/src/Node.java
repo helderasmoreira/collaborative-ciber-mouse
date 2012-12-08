@@ -29,7 +29,17 @@ public class Node implements Comparable {
         @Override
         public int compareTo(Object o) {
             Node p = (Node) o;
-            return (int) (this.f - p.f);
+            
+            if(this.f == p.f){
+                return 0;
+            }
+            
+            if(this.f > p.f){
+                return 1;
+            }
+            else {
+                return -1;
+            }
         }
 
         @Override
