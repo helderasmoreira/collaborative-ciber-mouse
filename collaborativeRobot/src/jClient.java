@@ -33,7 +33,6 @@ public class jClient extends Observable {
 		RUN, WAIT, RETURN
 	}
 
-	public static final int robotRadius = (int) Constants.MAP_PRECISION / 2;
 	static public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
 	static public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
@@ -42,6 +41,10 @@ public class jClient extends Observable {
 	private boolean firstReturn = true;
 	public static double PosX;
 	public static double PosY;
+	public static double PosX_aStar;
+	public static double PosY_aStar;
+	public static double previousPosX;
+	public static double previousPosY;
 	public static int halfPosX, halfPosY;
 	static int frontSensorPosX;
 	static int frontSensorPosY;
@@ -58,8 +61,10 @@ public class jClient extends Observable {
 	public static int sensorRequest = 0;
 	public static double turnAround = -1.0;
 	
-	public double previousMotorPowL = -1.0;
-	public double previousMotorPowR = -1.0;
+	public double previousMotorPowL = 0.0;
+	public double previousMotorPowR = 0.0;
+	
+	public double orientation = 0;
 	
 	List<Node> nodes;
 
@@ -162,11 +167,29 @@ public class jClient extends Observable {
 		PosX = halfPosX;
 		PosY = halfPosY;
 		
+		PosX_aStar = PosX;
+		PosY_aStar = PosY;
+		
+		previousPosX = PosX_aStar;
+		previousPosY = PosY_aStar;
+		
 		aStarMatrix[(int) Math.round(PosY)][(int) Math.round(PosX)] = 0.0;
 		
 		updateMap();
 		
 		System.out.println(PosX + " " + PosY);
+		
+		double compass = compassToDeg(makePositive(this.compass));
+		
+		if(compass > 80 && compass < 100)
+			orientation = Math.toRadians(90);
+		else if(compass > 170 && compass < 190)
+			orientation = Math.toRadians(180);
+		else if(compass > 260 && compass < 280)
+			orientation = Math.toRadians(270);
+		else orientation = Math.toRadians(0);
+		
+		orientation = normalizeAngle(orientation);
 		
 		while (true) {
 			cif.ReadSensors();
@@ -178,56 +201,97 @@ public class jClient extends Observable {
 			}
 		}
 	}
+	
+	public static double normalizeAngle(double angle) {
+
+		if (angle < -Math.PI)
+			angle = 2 * Math.PI + angle;
+		else if (angle > Math.PI)
+			angle = -1 * (2 * Math.PI - angle);
+
+		return angle;
+	}
 
 	private void DriveMotors(double leftMotorForce, double rightMotorForce) {
-		cif.DriveMotors(leftMotorForce, rightMotorForce);
+		boolean emergency = false;
 		
-		if(previousMotorPowL == -1.0) {
-			previousMotorPowL = leftMotorForce;
-			previousMotorPowR = rightMotorForce;
+		if(irSensor0 > 9.0 || irSensor1 > 9.0 || irSensor2 > 9.0 || cif.GetBumperSensor()) {
+			leftMotorForce = -0.15;
+			rightMotorForce = -0.15;
+			emergency = true;
 		}
 		
+		cif.DriveMotors(leftMotorForce, rightMotorForce);
+			
 		leftMotorForce = (leftMotorForce + previousMotorPowL) / 2.0;
 		rightMotorForce = (rightMotorForce + previousMotorPowR) / 2.0;
 		
-		previousMotorPowL = leftMotorForce;
-		previousMotorPowR = rightMotorForce;
-
-		double compassRadians = Math.toRadians(compassToDeg(compass));
+		final double rot = (rightMotorForce - leftMotorForce) / (Constants.ROBOT_RADIUS * 2);
+		orientation = normalizeAngle(this.orientation + rot);
 		
 		double L = (rightMotorForce + leftMotorForce) / 2.0;
 		
-		double iX = ((Math.cos(compassRadians) * L)) * Constants.MAP_PRECISION;
-		double iY = ((Math.sin(compassRadians) * L)) * Constants.MAP_PRECISION;
+		double iX = ((Math.cos(Math.toRadians(compassToDeg(compass))) * L)) * Constants.MAP_PRECISION;
+		double iY = ((Math.sin(Math.toRadians(compassToDeg(compass))) * L)) * Constants.MAP_PRECISION;
 		
 		double robotMapX2 = (PosX + iX);
 		double robotMapY2 = (PosY - iY);
 
-		// System.out.println("rM="+ rightMotorForce );
-		// System.out.println("lM="+ leftMotorForce );
-		// System.out.println("L="+ L );
-		// System.out.println("compassRadians="+ compassRadians);
-
 		PosX = robotMapX2;
 		PosY = robotMapY2;
-		updateAStarMatrix();
-
+		
+		PosY_aStar = (int) (initialPosY - cif.GetY() *
+				 Constants.MAP_PRECISION + halfPosY);
+		PosX_aStar = (int) (cif.GetX() * Constants.MAP_PRECISION -
+				 initialPosX + halfPosX);
+		
+		if(firstReturn) {
+			int y = (int) (PosY_aStar > previousPosY ? PosY_aStar : previousPosY) + 1;
+			int x = (int) (PosX_aStar > previousPosX ? PosX_aStar : previousPosX) + 1;
+			double matrix[][] = new double[y][x];
+			
+			List<Node> nodes = PathFinder.calculate(matrix, (int) PosX_aStar, (int) PosY_aStar, (int) previousPosX, (int) previousPosY);
+			for(Node n: nodes) {
+				updateAStarMatrix(n.x, n.y);
+			}
+		}
+		
+		previousMotorPowL = leftMotorForce;
+		previousMotorPowR = rightMotorForce;
+		
+		previousPosX = PosX_aStar;
+		previousPosY = PosY_aStar;
+		
+		updateAStarMatrix((int)PosX_aStar, (int)PosY_aStar);
+		
+		if(emergency) {
+			if(!firstReturn) {
+                nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar), halfPosX, halfPosY);
+            }
+			if(!firstReturn && (nodes == null || nodes.isEmpty())) {
+				cif.DriveMotors(0.0, 0.0);
+				System.exit(0); /* Terminate agent */
+			}
+		}
+		
 	}
 
-	private void updateAStarMatrix() {
-		int y = (int) Math.round(PosY);
-		int x = (int) Math.round(PosX);
-	
+	private void updateAStarMatrix(int x, int y) {
+		
 		aStarMatrix[y][x] = 0.0;
-//        System.out.println(x +" | "+ y);       
-//		aStarMatrix[y][x+1] = 0.0;
-//		aStarMatrix[y][x-1] = 0.0;
-//		aStarMatrix[y+1][x] = 0.0;
-//		aStarMatrix[y-1][x] = 0.0;
-//		aStarMatrix[y+1][x+1] = 0.0;
-//		aStarMatrix[y-1][x-1] = 0.0;
-//		aStarMatrix[y+1][x-1] = 0.0;
-//		aStarMatrix[y-1][x+1] = 0.0;
+		aStarMatrix[y][x+1] = 0.0;
+		aStarMatrix[y][x-1] = 0.0;
+		aStarMatrix[y+1][x] = 0.0;
+		aStarMatrix[y-1][x] = 0.0;
+		aStarMatrix[y+1][x+1] = 0.0;
+		aStarMatrix[y-1][x-1] = 0.0;
+		aStarMatrix[y+1][x-1] = 0.0;
+		aStarMatrix[y-1][x+1] = 0.0;
+		
+		for(int i = 0; i < probabilitiesMap.length; i++)
+			for(int j = 0; j < probabilitiesMap[i].length; j++)
+				if(probabilitiesMap[i][j] > 0.75)
+					aStarMatrix[i][j] = 0.70;
 	}
 
 	private void updateMap() {
@@ -243,11 +307,11 @@ public class jClient extends Observable {
 		// System.out.println("(X1,Y1)=(" + robotMapX + "," + robotMapY + ")");
 		// System.out.println("(X2,Y2)=(" + PosX + "," + PosY + ")\n");
 
-		int[] frontSensorPos = frontSensorMapPosition(robotMapX, robotMapY,
+		int[] frontSensorPos = Util.frontSensorMapPosition(robotMapX, robotMapY,
 				compass);
-		int[] leftSensorPos = leftSensorMapPosition(robotMapX, robotMapY,
+		int[] leftSensorPos = Util.leftSensorMapPosition(robotMapX, robotMapY,
 				compass);
-		int[] rightSensorPos = rightSensorMapPosition(robotMapX, robotMapY,
+		int[] rightSensorPos = Util.rightSensorMapPosition(robotMapX, robotMapY,
 				compass);
 		// System.out.println("Left Sensor X: " + leftSensorPos[0]);
 		// System.out.println("Left Sensor Y: " + leftSensorPos[1]);
@@ -268,10 +332,24 @@ public class jClient extends Observable {
 		rightSensorPosX = rightSensorPos[0];
 		rightSensorPosY = rightSensorPos[1];
 		rightSensor = irSensor2;
+    
+    SensorProbBean sb = new SensorProbBean();
+    sb.compass = compass;
+    sb.frontSensor = jClient.frontSensor;
+    sb.frontSensorPosX = frontSensorPosX;
+    sb.frontSensorPosY = frontSensorPosY;
+    sb.leftSensor = leftSensor;
+    sb.leftSensorPosX = leftSensorPosX;
+    sb.leftSensorPosY = leftSensorPosY;
+    sb.rightSensor = rightSensor;
+    sb.rightSensorPosX = rightSensorPosX;
+    sb.rightSensorPosY = rightSensorPosY;
+    sb.mapX = PosX;
+    sb.mapY = PosY;
 
 		Communication.say();
 		setChanged();
-		notifyObservers();
+		notifyObservers(sb);
 
 	}
 
@@ -319,19 +397,23 @@ public class jClient extends Observable {
 	}
 	
 	private void goHome() {
-		if(nodes.size() == 1)
+		if(nodes.size() == 1) {
+			DriveMotors(0.0, 0.0);
 			return;
+		}
 		
 		nodes.remove(nodes.size() - 1);
 		Node n = nodes.get(nodes.size() - 1);
-		
-		double anglePoint = makePositive(Math.atan2(PosY - n.y, n.x - PosX));
+	
+		double anglePoint = makePositive(Math.atan2(PosY_aStar - n.y, n.x - PosX_aStar));
+		/*double angleNow = makePositive(orientation);*/
 		double angleNow = makePositive(Math.toRadians(compassToDeg(jClient.compass)));
 		
 		if(Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
 		
 			while(Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
 				alignRobot(anglePoint, angleNow);
+				/*angleNow = makePositive(orientation);*/
 				angleNow = makePositive(Math.toRadians(compassToDeg(jClient.compass)));
 			}
 		
@@ -342,31 +424,80 @@ public class jClient extends Observable {
 		
 		updateMap();
 		
-		int x = (int) Math.round(PosX);
-		int y = (int) Math.round(PosY);
+		int x = (int) Math.round(PosX_aStar);
+		int y = (int) Math.round(PosY_aStar);
 		
-		if(x != n.x || y != n.y) {
-			//nodes.add(new Node(n.x, n.y));
+		if(nodes != null && (Math.abs(x - n.x) > 10 || Math.abs(y - n.y) > 10)) {
+			nodes.add(new Node(n.x, n.y));
 		}
+		
+		//prunePath();
 		//System.out.println(n.x + " " + n.y + " " + x + " " + y);
 	}
 
 	private void alignRobot(double anglePoint, double angleNow) {
-		if(angleNow > anglePoint)
-			turnAround = 1.0;
-		else
-			turnAround = -1.0;
+		
+		double dif = angleDifference(normalizeAngle(angleNow), normalizeAngle(anglePoint));
 		
 		requestInfo();
 		cif.ReadSensors();
 		getInfo();
 		
-		if(turnAround == 1.0)
-			DriveMotors(0.04*Math.abs(angleNow - anglePoint), -0.04*Math.abs(angleNow - anglePoint));
-		else
-			DriveMotors(-0.04*Math.abs(angleNow - anglePoint), 0.04*Math.abs(angleNow - anglePoint));
+		double lPowIn = 0.20 * (2 * Constants.ROBOT_RADIUS * -dif );
+		double rPowIn = 0.20 * (2 * Constants.ROBOT_RADIUS * dif );
 		
+		DriveMotors(constrain(lPowIn, -0.15, 0.15), constrain(rPowIn, -0.15, 0.15));
+
 		updateMap();
+	}
+	
+	private void prunePath() {
+
+		if (nodes == null || nodes.isEmpty())
+			return;
+		
+		Node n = nodes.get(0);
+		
+		double distance = Math.sqrt(Math.abs(n.x - PosX)
+				* Math.abs(n.x - PosX) + Math.abs(n.y - PosY)
+				* Math.abs(n.y - PosY));
+
+		for (int i = 1; i < nodes.size(); i++) {
+			double distance2 = Math.sqrt(Math.abs(nodes.get(i).x - PosX)
+					* Math.abs(nodes.get(i).x - PosX) + Math.abs(nodes.get(i).y - PosY)
+					* Math.abs(nodes.get(i).y - PosY));
+			if (distance <= distance2) {
+				nodes.remove(i-1);
+				distance = distance2;
+			} else
+				break;
+		}
+	}
+	
+	private static double constrain(double value, double min, double max) {
+		if (value < min)
+			return min;
+		else if (value > max)
+			return max;
+		else
+			return value;
+	}
+	
+	public static double angleDifference(double alpha, double beta) {
+
+		double deltatheta = 0;
+
+		if ((alpha < 0 && beta < 0) || (alpha > 0 && beta > 0)) {
+			deltatheta = beta - alpha;
+		} else {
+			if (Math.abs(alpha) + Math.abs(beta) <= Math.PI)
+				deltatheta = (Math.abs(alpha) + Math.abs(beta));
+			else
+				deltatheta = -Math.abs(2 * Math.PI - Math.abs(alpha - beta));
+			if (beta < alpha)
+				deltatheta *= -1;
+		}
+		return deltatheta;
 	}
 	
 	public static double makePositive(double angle) {
@@ -429,13 +560,13 @@ public class jClient extends Observable {
 			getInfo();
 
 			// se estiver numa esquina, roda no sentido do relógio
-			if (irSensor2 < 2.0 && irSensor0 < 2.0 && irSensor2 < 3.0) {
+			if (irSensor2 < 1.5 && irSensor0 < 1.5 && irSensor2 < 2.0) {
 				DriveMotors(0.1, -0.1);
 				// se estiver num canto, roda no sentido contrário ao do relógio
-			} else if (irSensor0 <= 2.0 && irSensor1 <= 2.0 && irSensor2 <= 6.0) {
+			} else if (irSensor0 <= 1.5 && irSensor1 <= 1.5 && irSensor2 <= 3.0) {
 				DriveMotors(0.1, 0.1);
 				// caso não haja obstáculo ou esteja perto da parede, anda
-			} else if (irSensor0 >= 2.0 || irSensor2 > 6.0) {
+			} else if (irSensor0 >= 1.5 || irSensor2 > 3.0) {
 				DriveMotors(-0.1, 0.1);
 			}
 
@@ -445,7 +576,7 @@ public class jClient extends Observable {
 
 		// se o beacon estiver visível, tenta desviar-se dos obstáculos
 		if (beacon.beaconVisible) {
-			if (irSensor0 > 2.0 && irSensor1 >= irSensor2) {
+			if (irSensor0 > 1.5 && irSensor1 >= irSensor2) {
 				DriveMotors(0.1, -0.1);
 			} else if (irSensor0 > 2.0 && irSensor1 < irSensor2) {
 				DriveMotors(-0.1, 0.1);
@@ -485,10 +616,16 @@ public class jClient extends Observable {
 		case RETURN: /* Return to home area */
 			if(firstReturn) {
 				nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY);
-				firstReturn = false;
-				for(int i = 0; i < nodes.size(); i++) {
-					map[nodes.get(i).y][nodes.get(i).x] = -3.0;
+				
+				if(nodes != null && nodes.size() > 0) {
+					for(int i = 0; i < nodes.size(); i++) {
+						map[nodes.get(i).y][nodes.get(i
+								).x] = -3.0;
+					}
+					System.out.println("GOING HOME!");
+					firstReturn = false;
 				}
+				else System.exit(0); /* Terminate agent */
 			}
 			if (cif.GetFinished()) {
 				System.exit(0); /* Terminate agent */
@@ -499,7 +636,8 @@ public class jClient extends Observable {
 						+ "\n");
 			} else {
 				//original_wander(false);
-				goHome();
+				if(nodes != null && nodes.size() > 0)
+					goHome();
 			}
 			break;
 
@@ -523,41 +661,6 @@ public class jClient extends Observable {
 		}
 	}
 
-	/*
-	 * sensorDir is in Degrees returns [x,y]
-	 */
-	private int[] sensorMapPosition(int robotMapX, int robotMapY,
-			double sensorDir) {
-		double sensorPosX = robotMapX + robotRadius
-				* Math.cos(Math.toRadians(sensorDir));
-		double sensorPosY = robotMapY - robotRadius
-				* Math.sin(Math.toRadians(sensorDir));
-
-		return new int[] { Math.round((float) sensorPosX),
-				Math.round((float) sensorPosY) };
-	}
-
-	public int[] frontSensorMapPosition(int robotMapX, int robotMapY,
-			double compass) {
-		double frontSensorDirection = compassToDeg(compass);
-		return sensorMapPosition(robotMapX, robotMapY, frontSensorDirection);
-	}
-
-	public int[] leftSensorMapPosition(int robotMapX, int robotMapY,
-			double compass) {
-		double leftSensorDirection = compassToDeg(compass) + 60;
-		return sensorMapPosition(robotMapX, robotMapY, leftSensorDirection);
-	}
-
-	public int[] rightSensorMapPosition(int robotMapX, int robotMapY,
-			double compass) {
-		double rightSensorDirection = compassToDeg(compass) - 60;
-		return sensorMapPosition(robotMapX, robotMapY, rightSensorDirection);
-	}
-
-	public double euclideanDistance(int x1, int y1, int x2, int y2) {
-		return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-	}
 
 	static void print_usage() {
 		System.out

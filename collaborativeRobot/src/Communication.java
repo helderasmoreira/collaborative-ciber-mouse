@@ -97,10 +97,10 @@ public class Communication {
 		
 		int offsetY = Integer.parseInt(beaconMostProbablePoint[1]);
 		int offsetX = Integer.parseInt(beaconMostProbablePoint[3]);
-		/*
-		mostProbableY = mostProbableY + jClient.initialPosY - offsetY;
-		mostProbableX = mostProbableX + jClient.initialPosX - offsetX;
-		*/
+
+		mostProbableY = mostProbableY - (offsetY - jClient.initialPosY);
+		mostProbableX = mostProbableX + (offsetX - jClient.initialPosX);
+    
 		jClient.beaconProbability[mostProbableY][mostProbableX] = Math.max(value, jClient.beaconProbability[mostProbableY][mostProbableX]);
 
 		if (lines.length == 3) { // corner case
@@ -151,10 +151,10 @@ public class Communication {
 	}
 
 	/* gets the sensors of the robot in a string in the following format:
-	 * sensors|x|offsetX|y|offsetY|frontsensor|leftsensor|rightsensor
+	 * sensors|x|offsetX|y|offsetY|frontsensor|leftsensor|rightsensor|compass
 	 */
 	private static String getSensors() {
-		return "sensors|" + ((int)jClient.PosX * 100) + "|" + jClient.initialPosX + "|" + ((int)jClient.PosY * 100) + "|" + jClient.initialPosY + "|" + jClient.frontSensor + "|" + jClient.leftSensor + "|" + jClient.rightSensor; 
+		return "sensors|" + ((int)jClient.PosX) + "|" + jClient.initialPosX + "|" + ((int)jClient.PosY) + "|" + jClient.initialPosY + "|" + jClient.frontSensor + "|" + jClient.leftSensor + "|" + jClient.rightSensor + "|" + jClient.compass; 
 	}
 
 	/*
@@ -172,20 +172,45 @@ public class Communication {
 			else {
 				dataToProcess[i - 1] = jClient.cif.GetMessageFrom(i);
 				if (dataToProcess[i-1].contains("sensors"))
-					Communication.decodeAndApplySensorsMessage();
-				else
+					Communication.decodeAndApplySensorsMessage(dataToProcess[i - 1]);
+        else{
+          //System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
 					Communication.decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
-				//System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+        }
 			}
 		}	
 	}
 
 	/*
 	 * decodes the message received from the other mouse about their sensors
-	 * format: x|offsetX|y|offsetY|frontsensor|leftsensor|rightsensor
+	 * format: sensors|x|offsetX|y|offsetY|frontsensor|leftsensor|rightsensor|compass
 	 */
-	private static void decodeAndApplySensorsMessage() {
-		// TODO Auto-generated method stub
+	private static void decodeAndApplySensorsMessage(String message) {
+		String[] contents = message.split("\\|");
+    SensorProbBean sb = new SensorProbBean();
+    sb.compass = Double.parseDouble(contents[8]);
+    sb.frontSensor = Double.parseDouble(contents[5]);
+    sb.leftSensor = Double.parseDouble(contents[6]);
+    sb.rightSensor = Double.parseDouble(contents[7]);
+    
+    int otherRoboX = Integer.parseInt(contents[1]);
+    int otherRoboXoffset = Integer.parseInt(contents[2]);
+    int otherRoboY = Integer.parseInt(contents[3]);
+    int otherRoboYoffset = Integer.parseInt(contents[4]);
+    
+    sb.mapX = otherRoboX + (otherRoboXoffset - jClient.initialPosX);
+    sb.mapY = otherRoboY - (otherRoboYoffset - jClient.initialPosX);
 		
+    int[] fsp = Util.frontSensorMapPosition((int) sb.mapX, (int) sb.mapY, sb.compass);
+    sb.frontSensorPosX = fsp[0];
+    sb.frontSensorPosY = fsp[1];
+    
+    int[] lsp = Util.leftSensorMapPosition((int) sb.mapX, (int) sb.mapY, sb.compass);
+    sb.leftSensorPosX = lsp[0];
+    sb.leftSensorPosY = lsp[1];
+    
+    int[] rsp = Util.rightSensorMapPosition((int) sb.mapX, (int) sb.mapY, sb.compass);
+    sb.rightSensorPosX = rsp[0];
+    sb.rightSensorPosY = rsp[1];
 	}
 }
