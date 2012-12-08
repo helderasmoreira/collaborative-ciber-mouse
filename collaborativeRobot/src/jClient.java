@@ -271,7 +271,7 @@ public class jClient extends Observable {
 			if(nodes == null || nodes.size() == 0) {
 				cif.DriveMotors(0.0, 0.0);
 				System.out.println("ACABOU");
-				System.exit(0); /* Terminate agent */
+				//System.exit(0); /* Terminate agent */
 			}
 		}
 		
