@@ -18,7 +18,7 @@ public class PathFinder {
     public PathFinder(double[][] map) {
         this.map = map;
         this.maxExpected = map.length * map[0].length;
-        System.out.println("Max expected:" + this.maxExpected);
+        //System.out.println("Max expected:" + this.maxExpected);
     }
 
     protected boolean isGoal(Node node) {
@@ -109,7 +109,7 @@ public class PathFinder {
 
     private List<Node> compute(Node start) {
         open.add(start);
-        System.out.println("Goal: " + goal);
+        //System.out.println("Goal: " + goal);
         List<Node> path = null;
 
         while (open.peek() != null) {
@@ -288,7 +288,7 @@ public class PathFinder {
       
       List<Node> nodes = pf.calculate(oX, oY, goalX, goalY);
       
-      System.out.println(map[oY][oX]);
+     /* System.out.println(map[oY][oX]);
       System.out.println(map[goalY][goalX]);
       
       if (nodes == null) {
@@ -300,7 +300,7 @@ public class PathFinder {
               System.out.print(n);
           }
           System.out.println();
-      }
+      }*/
       
       return nodes;
 
