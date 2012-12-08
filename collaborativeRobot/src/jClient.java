@@ -247,23 +247,14 @@ public class jClient extends Observable {
 				 initialPosX + halfPosX);
 		
 		if(firstReturn) {
-			
-			double tempPosX = PosX_aStar;
-			double tempPosY = PosY_aStar;
-			
 			int y = (int) (PosY_aStar > previousPosY ? PosY_aStar : previousPosY) + 1;
 			int x = (int) (PosX_aStar > previousPosX ? PosX_aStar : previousPosX) + 1;
 			double matrix[][] = new double[y][x];
 			
 			List<Node> nodes = PathFinder.calculate(matrix, (int) PosX_aStar, (int) PosY_aStar, (int) previousPosX, (int) previousPosY);
 			for(Node n: nodes) {
-				PosX_aStar = n.x;
-				PosY_aStar = n.y;
-				updateAStarMatrix((int)PosX_aStar, (int)PosY_aStar);
+				updateAStarMatrix(n.x, n.y);
 			}
-			
-			PosX_aStar = tempPosX;
-			PosY_aStar = tempPosY;
 		}
 		
 		previousMotorPowL = leftMotorForce;
