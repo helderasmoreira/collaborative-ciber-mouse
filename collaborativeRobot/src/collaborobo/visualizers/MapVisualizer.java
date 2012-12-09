@@ -1,4 +1,8 @@
+package collaborobo.visualizers;
 
+import collaborobo.CollaborativeRobot;
+import collaborobo.utils.Constants;
+import collaborobo.utils.Util;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -6,16 +10,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class MapVisualizer extends Thread {
-  
+
   CollaborativeRobot robot;
 
-  MapVisualizer(CollaborativeRobot robot) {
+  public MapVisualizer(CollaborativeRobot robot) {
     this.robot = robot;
   }
 
   @Override
   public void run() {
-
     JFrame frame = new JFrame("Map Visualizer");
     JPanel panel = new JPanel();
     panel.setBackground(Color.WHITE);
@@ -28,23 +31,23 @@ public class MapVisualizer extends Thread {
 
     while (true) {
       Graphics g = panel.getGraphics();
-      for (int i = 0; i < CollaborativeRobot.map.length; i++) {
-        for (int j = 0; j < CollaborativeRobot.map[i].length; j++) {
-          if (CollaborativeRobot.map[i][j] == 1.0) {
+      for (int y = 0; y < robot.map.length; y++) {
+        for (int x = 0; x < robot.map[y].length; x++) {
+          if (robot.map[y][x] == 1.0) {
             g.setColor(Color.RED);
-            g.fillRect(j, i, 1, 1);
-          } else if (CollaborativeRobot.map[i][j] == -1.0) {
+            g.fillRect(x, y, 1, 1);
+          } else if (robot.map[y][x] == -1.0) {
             g.setColor(Color.BLUE);
             //g.fillRect(j, i, 1, 1);
-          } else if (CollaborativeRobot.map[i][j] == -1.1) {
+          } else if (robot.map[y][x] == -1.1) {
             g.setColor(Color.GREEN);
             //g.fillRect(j, i, 1, 1);
-          } else if (CollaborativeRobot.map[i][j] == -1.2) {
+          } else if (robot.map[y][x] == -1.2) {
             g.setColor(Color.ORANGE);
             //g.fillRect(j, i, 1, 1);
-          } else if (CollaborativeRobot.map[i][j] == -3.0) {
+          } else if (robot.map[y][x] == -3.0) {
             g.setColor(Color.ORANGE);
-            g.fillRect(j, i, 1, 1);
+            g.fillRect(x, y, 1, 1);
           }
         }
       }
@@ -66,20 +69,20 @@ public class MapVisualizer extends Thread {
       angleCenterI3 = Util.normalizeAngle(angleCenterI3);
       angleCenterF3 = Util.normalizeAngle(angleCenterF3);
 
-      calculateArea(10.3, CollaborativeRobot.map, CollaborativeRobot.frontSensorPosX, CollaborativeRobot.frontSensorPosY,
-              CollaborativeRobot.leftSensorPosX, CollaborativeRobot.leftSensorPosY,
-              CollaborativeRobot.rightSensorPosX, CollaborativeRobot.rightSensorPosY, panel,
+      calculateArea(10.3, robot.map, robot.frontSensorPosX, robot.frontSensorPosY,
+              robot.leftSensorPosX, robot.leftSensorPosY,
+              robot.rightSensorPosX, robot.rightSensorPosY, panel,
               angleCenterI, angleCenterF,
               angleCenterI2, angleCenterF2,
               angleCenterI3, angleCenterF3,
-              g, CollaborativeRobot.frontSensor, CollaborativeRobot.leftSensor, CollaborativeRobot.rightSensor);
+              g, robot.frontSensor, robot.leftSensor, robot.rightSensor);
 
       g.dispose();
     }
 
   }
 
-  private static void calculateArea(double radius, double[][] matrix,
+  private void calculateArea(double radius, double[][] matrix,
           int centerPosX, int centerPosY, int centerPosX2, int centerPosY2, int centerPosX3, int centerPosY3, JPanel panel,
           double angleCenterI, double angleCenterF,
           double angleCenterI2, double angleCenterF2,
@@ -123,7 +126,7 @@ public class MapVisualizer extends Thread {
     }
   }
 
-  private static void calculateVisibleArea(double radius, int centerPosX2,
+  private void calculateVisibleArea(double radius, int centerPosX2,
           int centerPosY2, double angleCenterI, double angleCenterF,
           Graphics g, double obstacleDistance, int i, int j) {
 
@@ -135,8 +138,7 @@ public class MapVisualizer extends Thread {
             * Math.abs(i - centerPosY2) + Math.abs(j - centerPosX2)
             * Math.abs(j - centerPosX2));
 
-    if (distanceCenter < radius && anglePoint > angleCenterI
-            && anglePoint < angleCenterF) {
+    if (distanceCenter < radius && anglePoint > angleCenterI && anglePoint < angleCenterF) {
       g.setColor(Color.GREEN);
       g.fillRect(j, i, 1, 1);
     }

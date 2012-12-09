@@ -1,6 +1,12 @@
+package collaborobo;
 
+import collaborobo.path.PathFinder;
+import collaborobo.path.Node;
 import ciberIF.beaconMeasure;
 import ciberIF.ciberIF;
+import collaborobo.utils.Constants;
+import collaborobo.utils.Util;
+import collaborobo.visualizers.*;
 import java.util.List;
 import java.util.Observable;
 
@@ -10,38 +16,39 @@ public class CollaborativeRobot extends Observable {
 
     RUN, WAIT, RETURN
   }
-  static public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
-  static public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
-  static public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
-  static public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
-  public static int initialPosX, initialPosY;
+  public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
+  public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
+  public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
+  public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
+  public int initialPosX, initialPosY;
   private boolean firstReturn = true;
-  public static double PosX;
-  public static double PosY;
-  public static double PosX_aStar;
-  public static double PosY_aStar;
-  public static double previousPosX;
-  public static double previousPosY;
-  public static int halfPosX, halfPosY;
-  static int frontSensorPosX;
-  static int frontSensorPosY;
-  static double frontSensor;
-  static int leftSensorPosX;
-  static int leftSensorPosY;
-  static double leftSensor;
-  static int rightSensorPosX;
-  static int rightSensorPosY;
-  static double rightSensor;
-  public static double turnAround = -1.0;
+  public double PosX;
+  public double PosY;
+  public double PosX_aStar;
+  public double PosY_aStar;
+  public double previousPosX;
+  public double previousPosY;
+  public int halfPosX, halfPosY;
+  public int frontSensorPosX;
+  public int frontSensorPosY;
+  public double frontSensor;
+  public int leftSensorPosX;
+  public int leftSensorPosY;
+  public double leftSensor;
+  public int rightSensorPosX;
+  public int rightSensorPosY;
+  public double rightSensor;
+  public double turnAround = -1.0;
   public double previousMotorPowL = 0.0;
   public double previousMotorPowR = 0.0;
   public double orientation = 0;
-  List<Node> nodes;
+  public List<Node> nodes;
+  
   private Communication comm;
   
   public String name;
   public int pos;
-  static public beaconMeasure beacon;
+  public beaconMeasure beacon;
   public double compass;
   public ciberIF cif;
   private int ground;
@@ -75,8 +82,8 @@ public class CollaborativeRobot extends Observable {
     MapVisualizer visualizer = new MapVisualizer(this);
     visualizer.start();
 
-    MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
-    probabilitiesVisualizer.start();
+    MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
+    probVisualizer.start();
 
     BeaconVisualizer bv = new BeaconVisualizer(this);
     bv.start();
@@ -245,7 +252,7 @@ public class CollaborativeRobot extends Observable {
 
     SensorProbBean sb = new SensorProbBean();
     sb.compass = compass;
-    sb.frontSensor = CollaborativeRobot.frontSensor;
+    sb.frontSensor = frontSensor;
     sb.frontSensorPosX = frontSensorPosX;
     sb.frontSensorPosY = frontSensorPosY;
     sb.leftSensor = leftSensor;

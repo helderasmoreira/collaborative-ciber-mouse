@@ -1,3 +1,5 @@
+package collaborobo;
+
 public class SensorProbBean {
   public boolean ownRobot = true;
   public double frontSensor;

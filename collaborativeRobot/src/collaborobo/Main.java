@@ -1,3 +1,5 @@
+package collaborobo;
+
 
 public class Main {
 
@@ -45,7 +47,7 @@ public class Main {
     robot.pos = pos;
     robot.cif.InitRobot(robName, pos, host);
 
-    ComputeProbabilities observing = new ComputeProbabilities();
+    ComputeProbabilities observing = new ComputeProbabilities(robot);
     robot.addObserver(observing);
 
     robot.mainLoop();
@@ -53,6 +55,7 @@ public class Main {
 
   private static void print_usage() {
     System.out.println(
-            "Usage: java jClient [-robname <robname>] [-pos <pos>] [-host <hostname>[:<port>]]");
+            "Usage: java CollaborativeRobot [-robname <robname>] [-pos <pos>]"
+            + " [-host <hostname>[:<port>]]");
   }
 }

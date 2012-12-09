@@ -1,11 +1,16 @@
+package collaborobo.visualizers;
 
+import collaborobo.CollaborativeRobot;
+import collaborobo.utils.Constants;
+import collaborobo.utils.Util;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class BeaconVisualizer extends Thread {
-  
+
   CollaborativeRobot robot;
 
   public BeaconVisualizer(CollaborativeRobot robot) {
@@ -14,13 +19,15 @@ public class BeaconVisualizer extends Thread {
 
   @Override
   public void run() {
-    JPanel panel = new JPanel();
     JFrame frame = new JFrame("Beacon Visualizer - " + robot.pos);
+    JPanel panel = new JPanel();
+    panel.setBackground(Color.WHITE);
     frame.add(panel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(Constants.mapSizeX, Constants.mapSizeY);
-    panel.setBackground(Color.WHITE);
+    frame.setPreferredSize(new Dimension(Constants.mapSizeX, Constants.mapSizeY));
     frame.setVisible(true);
+    frame.pack();
 
     while (true) {
       Graphics g = panel.getGraphics();
@@ -43,7 +50,7 @@ public class BeaconVisualizer extends Thread {
           for (int x = 0; x < robot.beaconProbability[y].length; x++) {
             calculateVisibleArea(centerPosX, centerPosY, angleI, angleF, g, x, y);
             int prob = robot.beaconProbability[y][x];
-            if ( prob > 3 && prob <= 4) {
+            if (prob > 3 && prob <= 4) {
               g.setColor(Color.YELLOW);
               g.fillRect(x, y, 1, 1);
             } else if (prob > 8 && prob <= 12) {

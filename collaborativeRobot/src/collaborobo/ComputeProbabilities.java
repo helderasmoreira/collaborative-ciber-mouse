@@ -1,4 +1,8 @@
+package collaborobo;
 
+
+import collaborobo.utils.Constants;
+import collaborobo.utils.Util;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -8,6 +12,12 @@ public class ComputeProbabilities implements Observer {
   protected static final float B_PROB = 0.475f;
   protected static final float C_PROB = 0.535f;
   protected static final float D_PROB = -1.0f;
+  
+  CollaborativeRobot robot;
+
+  public ComputeProbabilities(CollaborativeRobot robot) {
+    this.robot = robot;
+  } 
 
   @Override
   public void update(Observable obj, Object arg) {
@@ -95,7 +105,7 @@ public class ComputeProbabilities implements Observer {
           }
 
           // RIGHT
-          if (CollaborativeRobot.rightSensor >= Constants.SENSOR_MINIMUM_VALUE) {
+          if (sb.rightSensor >= Constants.SENSOR_MINIMUM_VALUE) {
             calculateVisibleArea(sb.rightSensorPosX, sb.rightSensorPosY,
                     angleCenterI3, angleCenterF3, sb.rightSensor, i, j);
           }
@@ -105,7 +115,7 @@ public class ComputeProbabilities implements Observer {
     }
   }
 
-  private static void calculateVisibleArea(int centerPosX2,
+  private void calculateVisibleArea(int centerPosX2,
           int centerPosY2, double angleCenterI, double angleCenterF,
           double sensorValue, int i, int j) {
 
@@ -127,8 +137,8 @@ public class ComputeProbabilities implements Observer {
       }
 
       // Teorema de Bayes
-      CollaborativeRobot.probabilitiesMap[i][j] = (prob * CollaborativeRobot.probabilitiesMap[i][j])
-              / ((prob * CollaborativeRobot.probabilitiesMap[i][j]) + ((1 - prob) * (1 - CollaborativeRobot.probabilitiesMap[i][j])));
+      robot.probabilitiesMap[i][j] = (prob * robot.probabilitiesMap[i][j])
+              / ((prob * robot.probabilitiesMap[i][j]) + ((1 - prob) * (1 - robot.probabilitiesMap[i][j])));
     }
   }
 
