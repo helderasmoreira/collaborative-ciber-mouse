@@ -183,17 +183,17 @@ public class PathFinder {
 
         List<Node> nodes = pf.calculate(oX, oY, goalX, goalY);
 
-        System.out.println(map[oY][oX]);
-        System.out.println(map[goalY][goalX]);
+        //System.out.println(map[oY][oX]);
+        //System.out.println(map[goalY][goalX]);
 
         if (nodes == null) {
             System.out.println("No path");
         } else {
-            System.out.print("Path = ");
+            //System.out.print("Path = ");
             for (Node n : nodes) {
-                System.out.print(n);
+                //System.out.print(n);
             }
-            System.out.println();
+            //System.out.println();
         }
 
         return nodes;

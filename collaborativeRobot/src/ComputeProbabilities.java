@@ -53,18 +53,18 @@ public class ComputeProbabilities implements Observer {
       double angleCenterI = compassRadians + Math.toRadians(-30);
       double angleCenterF = compassRadians + Math.toRadians(30);
 
-      angleCenterI = normalizeAngle(angleCenterI);
-      angleCenterF = normalizeAngle(angleCenterF);
+      angleCenterI = Util.normalizeAngle(angleCenterI);
+      angleCenterF = Util.normalizeAngle(angleCenterF);
 
       double angleCenterI2 = angleCenterI + Math.toRadians(60);
       double angleCenterF2 = angleCenterF + Math.toRadians(60);
-      angleCenterI2 = normalizeAngle(angleCenterI2);
-      angleCenterF2 = normalizeAngle(angleCenterF2);
+      angleCenterI2 = Util.normalizeAngle(angleCenterI2);
+      angleCenterF2 = Util.normalizeAngle(angleCenterF2);
 
       double angleCenterI3 = angleCenterI - Math.toRadians(60);
       double angleCenterF3 = angleCenterF - Math.toRadians(60);
-      angleCenterI3 = normalizeAngle(angleCenterI3);
-      angleCenterF3 = normalizeAngle(angleCenterF3);
+      angleCenterI3 = Util.normalizeAngle(angleCenterI3);
+      angleCenterF3 = Util.normalizeAngle(angleCenterF3);
 
       final double griddelta = 2 * (1 / Constants.SENSOR_MINIMUM_VALUE) * Constants.MAP_PRECISION;
 
@@ -103,17 +103,6 @@ public class ComputeProbabilities implements Observer {
         }
       }
     }
-  }
-
-  double normalizeAngle(double angle) {
-    double newAngle = angle;
-    while (newAngle <= -Math.PI) {
-      newAngle += 2 * Math.PI;
-    }
-    while (newAngle > Math.PI) {
-      newAngle -= 2 * Math.PI;
-    }
-    return newAngle;
   }
 
   private static void calculateVisibleArea(int centerPosX2,

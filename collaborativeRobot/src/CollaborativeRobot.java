@@ -32,77 +32,20 @@ public class CollaborativeRobot extends Observable {
   static int rightSensorPosX;
   static int rightSensorPosY;
   static double rightSensor;
-  static ciberIF cif;
-  static int pos;
   public static double turnAround = -1.0;
   public double previousMotorPowL = 0.0;
   public double previousMotorPowR = 0.0;
   public double orientation = 0;
   List<Node> nodes;
-  private String robName;
-  static double compass;
+  private Communication comm;
+  
+  public String name;
+  public int pos;
   static public beaconMeasure beacon;
+  public double compass;
+  public ciberIF cif;
   private int ground;
   private State state;
-
-  public static void main(String[] args) {
-
-    String host, robName;
-    int arg;
-
-    // default values
-    host = "localhost";
-    robName = "Collabot";
-    pos = 1;
-
-    // parse command-line arguments
-    try {
-      arg = 0;
-      while (arg < args.length) {
-        if (args[arg].equals("-pos")) {
-          if (args.length > arg + 1) {
-            pos = Integer.valueOf(args[arg + 1]).intValue();
-            arg += 2;
-          }
-        } else if (args[arg].equals("-robname")) {
-          if (args.length > arg + 1) {
-            robName = args[arg + 1];
-            arg += 2;
-          }
-        } else if (args[arg].equals("-host")) {
-          if (args.length > arg + 1) {
-            host = args[arg + 1];
-            arg += 2;
-          }
-        } else {
-          throw new Exception();
-        }
-      }
-    } catch (Exception e) {
-      print_usage();
-      return;
-    }
-
-    for (int i = 0; i < aStarMatrix.length; i++) {
-      for (int j = 0; j < aStarMatrix[i].length; j++) {
-        aStarMatrix[i][j] = 1.0;
-      }
-    }
-
-    // create client
-    CollaborativeRobot client = new CollaborativeRobot();
-
-    client.robName = robName;
-
-    cif.InitRobot(robName, pos, host);
-
-    ComputeProbabilities observing = new ComputeProbabilities();
-    client.addObserver(observing);
-
-    // main loop
-    client.mainLoop();
-
-  }
 
   // Constructor
   CollaborativeRobot() {
@@ -112,11 +55,9 @@ public class CollaborativeRobot extends Observable {
     state = State.RUN;
     halfPosX = Constants.mapSizeX / 2;
     halfPosY = Constants.mapSizeY / 2;
+    comm = new Communication(this);
   }
 
-  /**
-   * reads a new message, decides what to do and sends action to simulator
-   */
   public void mainLoop() {
 
     for (int i = 0; i < probabilitiesMap.length; i++) {
@@ -125,17 +66,21 @@ public class CollaborativeRobot extends Observable {
       }
     }
 
-    MapVisualizer visualizer = new MapVisualizer();
+    for (int i = 0; i < aStarMatrix.length; i++) {
+      for (int j = 0; j < aStarMatrix[i].length; j++) {
+        aStarMatrix[i][j] = 1.0;
+      }
+    }
+
+    MapVisualizer visualizer = new MapVisualizer(this);
     visualizer.start();
 
     MapProbabilitiesVisualizer probabilitiesVisualizer = new MapProbabilitiesVisualizer();
     probabilitiesVisualizer.start();
 
-    BeaconVisualizer bv = new BeaconVisualizer();
+    BeaconVisualizer bv = new BeaconVisualizer(this);
     bv.start();
-
-    Communication.init();
-
+     
     cif.ReadSensors();
 
     initialPosX = (int) (cif.GetX() * Constants.MAP_PRECISION);
@@ -278,12 +223,9 @@ public class CollaborativeRobot extends Observable {
     // System.out.println("(X1,Y1)=(" + robotMapX + "," + robotMapY + ")");
     // System.out.println("(X2,Y2)=(" + PosX + "," + PosY + ")\n");
 
-    int[] frontSensorPos = Util.frontSensorMapPosition(robotMapX, robotMapY,
-            compass);
-    int[] leftSensorPos = Util.leftSensorMapPosition(robotMapX, robotMapY,
-            compass);
-    int[] rightSensorPos = Util.rightSensorMapPosition(robotMapX, robotMapY,
-            compass);
+    int[] frontSensorPos = Util.frontSensorMapPosition(robotMapX, robotMapY, compass);
+    int[] leftSensorPos = Util.leftSensorMapPosition(robotMapX, robotMapY, compass);
+    int[] rightSensorPos = Util.rightSensorMapPosition(robotMapX, robotMapY, compass);
     // System.out.println("Left Sensor X: " + leftSensorPos[0]);
     // System.out.println("Left Sensor Y: " + leftSensorPos[1]);
     // System.out.println("Right Sensor X: " + rightSensorPos[0]);
@@ -315,10 +257,14 @@ public class CollaborativeRobot extends Observable {
     sb.mapX = PosX;
     sb.mapY = PosY;
 
-    Communication.say();
-    setChanged();
-    notifyObservers(sb);
+    comm.say();
+    tellObservers(sb);
 
+  }
+
+  public void tellObservers(Object arg) {
+    setChanged();
+    notifyObservers(arg);
   }
 
   public void getInfo() {
@@ -341,7 +287,7 @@ public class CollaborativeRobot extends Observable {
       beacon = cif.GetBeaconSensor(Constants.BEACON);
     }
 
-    Communication.receive();
+    comm.receive();
   }
 
   public void requestInfo() {
@@ -375,14 +321,14 @@ public class CollaborativeRobot extends Observable {
 
     double anglePoint = Util.makePositive(Math.atan2(PosY_aStar - n.y, n.x - PosX_aStar));
     /*double angleNow = makePositive(orientation);*/
-    double angleNow = Util.makePositive(Math.toRadians(CollaborativeRobot.compass));
+    double angleNow = Util.makePositive(Math.toRadians(compass));
 
     if (Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
 
       while (Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
         alignRobot(anglePoint, angleNow);
         /*angleNow = makePositive(orientation);*/
-        angleNow = Util.makePositive(Math.toRadians(CollaborativeRobot.compass));
+        angleNow = Util.makePositive(Math.toRadians(compass));
       }
 
     } else {
@@ -552,7 +498,7 @@ public class CollaborativeRobot extends Observable {
         }
         if (ground == 1) { /* Finish */
           cif.Finish();
-          System.out.println(robName + " found home at " + cif.GetTime()
+          System.out.println(name + " found home at " + cif.GetTime()
                   + "\n");
         } else {
           //original_wander(false);
@@ -565,10 +511,5 @@ public class CollaborativeRobot extends Observable {
     }
 
     requestInfo();
-  }
-
-  static void print_usage() {
-    System.out.println(
-            "Usage: java jClient [-robname <robname>] [-pos <pos>] [-host <hostname>[:<port>]]");
   }
 };
