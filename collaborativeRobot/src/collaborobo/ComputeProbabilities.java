@@ -1,6 +1,5 @@
 package collaborobo;
 
-
 import collaborobo.utils.Constants;
 import collaborobo.utils.Util;
 import java.util.Observable;
@@ -12,12 +11,11 @@ public class ComputeProbabilities implements Observer {
   protected static final float B_PROB = 0.475f;
   protected static final float C_PROB = 0.535f;
   protected static final float D_PROB = -1.0f;
-  
   CollaborativeRobot robot;
 
   public ComputeProbabilities(CollaborativeRobot robot) {
     this.robot = robot;
-  } 
+  }
 
   @Override
   public void update(Observable obj, Object arg) {
@@ -25,7 +23,7 @@ public class ComputeProbabilities implements Observer {
     if (arg instanceof SensorProbBean) {
       SensorProbBean sb = (SensorProbBean) arg;
 
-      final double robotSize = 2.0 * Constants.ROBOT_RADIUS * Constants.MAP_PRECISION;
+      final double robotSize = Constants.ROBOT_RADIUS * Constants.MAP_PRECISION;
 
       int minx = (int) (sb.mapX - robotSize),
               maxx = (int) (sb.mapX + robotSize),
@@ -33,21 +31,21 @@ public class ComputeProbabilities implements Observer {
               maxy = (int) (sb.mapY + robotSize);
 
       minx = minx > 0 ? minx : 0;
-      maxx = (int) (maxx < Constants.arenaSizeX * 2 * Constants.MAP_PRECISION ? maxx : Constants.arenaSizeX * 2 * Constants.MAP_PRECISION - 1);
+      maxx = (int) (maxx < Constants.mapSizeX ? maxx : Constants.mapSizeX - 1);
       miny = miny > 0 ? miny : 0;
-      maxy = (int) (maxy < Constants.arenaSizeY * 2 * Constants.MAP_PRECISION ? maxy : Constants.arenaSizeY * 2 * Constants.MAP_PRECISION - 1);
+      maxy = (int) (maxy < Constants.mapSizeY ? maxy : Constants.mapSizeY - 1);
 
       double prob = A_PROB;
 
-      for (int i = miny; i < maxy; i++) {
-        for (int j = minx; j < maxx; j++) {
-          double distanceCenter = Math.sqrt(Math.abs(i - sb.mapY)
-                  * Math.abs(i - sb.mapY) + Math.abs(j - sb.mapX)
-                  * Math.abs(j - sb.mapX));
+      for (int y = miny; y < maxy; y++) {
+        for (int x = minx; x < maxx; x++) {
+          double distanceCenter = Math.sqrt(Math.abs(y - sb.mapY)
+                  * Math.abs(y - sb.mapY) + Math.abs(x - sb.mapX)
+                  * Math.abs(x - sb.mapX));
 
-          /*if(distanceCenter < robotSize)
-           jClient.probabilitiesMap[i][j] = (prob * jClient.probabilitiesMap[i][j])
-           / ((prob * jClient.probabilitiesMap[i][j]) + ((1 - prob) * (1 - jClient.probabilitiesMap[i][j])));*/
+          if (distanceCenter < robotSize) {
+            robot.probabilitiesMap[y][x] = 0.0;
+          }
         }
       }
 
@@ -84,52 +82,45 @@ public class ComputeProbabilities implements Observer {
       maxy = (int) (sb.mapY + griddelta);
 
       minx = minx > 0 ? minx : 0;
-      maxx = (int) (maxx < Constants.arenaSizeX * 2 * Constants.MAP_PRECISION ? maxx : Constants.arenaSizeX * 2 * Constants.MAP_PRECISION - 1);
+      maxx = (int) (maxx < Constants.mapSizeX ? maxx : Constants.mapSizeX - 1);
       miny = miny > 0 ? miny : 0;
-      maxy = (int) (maxy < Constants.arenaSizeY * 2 * Constants.MAP_PRECISION ? maxy : Constants.arenaSizeY * 2 * Constants.MAP_PRECISION - 1);
+      maxy = (int) (maxy < Constants.mapSizeY ? maxy : Constants.mapSizeY - 1);
 
-      for (int i = miny; i < maxy; i++) {
-        for (int j = minx; j < maxx; j++) {
+      for (int y = miny; y < maxy; y++) {
+        for (int x = minx; x < maxx; x++) {
 
           // FRONT
           if (sb.frontSensor >= Constants.SENSOR_MINIMUM_VALUE) {
             calculateVisibleArea(sb.frontSensorPosX, sb.frontSensorPosY,
-                    angleCenterI, angleCenterF, sb.leftSensor, i, j);
+                    angleCenterI, angleCenterF, sb.leftSensor, y, x);
           }
-
 
           // LEFT
           if (sb.leftSensor >= Constants.SENSOR_MINIMUM_VALUE) {
             calculateVisibleArea(sb.leftSensorPosX, sb.leftSensorPosY,
-                    angleCenterI2, angleCenterF2, sb.leftSensor, i, j);
+                    angleCenterI2, angleCenterF2, sb.leftSensor, y, x);
           }
 
           // RIGHT
           if (sb.rightSensor >= Constants.SENSOR_MINIMUM_VALUE) {
             calculateVisibleArea(sb.rightSensorPosX, sb.rightSensorPosY,
-                    angleCenterI3, angleCenterF3, sb.rightSensor, i, j);
+                    angleCenterI3, angleCenterF3, sb.rightSensor, y, x);
           }
-
         }
       }
     }
   }
 
-  private void calculateVisibleArea(int centerPosX2,
-          int centerPosY2, double angleCenterI, double angleCenterF,
-          double sensorValue, int i, int j) {
+  private void calculateVisibleArea(int centerX,
+          int centerY, double angleCenterI, double angleCenterF,
+          double sensorValue, int y, int x) {
 
-    double anglePoint;
-    double distanceCenter;
+    double anglePoint = Math.atan2(centerY - y, x - centerX);
 
-    anglePoint = Math.atan2(centerPosY2 - i, j - centerPosX2);
-
-    if (anglePoint >= angleCenterI
-            && anglePoint <= angleCenterF) {
-
-      distanceCenter = Math.sqrt(Math.abs(i - centerPosY2)
-              * Math.abs(i - centerPosY2) + Math.abs(j - centerPosX2)
-              * Math.abs(j - centerPosX2));
+    if (anglePoint >= angleCenterI && anglePoint <= angleCenterF) {
+      double distanceCenter = Math.sqrt(Math.abs(y - centerY)
+              * Math.abs(y - centerY) + Math.abs(x - centerX)
+              * Math.abs(x - centerX));
 
       double prob = computeProb(sensorValue, distanceCenter);
       if (prob == -1.0) {
@@ -137,12 +128,14 @@ public class ComputeProbabilities implements Observer {
       }
 
       // Teorema de Bayes
-      robot.probabilitiesMap[i][j] = (prob * robot.probabilitiesMap[i][j])
-              / ((prob * robot.probabilitiesMap[i][j]) + ((1 - prob) * (1 - robot.probabilitiesMap[i][j])));
+      robot.probabilitiesMap[y][x] =
+              (prob * robot.probabilitiesMap[y][x])
+              / ((prob * robot.probabilitiesMap[y][x])
+              + ((1 - prob) * (1 - robot.probabilitiesMap[y][x])));
     }
   }
 
-  public static double computeProb(final double reading, final double dist) {
+  public double computeProb(final double reading, final double dist) {
 
     if (dist < (1 / (reading + Constants.OBST_NOISE)) * Constants.MAP_PRECISION) {
       return A_PROB;
