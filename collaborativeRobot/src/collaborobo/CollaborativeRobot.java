@@ -327,14 +327,14 @@ public class CollaborativeRobot extends Observable {
     Node n = nodes.get(nodes.size() - 1);
 
     double anglePoint = Util.makePositive(Math.atan2(PosY_aStar - n.y, n.x - PosX_aStar));
-    /*double angleNow = makePositive(orientation);*/
+    /*double angleNow = Util.makePositive(orientation);*/
     double angleNow = Util.makePositive(Math.toRadians(compass));
 
     if (Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
 
       while (Math.abs(angleNow - anglePoint) > Math.toRadians(Constants.MAX_ANGLE_DEGREES_DEVIATION)) {
         alignRobot(anglePoint, angleNow);
-        /*angleNow = makePositive(orientation);*/
+        /*angleNow = Util.makePositive(orientation);*/
         angleNow = Util.makePositive(Math.toRadians(compass));
       }
 
@@ -351,7 +351,7 @@ public class CollaborativeRobot extends Observable {
       nodes.add(new Node(n.x, n.y));
     }
 
-    //prunePath();
+    prunePath();
     //System.out.println(n.x + " " + n.y + " " + x + " " + y);
   }
 
@@ -427,10 +427,16 @@ public class CollaborativeRobot extends Observable {
       if (cif.GetBumperSensor()) {
         DriveMotors(-0.15, 0.15);
       }
-
+      
       requestInfo();
       cif.ReadSensors();
       getInfo();
+      
+      if(ground == 0) {
+    	  cif.SetVisitingLed(true);
+    	  DriveMotors(0.0,0.0);
+    	  break;
+      }
 
       // se estiver numa esquina, roda no sentido do relógio
       if (rightSensor < 1.5 && frontSensor < 1.5 && rightSensor < 2.0) {
