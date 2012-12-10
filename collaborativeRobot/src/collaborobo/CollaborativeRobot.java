@@ -275,6 +275,9 @@ public class CollaborativeRobot extends Observable {
   }
 
   public void getInfo() {
+	  
+	comm.receive();
+	  
     if (cif.IsObstacleReady(0)) {
       frontSensor = cif.GetObstacleSensor(0);
     }
@@ -297,10 +300,7 @@ public class CollaborativeRobot extends Observable {
     		beacon = createBeaconFromMatrix();
     		System.out.println("beacon from Matrix - beaconDir : " + beacon.beaconDir);
     	}
-    		
     }
-
-    comm.receive();
   }
 
   private beaconMeasure createBeaconFromMatrix() {
@@ -316,6 +316,7 @@ public class CollaborativeRobot extends Observable {
 			}
 	
 	beaconMeasure beacon = new beaconMeasure();
+	System.out.println("Y: " + maxI + " - X: " + maxJ);
 	beacon.beaconDir = Math.toDegrees(Math.atan2(PosY - maxI, maxJ - PosX));
 	beacon.beaconVisible = true;
 	return beacon;
