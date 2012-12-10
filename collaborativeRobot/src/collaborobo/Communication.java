@@ -112,6 +112,9 @@ public class Communication {
 
     mostProbableY = mostProbableY - (offsetY - robot.initialPosY);
     mostProbableX = mostProbableX + (offsetX - robot.initialPosX);
+    
+    mostProbableX = Util.constrain(mostProbableX, 1, Constants.mapSizeX -2);
+    mostProbableY = Util.constrain(mostProbableY, 1, Constants.mapSizeY -2);
 
     robot.beaconProbability[mostProbableY][mostProbableX] = Math.max(value, robot.beaconProbability[mostProbableY][mostProbableX]);
 
@@ -196,7 +199,7 @@ public class Communication {
         if (dataToProcess[i - 1].contains("sensors")) {
           decodeAndApplySensorsMessage(dataToProcess[i - 1]);
         } else {
-          //System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+          System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
           decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
         }
       }
