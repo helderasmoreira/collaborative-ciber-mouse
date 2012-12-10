@@ -128,9 +128,15 @@ public class Communication {
         return;
       }
 
-      if (firstLine.length < 3 || thirdLine.length < 3 || secondLine.length < 2) //point near the wall
+      if (firstLine.length < 3 || thirdLine.length < 3 || secondLine.length < 2) //point near the wall 
       {
-        return;
+    	  robot.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]), robot.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
+          robot.beaconProbability[mostProbableY - 1][mostProbableX] = Math.max(Integer.parseInt(firstLine[1]), robot.beaconProbability[mostProbableY - 1][mostProbableX]);
+
+          robot.beaconProbability[mostProbableY][mostProbableX - 1] = Math.max(Integer.parseInt(secondLine[0]), robot.beaconProbability[mostProbableY][mostProbableX - 1]);
+
+          robot.beaconProbability[mostProbableY + 1][mostProbableX - 1] = Math.max(Integer.parseInt(thirdLine[0]), robot.beaconProbability[mostProbableY + 1][mostProbableX - 1]);
+          robot.beaconProbability[mostProbableY + 1][mostProbableX] = Math.max(Integer.parseInt(thirdLine[1]), robot.beaconProbability[mostProbableY + 1][mostProbableX]);
       }
 
       robot.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]), robot.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
@@ -189,7 +195,7 @@ public class Communication {
         if (dataToProcess[i - 1].contains("sensors")) {
           decodeAndApplySensorsMessage(dataToProcess[i - 1]);
         } else {
-          //System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+          System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
           decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
         }
       }

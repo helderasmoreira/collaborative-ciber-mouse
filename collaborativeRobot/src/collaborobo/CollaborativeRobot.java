@@ -81,13 +81,13 @@ public class CollaborativeRobot extends Observable {
 /*
     MapVisualizer visualizer = new MapVisualizer(this);
     visualizer.start();
-*/
+
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
-/*
+*/
     BeaconVisualizer bv = new BeaconVisualizer(this);
     bv.start();
-*/   
+   
     cif.ReadSensors();
 
     initialPosX = (int) (cif.GetX() * Constants.MAP_PRECISION);
