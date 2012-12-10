@@ -306,7 +306,6 @@ public class CollaborativeRobot extends Observable {
     		beacon = cif.GetBeaconSensor(Constants.BEACON);
     	else {
     		beacon = createBeaconFromMatrix();
-    		System.out.println("beacon from Matrix - beaconDir : " + beacon.beaconDir);
     	}
     } else {
       beacon.beaconVisible = false;
@@ -326,7 +325,6 @@ public class CollaborativeRobot extends Observable {
 			}
 	
 	beaconMeasure beacon = new beaconMeasure();
-	System.out.println("Y: " + maxY + " - X: " + maxX);
         if(max == 0){
             beacon.beaconVisible = false;
         }
