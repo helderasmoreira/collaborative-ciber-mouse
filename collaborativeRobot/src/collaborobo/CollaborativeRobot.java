@@ -291,13 +291,37 @@ public class CollaborativeRobot extends Observable {
       ground = cif.GetGroundSensor();
     }
     if (cif.IsBeaconReady(Constants.BEACON)) {
-      beacon = cif.GetBeaconSensor(Constants.BEACON);
+    	if (beacon.beaconVisible)
+    		beacon = cif.GetBeaconSensor(Constants.BEACON);
+    	else {
+    		beacon = createBeaconFromMatrix();
+    		System.out.println("beacon from Matrix - beaconDir : " + beacon.beaconDir);
+    	}
+    		
     }
 
     comm.receive();
   }
 
-  public void requestInfo() {
+  private beaconMeasure createBeaconFromMatrix() {
+	  
+	int maxI = 0, maxJ = 0;
+	int max = 0;
+	for(int i=0;i<beaconProbability.length;i++)
+		for(int j=0;j<beaconProbability[i].length;j++)
+			if (beaconProbability[i][j] > max) {
+				maxI = i;
+				maxJ = j;
+				max = beaconProbability[i][j];
+			}
+	
+	beaconMeasure beacon = new beaconMeasure();
+	beacon.beaconDir = Math.toDegrees(Math.atan2(PosY - maxI, maxJ - PosX));
+	beacon.beaconVisible = true;
+	return beacon;
+}
+
+public void requestInfo() {
 
     // estes são sempre pedidos
     cif.RequestIRSensor(0);
