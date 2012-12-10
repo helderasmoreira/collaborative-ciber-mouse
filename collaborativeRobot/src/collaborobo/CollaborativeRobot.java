@@ -78,13 +78,13 @@ public class CollaborativeRobot extends Observable {
         aStarMatrix[i][j] = 1.0;
       }
     }
-/*
+
     MapVisualizer visualizer = new MapVisualizer(this);
     visualizer.start();
 
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
-    */
+    
     BeaconVisualizer bv = new BeaconVisualizer(this);
     bv.start();
  
@@ -237,6 +237,14 @@ public class CollaborativeRobot extends Observable {
     // System.out.println("Left Sensor Y: " + leftSensorPos[1]);
     // System.out.println("Right Sensor X: " + rightSensorPos[0]);
     // System.out.println("Right Sensor Y: " + rightSensorPos[1]);
+    
+    frontSensorPos[0] = Util.constrain(frontSensorPos[0], 0, Constants.mapSizeX-1);
+    frontSensorPos[1] = Util.constrain(frontSensorPos[1], 0, Constants.mapSizeY-1);
+    leftSensorPos[0] = Util.constrain(leftSensorPos[0], 0, Constants.mapSizeX-1);
+    leftSensorPos[1] = Util.constrain(leftSensorPos[1], 0, Constants.mapSizeY-1);
+    rightSensorPos[0] = Util.constrain(rightSensorPos[0], 0, Constants.mapSizeX-1);
+    rightSensorPos[1] = Util.constrain(rightSensorPos[1], 0, Constants.mapSizeY-1);
+    
     map[frontSensorPos[1]][frontSensorPos[0]] = -1.0;
     map[leftSensorPos[1]][leftSensorPos[0]] = -1.1;
     map[rightSensorPos[1]][rightSensorPos[0]] = -1.2;
@@ -319,6 +327,9 @@ public class CollaborativeRobot extends Observable {
 	
 	beaconMeasure beacon = new beaconMeasure();
 	System.out.println("Y: " + maxY + " - X: " + maxX);
+        if(max == 0){
+            beacon.beaconVisible = false;
+        }
 	beacon.beaconDir = Math.toDegrees(Math.atan2(PosY - maxY, maxX - PosX));
 	beacon.beaconVisible = true;
 	return beacon;
@@ -378,7 +389,7 @@ public void requestInfo() {
       nodes.add(new Node(n.x, n.y));
     }
 
-    prunePath();
+    //prunePath();
     //System.out.println(n.x + " " + n.y + " " + x + " " + y);
   }
 
