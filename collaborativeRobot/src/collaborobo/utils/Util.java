@@ -48,10 +48,10 @@ public class Util {
     return angle;
   }
 
-  public static double constrain(double value, double min, double max) {
-    if (value < min) {
+  public static <T extends Comparable<T>> T constrain(T value, T min, T max) {
+    if (value.compareTo(min) < 0) {
       return min;
-    } else if (value > max) {
+    } else if (value.compareTo(max) > 0) {
       return max;
     } else {
       return value;

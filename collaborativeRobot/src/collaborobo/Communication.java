@@ -32,13 +32,13 @@ public class Communication {
 
     int maxValues[][] = new int[order][3];
 
-    for (int i = 0; i < robot.beaconProbability.length; i++) {
-      for (int j = 0; j < robot.beaconProbability[i].length; j++) {
+    for (int y = 0; y < robot.beaconProbability.length; y++) {
+      for (int x = 0; x < robot.beaconProbability[y].length; x++) {
         int minimum = getMinimum(maxValues);
-        if (robot.beaconProbability[i][j] > (maxValues[minimum][0])) {
-          maxValues[minimum][1] = i;
-          maxValues[minimum][0] = (robot.beaconProbability[i][j]);
-          maxValues[minimum][2] = j;
+        if (robot.beaconProbability[y][x] > (maxValues[minimum][0])) {
+          maxValues[minimum][1] = y;
+          maxValues[minimum][0] = (robot.beaconProbability[y][x]);
+          maxValues[minimum][2] = x;
         }
       }
     }
@@ -50,19 +50,19 @@ public class Communication {
       }
     });
 
-    int iMax = maxValues[order - 1][1];
-    int jMax = maxValues[order - 1][2];
+    int yMax = maxValues[order - 1][1];
+    int xMax = maxValues[order - 1][2];
 
-    if (robot.beaconProbability[iMax][jMax] == 0) {
+    if (robot.beaconProbability[yMax][xMax] == 0) {
       return "";
     }
 
-    String ret = iMax + "-" + robot.initialPosY + "-" + jMax + "-" + robot.initialPosX + "-"
-            + +robot.beaconProbability[iMax][jMax] + "|";
+    String ret = yMax + "-" + robot.initialPosY + "-" + xMax + "-" + robot.initialPosX + "-"
+            + +robot.beaconProbability[yMax][xMax] + "|";
 
-    for (int i = Math.max(iMax - 1, 0); i <= Math.min(iMax + 1, Constants.mapSizeY - 1); i++) {
-      for (int j = Math.max(jMax - 1, 0); j <= Math.min(jMax + 1, Constants.mapSizeX - 1); j++) {
-        if (i == iMax && j == jMax) {
+    for (int i = Math.max(yMax - 1, 0); i <= Math.min(yMax + 1, Constants.mapSizeY - 1); i++) {
+      for (int j = Math.max(xMax - 1, 0); j <= Math.min(xMax + 1, Constants.mapSizeX - 1); j++) {
+        if (i == yMax && j == xMax) {
           continue;
         }
         ret += robot.beaconProbability[i][j] + ";";
@@ -112,6 +112,9 @@ public class Communication {
 
     mostProbableY = mostProbableY - (offsetY - robot.initialPosY);
     mostProbableX = mostProbableX + (offsetX - robot.initialPosX);
+    
+    mostProbableX = Util.constrain(mostProbableX, 1, Constants.mapSizeX -2);
+    mostProbableY = Util.constrain(mostProbableY, 1, Constants.mapSizeY -2);
 
     robot.beaconProbability[mostProbableY][mostProbableX] = Math.max(value, robot.beaconProbability[mostProbableY][mostProbableX]);
 
@@ -128,21 +131,27 @@ public class Communication {
         return;
       }
 
-      if (firstLine.length < 3 || thirdLine.length < 3 || secondLine.length < 2) //point near the wall
+      if (firstLine.length < 3 || thirdLine.length < 3 || secondLine.length < 2) //point near the wall 
       {
-        return;
+    	  robot.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]), robot.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
+          robot.beaconProbability[mostProbableY - 1][mostProbableX] = Math.max(Integer.parseInt(firstLine[1]), robot.beaconProbability[mostProbableY - 1][mostProbableX]);
+
+          robot.beaconProbability[mostProbableY][mostProbableX - 1] = Math.max(Integer.parseInt(secondLine[0]), robot.beaconProbability[mostProbableY][mostProbableX - 1]);
+
+          robot.beaconProbability[mostProbableY + 1][mostProbableX - 1] = Math.max(Integer.parseInt(thirdLine[0]), robot.beaconProbability[mostProbableY + 1][mostProbableX - 1]);
+          robot.beaconProbability[mostProbableY + 1][mostProbableX] = Math.max(Integer.parseInt(thirdLine[1]), robot.beaconProbability[mostProbableY + 1][mostProbableX]);
+      } else {
+          robot.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]), robot.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
+          robot.beaconProbability[mostProbableY - 1][mostProbableX] = Math.max(Integer.parseInt(firstLine[1]), robot.beaconProbability[mostProbableY - 1][mostProbableX]);
+          robot.beaconProbability[mostProbableY - 1][mostProbableX + 1] = Math.max(Integer.parseInt(firstLine[2]), robot.beaconProbability[mostProbableY - 1][mostProbableX + 1]);
+
+          robot.beaconProbability[mostProbableY][mostProbableX - 1] = Math.max(Integer.parseInt(secondLine[0]), robot.beaconProbability[mostProbableY][mostProbableX - 1]);
+          robot.beaconProbability[mostProbableY][mostProbableX + 1] = Math.max(Integer.parseInt(secondLine[1]), robot.beaconProbability[mostProbableY][mostProbableX + 1]);
+
+          robot.beaconProbability[mostProbableY + 1][mostProbableX - 1] = Math.max(Integer.parseInt(thirdLine[0]), robot.beaconProbability[mostProbableY + 1][mostProbableX - 1]);
+          robot.beaconProbability[mostProbableY + 1][mostProbableX] = Math.max(Integer.parseInt(thirdLine[1]), robot.beaconProbability[mostProbableY + 1][mostProbableX]);
+          robot.beaconProbability[mostProbableY + 1][mostProbableX + 1] = Math.max(Integer.parseInt(thirdLine[2]), robot.beaconProbability[mostProbableY + 1][mostProbableX + 1]);
       }
-
-      robot.beaconProbability[mostProbableY - 1][mostProbableX - 1] = Math.max(Integer.parseInt(firstLine[0]), robot.beaconProbability[mostProbableY - 1][mostProbableX - 1]);
-      robot.beaconProbability[mostProbableY - 1][mostProbableX] = Math.max(Integer.parseInt(firstLine[1]), robot.beaconProbability[mostProbableY - 1][mostProbableX]);
-      robot.beaconProbability[mostProbableY - 1][mostProbableX + 1] = Math.max(Integer.parseInt(firstLine[2]), robot.beaconProbability[mostProbableY - 1][mostProbableX + 1]);
-
-      robot.beaconProbability[mostProbableY][mostProbableX - 1] = Math.max(Integer.parseInt(secondLine[0]), robot.beaconProbability[mostProbableY][mostProbableX - 1]);
-      robot.beaconProbability[mostProbableY][mostProbableX + 1] = Math.max(Integer.parseInt(secondLine[1]), robot.beaconProbability[mostProbableY][mostProbableX + 1]);
-
-      robot.beaconProbability[mostProbableY + 1][mostProbableX - 1] = Math.max(Integer.parseInt(thirdLine[0]), robot.beaconProbability[mostProbableY + 1][mostProbableX - 1]);
-      robot.beaconProbability[mostProbableY + 1][mostProbableX] = Math.max(Integer.parseInt(thirdLine[1]), robot.beaconProbability[mostProbableY + 1][mostProbableX]);
-      robot.beaconProbability[mostProbableY + 1][mostProbableX + 1] = Math.max(Integer.parseInt(thirdLine[2]), robot.beaconProbability[mostProbableY + 1][mostProbableX + 1]);
     }
   }
 
@@ -153,7 +162,8 @@ public class Communication {
     String probableBeacon = getProbableBeacon(1);
     String sensors = getSensors();
 
-    if (robot.cif.GetTime() % 2.0 == 0) {
+    if (robot.cif.GetTime() % 2.0 == 0 
+            && robot.cif.GetTime() > 4.0) {
       robot.cif.Say(probableBeacon);
       //System.out.println("sending : " + probableBeacon);
     } else {
@@ -189,7 +199,7 @@ public class Communication {
         if (dataToProcess[i - 1].contains("sensors")) {
           decodeAndApplySensorsMessage(dataToProcess[i - 1]);
         } else {
-          //System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
+          System.out.println("message from " + i + ": " + dataToProcess[i - 1]);
           decodeAndApplyProbableBeaconMessage(dataToProcess[i - 1]);
         }
       }

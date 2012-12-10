@@ -86,8 +86,8 @@ public class CollaborativeRobot extends Observable {
     probVisualizer.start();
 
 /*    BeaconVisualizer bv = new BeaconVisualizer(this);
-    bv.start();
-*/   
+    bv.start();*/
+ 
     cif.ReadSensors();
 
     initialPosX = (int) (cif.GetX() * Constants.MAP_PRECISION);
@@ -237,6 +237,14 @@ public class CollaborativeRobot extends Observable {
     // System.out.println("Left Sensor Y: " + leftSensorPos[1]);
     // System.out.println("Right Sensor X: " + rightSensorPos[0]);
     // System.out.println("Right Sensor Y: " + rightSensorPos[1]);
+    
+    frontSensorPos[0] = Util.constrain(frontSensorPos[0], 0, Constants.mapSizeX-1);
+    frontSensorPos[1] = Util.constrain(frontSensorPos[1], 0, Constants.mapSizeY-1);
+    leftSensorPos[0] = Util.constrain(leftSensorPos[0], 0, Constants.mapSizeX-1);
+    leftSensorPos[1] = Util.constrain(leftSensorPos[1], 0, Constants.mapSizeY-1);
+    rightSensorPos[0] = Util.constrain(rightSensorPos[0], 0, Constants.mapSizeX-1);
+    rightSensorPos[1] = Util.constrain(rightSensorPos[1], 0, Constants.mapSizeY-1);
+    
     map[frontSensorPos[1]][frontSensorPos[0]] = -1.0;
     map[leftSensorPos[1]][leftSensorPos[0]] = -1.1;
     map[rightSensorPos[1]][rightSensorPos[0]] = -1.2;
@@ -275,6 +283,9 @@ public class CollaborativeRobot extends Observable {
   }
 
   public void getInfo() {
+	  
+	comm.receive();
+	  
     if (cif.IsObstacleReady(0)) {
       frontSensor = cif.GetObstacleSensor(0);
     }
@@ -291,13 +302,38 @@ public class CollaborativeRobot extends Observable {
       ground = cif.GetGroundSensor();
     }
     if (cif.IsBeaconReady(Constants.BEACON)) {
-      beacon = cif.GetBeaconSensor(Constants.BEACON);
+    	if (beacon.beaconVisible)
+    		beacon = cif.GetBeaconSensor(Constants.BEACON);
+    	else {
+    		beacon = createBeaconFromMatrix();
+    	}
+    } else {
+      beacon.beaconVisible = false;
     }
-
-    comm.receive();
   }
 
-  public void requestInfo() {
+  private beaconMeasure createBeaconFromMatrix() {
+	  
+	int maxY = 0, maxX = 0;
+	int max = 0;
+	for(int y=0;y<beaconProbability.length;y++)
+		for(int x=0;x<beaconProbability[y].length;x++)
+			if (beaconProbability[y][x] > max) {
+				maxY = y;
+				maxX = x;
+				max = beaconProbability[y][x];
+			}
+	
+	beaconMeasure beacon = new beaconMeasure();
+        if(max == 0){
+            beacon.beaconVisible = false;
+        }
+	beacon.beaconDir = Math.toDegrees(Math.atan2(PosY - maxY, maxX - PosX));
+	beacon.beaconVisible = true;
+	return beacon;
+}
+
+public void requestInfo() {
 
     // estes são sempre pedidos
     cif.RequestIRSensor(0);
