@@ -31,7 +31,7 @@ public class BeaconVisualizer extends Thread {
 
     while (true) {
       Graphics g = panel.getGraphics();
-      if (robot.beacon.beaconVisible) {
+      if (robot.beacon.beaconVisible && robot.cif.GetTime() > 4.0) {
 
         double robotDir = robot.compass;
         double beaconRelDir = robot.beacon.beaconDir;

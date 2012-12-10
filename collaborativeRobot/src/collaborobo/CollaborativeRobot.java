@@ -85,9 +85,10 @@ public class CollaborativeRobot extends Observable {
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
 */
+
     BeaconVisualizer bv = new BeaconVisualizer(this);
     bv.start();
-   
+ 
     cif.ReadSensors();
 
     initialPosX = (int) (cif.GetX() * Constants.MAP_PRECISION);
@@ -300,24 +301,26 @@ public class CollaborativeRobot extends Observable {
     		beacon = createBeaconFromMatrix();
     		System.out.println("beacon from Matrix - beaconDir : " + beacon.beaconDir);
     	}
+    } else {
+      beacon.beaconVisible = false;
     }
   }
 
   private beaconMeasure createBeaconFromMatrix() {
 	  
-	int maxI = 0, maxJ = 0;
+	int maxY = 0, maxX = 0;
 	int max = 0;
-	for(int i=0;i<beaconProbability.length;i++)
-		for(int j=0;j<beaconProbability[i].length;j++)
-			if (beaconProbability[i][j] > max) {
-				maxI = i;
-				maxJ = j;
-				max = beaconProbability[i][j];
+	for(int y=0;y<beaconProbability.length;y++)
+		for(int x=0;x<beaconProbability[y].length;x++)
+			if (beaconProbability[y][x] > max) {
+				maxY = y;
+				maxX = x;
+				max = beaconProbability[y][x];
 			}
 	
 	beaconMeasure beacon = new beaconMeasure();
-	System.out.println("Y: " + maxI + " - X: " + maxJ);
-	beacon.beaconDir = Math.toDegrees(Math.atan2(PosY - maxI, maxJ - PosX));
+	System.out.println("Y: " + maxY + " - X: " + maxX);
+	beacon.beaconDir = Math.toDegrees(Math.atan2(PosY - maxY, maxX - PosX));
 	beacon.beaconVisible = true;
 	return beacon;
 }
