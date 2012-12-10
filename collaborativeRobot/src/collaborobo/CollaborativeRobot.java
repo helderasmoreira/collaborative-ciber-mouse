@@ -78,14 +78,14 @@ public class CollaborativeRobot extends Observable {
         aStarMatrix[i][j] = 1.0;
       }
     }
-/*
-    MapVisualizer visualizer = new MapVisualizer(this);
-    visualizer.start();
-*/
+
+  /*  MapVisualizer visualizer = new MapVisualizer(this);
+    visualizer.start();*/
+    
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
-/*
-    BeaconVisualizer bv = new BeaconVisualizer(this);
+
+/*    BeaconVisualizer bv = new BeaconVisualizer(this);
     bv.start();
 */   
     cif.ReadSensors();
@@ -160,17 +160,17 @@ public class CollaborativeRobot extends Observable {
     PosX = robotMapX2;
     PosY = robotMapY2;
 
-    PosY_aStar = (int) (initialPosY - cif.GetY()
-            * Constants.MAP_PRECISION + halfPosY);
-    PosX_aStar = (int) (cif.GetX() * Constants.MAP_PRECISION
-            - initialPosX + halfPosX);
+    PosY_aStar = initialPosY - cif.GetY()
+            * Constants.MAP_PRECISION + halfPosY;
+    PosX_aStar = cif.GetX() * Constants.MAP_PRECISION
+            - initialPosX + halfPosX;
 
     if (firstReturn) {
-      int y = (int) (PosY_aStar > previousPosY ? PosY_aStar : previousPosY) + 1;
-      int x = (int) (PosX_aStar > previousPosX ? PosX_aStar : previousPosX) + 1;
+      int y = (int) Math.round((PosY_aStar > previousPosY ? PosY_aStar : previousPosY)) + 1;
+      int x = (int) Math.round((PosX_aStar > previousPosX ? PosX_aStar : previousPosX)) + 1;
       double matrix[][] = new double[y][x];
 
-      List<Node> nodes = PathFinder.calculate(matrix, (int) PosX_aStar, (int) PosY_aStar, (int) previousPosX, (int) previousPosY);
+      List<Node> nodes = PathFinder.calculate(matrix, (int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar), (int) Math.round(previousPosX), (int) Math.round(previousPosY));
       for (Node n : nodes) {
         updateAStarMatrix(n.x, n.y);
       }
@@ -182,7 +182,7 @@ public class CollaborativeRobot extends Observable {
     previousPosX = PosX_aStar;
     previousPosY = PosY_aStar;
 
-    updateAStarMatrix((int) PosX_aStar, (int) PosY_aStar);
+    updateAStarMatrix((int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar));
 
     if (emergency) {
       if (!firstReturn) {
@@ -347,11 +347,11 @@ public class CollaborativeRobot extends Observable {
     int x = (int) Math.round(PosX_aStar);
     int y = (int) Math.round(PosY_aStar);
 
-    if (nodes != null && (Math.abs(x - n.x) > 10 || Math.abs(y - n.y) > 10)) {
+    if (nodes != null && (Math.abs(x - n.x) > 2 || Math.abs(y - n.y) > 2)) {
       nodes.add(new Node(n.x, n.y));
     }
 
-    prunePath();
+    //prunePath();
     //System.out.println(n.x + " " + n.y + " " + x + " " + y);
   }
 

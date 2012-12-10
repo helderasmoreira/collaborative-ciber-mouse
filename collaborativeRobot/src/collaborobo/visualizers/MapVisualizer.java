@@ -52,20 +52,20 @@ public class MapVisualizer extends Thread {
         }
       }
 
-      double compassRadians = Math.toRadians(robot.compass);
+      double compassRadians = Util.makePositive(Math.toRadians(robot.compass));
       double angleCenterI = compassRadians + Math.toRadians(-30);
       double angleCenterF = compassRadians + Math.toRadians(30);
 
       angleCenterI = Util.normalizeAngle(angleCenterI);
       angleCenterF = Util.normalizeAngle(angleCenterF);
 
-      double angleCenterI2 = angleCenterI + Math.toRadians(60);
-      double angleCenterF2 = angleCenterF + Math.toRadians(60);
+      double angleCenterI2 = Util.makePositive(angleCenterI) + Math.toRadians(60);
+      double angleCenterF2 = Util.makePositive(angleCenterF) + Math.toRadians(60);
       angleCenterI2 = Util.normalizeAngle(angleCenterI2);
       angleCenterF2 = Util.normalizeAngle(angleCenterF2);
 
-      double angleCenterI3 = angleCenterI - Math.toRadians(60);
-      double angleCenterF3 = angleCenterF - Math.toRadians(60);
+      double angleCenterI3 = Util.makePositive(angleCenterI) - Math.toRadians(60);
+      double angleCenterF3 = Util.makePositive(angleCenterF) - Math.toRadians(60);
       angleCenterI3 = Util.normalizeAngle(angleCenterI3);
       angleCenterF3 = Util.normalizeAngle(angleCenterF3);
 
@@ -138,7 +138,8 @@ public class MapVisualizer extends Thread {
             * Math.abs(i - centerPosY2) + Math.abs(j - centerPosX2)
             * Math.abs(j - centerPosX2));
 
-    if (distanceCenter < radius && anglePoint > angleCenterI && anglePoint < angleCenterF) {
+    if (distanceCenter < radius && Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) > 0 
+    		&& Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) <= Math.toRadians(60.0)) {
       g.setColor(Color.GREEN);
       g.fillRect(j, i, 1, 1);
     }

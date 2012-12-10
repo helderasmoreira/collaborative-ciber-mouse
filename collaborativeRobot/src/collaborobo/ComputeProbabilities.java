@@ -57,20 +57,20 @@ public class ComputeProbabilities implements Observer {
        / ((prob * jClient.probabilitiesMap[y][x]) + ((1 - prob) * (1 - jClient.probabilitiesMap[y][x])));*/
 
 
-      double compassRadians = Math.toRadians(sb.compass);
+      double compassRadians = Util.makePositive(Math.toRadians(sb.compass));
       double angleCenterI = compassRadians + Math.toRadians(-30);
       double angleCenterF = compassRadians + Math.toRadians(30);
 
       angleCenterI = Util.normalizeAngle(angleCenterI);
       angleCenterF = Util.normalizeAngle(angleCenterF);
 
-      double angleCenterI2 = angleCenterI + Math.toRadians(60);
-      double angleCenterF2 = angleCenterF + Math.toRadians(60);
+      double angleCenterI2 = Util.makePositive(angleCenterI) + Math.toRadians(60);
+      double angleCenterF2 = Util.makePositive(angleCenterF) + Math.toRadians(60);
       angleCenterI2 = Util.normalizeAngle(angleCenterI2);
       angleCenterF2 = Util.normalizeAngle(angleCenterF2);
 
-      double angleCenterI3 = angleCenterI - Math.toRadians(60);
-      double angleCenterF3 = angleCenterF - Math.toRadians(60);
+      double angleCenterI3 = Util.makePositive(angleCenterI) - Math.toRadians(60);
+      double angleCenterF3 = Util.makePositive(angleCenterF) - Math.toRadians(60);
       angleCenterI3 = Util.normalizeAngle(angleCenterI3);
       angleCenterF3 = Util.normalizeAngle(angleCenterF3);
 
@@ -117,7 +117,8 @@ public class ComputeProbabilities implements Observer {
 
     double anglePoint = Math.atan2(centerY - y, x - centerX);
 
-    if (anglePoint >= angleCenterI && anglePoint <= angleCenterF) {
+    if (Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) > 0 
+    		&& Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) < Math.toRadians(60.0)) {
       double distanceCenter = Math.sqrt(Math.abs(y - centerY)
               * Math.abs(y - centerY) + Math.abs(x - centerX)
               * Math.abs(x - centerX));
