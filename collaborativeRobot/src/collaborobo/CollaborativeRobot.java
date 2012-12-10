@@ -84,7 +84,7 @@ public class CollaborativeRobot extends Observable {
 
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
-    
+
     BeaconVisualizer bv = new BeaconVisualizer(this);
     bv.start();
  
