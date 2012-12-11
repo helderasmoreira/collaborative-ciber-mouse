@@ -78,10 +78,10 @@ public class CollaborativeRobot extends Observable {
         aStarMatrix[i][j] = 1.0;
       }
     }
-
-  /*  MapVisualizer visualizer = new MapVisualizer(this);
-    visualizer.start();*/
-    
+/*
+    MapVisualizer visualizer = new MapVisualizer(this);
+    visualizer.start();
+*/
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
 
