@@ -78,10 +78,10 @@ public class CollaborativeRobot extends Observable {
         aStarMatrix[i][j] = 1.0;
       }
     }
-
-  /*  MapVisualizer visualizer = new MapVisualizer(this);
-    visualizer.start();*/
-    
+/*
+    MapVisualizer visualizer = new MapVisualizer(this);
+    visualizer.start();
+*/
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
 
@@ -518,7 +518,7 @@ public void requestInfo() {
         if (ground == 0) { /* Visit Target */
           cif.SetVisitingLed(true);
         } else {
-          wander(true);
+          wander(false);
         }
         break;
       case WAIT: /* Wait for others to visit target */
@@ -552,7 +552,8 @@ public void requestInfo() {
         } else {
           //original_wander(false);
           if (nodes != null && nodes.size() > 0) {
-            goHome();
+            //goHome();
+            wander(false);
           }
         }
         break;

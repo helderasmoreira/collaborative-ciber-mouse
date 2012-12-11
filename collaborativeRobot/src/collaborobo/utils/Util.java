@@ -39,13 +39,14 @@ public class Util {
 
   public static double normalizeAngle(double angle) {
 
-    if (angle < -Math.PI) {
-      angle = 2 * Math.PI + angle;
-    } else if (angle > Math.PI) {
-      angle = -1 * (2 * Math.PI - angle);
+    double newAngle = angle;
+    while (newAngle <= -Math.PI) {
+      newAngle += 2* Math.PI;
     }
-
-    return angle;
+    while (newAngle > Math.PI) {
+      newAngle -= 2* Math.PI;
+    }
+    return newAngle;
   }
 
   public static <T extends Comparable<T>> T constrain(T value, T min, T max) {
@@ -59,7 +60,11 @@ public class Util {
   }
 
   public static double makePositive(double angle) {
-    return angle >= 0 ? angle : angle + 2 * Math.PI;
+    double newAngle = angle;
+    while (newAngle <= -Math.PI) {
+      newAngle += 2* Math.PI;
+    }
+    return newAngle;
   }
 
   /*
