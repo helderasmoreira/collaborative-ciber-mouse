@@ -57,22 +57,22 @@ public class ComputeProbabilities implements Observer {
        / ((prob * jClient.probabilitiesMap[y][x]) + ((1 - prob) * (1 - jClient.probabilitiesMap[y][x])));*/
 
 
-      double compassRadians = Util.makePositive(Math.toRadians(sb.compass));
-      double angleCenterI = compassRadians + Math.toRadians(-30);
-      double angleCenterF = compassRadians + Math.toRadians(30);
+      double compassRadians = Math.toRadians(robot.compass);
+      double frontAngleBegin = compassRadians - Math.toRadians(30);
+      double frontAngleEnd = compassRadians + Math.toRadians(30);
 
-      angleCenterI = Util.normalizeAngle(angleCenterI);
-      angleCenterF = Util.normalizeAngle(angleCenterF);
+      frontAngleBegin = Util.normalizeAngle(frontAngleBegin);
+      frontAngleEnd = Util.normalizeAngle(frontAngleEnd);
 
-      double angleCenterI2 = Util.makePositive(angleCenterI) + Math.toRadians(60);
-      double angleCenterF2 = Util.makePositive(angleCenterF) + Math.toRadians(60);
-      angleCenterI2 = Util.normalizeAngle(angleCenterI2);
-      angleCenterF2 = Util.normalizeAngle(angleCenterF2);
+      double leftAngleBegin = compassRadians + Math.toRadians(30);
+      double leftAngleEnd = compassRadians + Math.toRadians(90);
+      leftAngleBegin = Util.normalizeAngle(leftAngleBegin);
+      leftAngleEnd = Util.normalizeAngle(leftAngleEnd);
 
-      double angleCenterI3 = Util.makePositive(angleCenterI) - Math.toRadians(60);
-      double angleCenterF3 = Util.makePositive(angleCenterF) - Math.toRadians(60);
-      angleCenterI3 = Util.normalizeAngle(angleCenterI3);
-      angleCenterF3 = Util.normalizeAngle(angleCenterF3);
+      double rightAngleBegin = compassRadians - Math.toRadians(90);
+      double rightAngleEnd = compassRadians - Math.toRadians(30);
+      rightAngleBegin = Util.normalizeAngle(rightAngleBegin);
+      rightAngleEnd = Util.normalizeAngle(rightAngleEnd);
 
       final double griddelta = 2 * (1 / Constants.SENSOR_MINIMUM_VALUE) * Constants.MAP_PRECISION;
 
@@ -92,36 +92,37 @@ public class ComputeProbabilities implements Observer {
           // FRONT
           if (sb.frontSensor >= Constants.SENSOR_MINIMUM_VALUE) {
             calculateVisibleArea(sb.frontSensorPosX, sb.frontSensorPosY,
-                    angleCenterI, angleCenterF, sb.leftSensor, y, x);
+                    frontAngleBegin, frontAngleEnd, sb.leftSensor, y, x);
           }
 
           // LEFT
           if (sb.leftSensor >= Constants.SENSOR_MINIMUM_VALUE) {
             calculateVisibleArea(sb.leftSensorPosX, sb.leftSensorPosY,
-                    angleCenterI2, angleCenterF2, sb.leftSensor, y, x);
+                    leftAngleBegin, leftAngleEnd, sb.leftSensor, y, x);
           }
 
           // RIGHT
           if (sb.rightSensor >= Constants.SENSOR_MINIMUM_VALUE) {
             calculateVisibleArea(sb.rightSensorPosX, sb.rightSensorPosY,
-                    angleCenterI3, angleCenterF3, sb.rightSensor, y, x);
+                    rightAngleBegin, rightAngleEnd, sb.rightSensor, y, x);
           }
         }
       }
     }
   }
 
-  private void calculateVisibleArea(int centerX,
-          int centerY, double angleCenterI, double angleCenterF,
-          double sensorValue, int y, int x) {
+  private void calculateVisibleArea(int cx, int cy, double angleBegin,
+          double angleEnd, double sensorValue, int y, int x) {
 
-    double anglePoint = Math.atan2(y -centerY, x - centerX);
+    double theta = Math.atan2(cy - y, x - cx);
 
-    if (Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) > 0 
-    		&& Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) < Math.toRadians(60.0)) {
-      double distanceCenter = Math.sqrt(Math.abs(y - centerY)
-              * Math.abs(y - centerY) + Math.abs(x - centerX)
-              * Math.abs(x - centerX));
+    boolean cond = (theta >= angleBegin && theta <= angleEnd);
+    if (angleBegin > angleEnd) {
+      cond = (theta >= angleBegin || theta <= angleEnd);
+    }
+
+    if (cond) {
+      double distanceCenter = Math.sqrt((y - cy) * (y - cy) + (x - cx) * (x - cx));
 
       double prob = computeProb(sensorValue, distanceCenter);
       if (prob == -1.0) {
