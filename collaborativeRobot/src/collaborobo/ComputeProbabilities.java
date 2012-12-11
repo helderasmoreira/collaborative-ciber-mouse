@@ -115,7 +115,7 @@ public class ComputeProbabilities implements Observer {
           int centerY, double angleCenterI, double angleCenterF,
           double sensorValue, int y, int x) {
 
-    double anglePoint = Math.atan2(centerY - y, x - centerX);
+    double anglePoint = Math.atan2(y -centerY, x - centerX);
 
     if (Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) > 0 
     		&& Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) < Math.toRadians(60.0)) {

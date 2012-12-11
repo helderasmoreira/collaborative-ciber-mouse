@@ -52,20 +52,24 @@ public class MapVisualizer extends Thread {
         }
       }
 
-      double compassRadians = Util.makePositive(Math.toRadians(robot.compass));
-      double angleCenterI = compassRadians + Math.toRadians(-30);
+      double compassRadians = Math.toRadians(robot.compass);
+//      System.out.println("Compass: " + compassRadians);
+//      System.out.println("Compass: " + Util.compassToDeg(robot.compass));
+      double angleCenterI = compassRadians - Math.toRadians(30);
       double angleCenterF = compassRadians + Math.toRadians(30);
-
+      
       angleCenterI = Util.normalizeAngle(angleCenterI);
       angleCenterF = Util.normalizeAngle(angleCenterF);
+//      System.out.println("AngleIN: " + angleCenterI);
+//      System.out.println("AngleFN: " + angleCenterF);
 
-      double angleCenterI2 = Util.makePositive(angleCenterI) + Math.toRadians(60);
-      double angleCenterF2 = Util.makePositive(angleCenterF) + Math.toRadians(60);
+      double angleCenterI2 = compassRadians + Math.toRadians(30);
+      double angleCenterF2 = compassRadians + Math.toRadians(90);
       angleCenterI2 = Util.normalizeAngle(angleCenterI2);
       angleCenterF2 = Util.normalizeAngle(angleCenterF2);
 
-      double angleCenterI3 = Util.makePositive(angleCenterI) - Math.toRadians(60);
-      double angleCenterF3 = Util.makePositive(angleCenterF) - Math.toRadians(60);
+      double angleCenterI3 = compassRadians - Math.toRadians(90);
+      double angleCenterF3 = compassRadians - Math.toRadians(30);
       angleCenterI3 = Util.normalizeAngle(angleCenterI3);
       angleCenterF3 = Util.normalizeAngle(angleCenterF3);
 
@@ -103,45 +107,50 @@ public class MapVisualizer extends Thread {
 
         double obstacleDistance;
         // FRONT
-        if (sensorValue > 0.0) {
+        if (sensorValue > -10.0) {
           obstacleDistance = (1.0 / sensorValue) * 10.0;
           calculateVisibleArea(radius, centerPosX, centerPosY,
-                  angleCenterI, angleCenterF, g, obstacleDistance, i, j);
+                  angleCenterI, angleCenterF, g, obstacleDistance, i, j,Color.RED);
         }
 
         // LEFT
-        if (sensorValue2 > 0.0) {
+        if (sensorValue2 > -10.0) {
           obstacleDistance = (1.0 / sensorValue2) * 10.0;
           calculateVisibleArea(radius, centerPosX2, centerPosY2,
-                  angleCenterI2, angleCenterF2, g, obstacleDistance, i, j);
+                  angleCenterI2, angleCenterF2, g, obstacleDistance, i, j, Color.BLUE);
         }
 
         // RIGHT
-        if (sensorValue3 > 0.0) {
+        if (sensorValue3 > -10.0) {
           obstacleDistance = (1.0 / sensorValue3) * 10.0;
           calculateVisibleArea(radius, centerPosX3, centerPosY3,
-                  angleCenterI3, angleCenterF3, g, obstacleDistance, i, j);
+                  angleCenterI3, angleCenterF3, g, obstacleDistance, i, j, Color.GREEN);
         }
       }
     }
   }
 
-  private void calculateVisibleArea(double radius, int centerPosX2,
-          int centerPosY2, double angleCenterI, double angleCenterF,
-          Graphics g, double obstacleDistance, int i, int j) {
+  private void calculateVisibleArea(double radius, int cx,
+          int cy, double angleCenterI, double angleCenterF,
+          Graphics g, double obstacleDistance, int y, int x, Color c) {
 
     double anglePoint;
     double distanceCenter;
-    anglePoint = Math.atan2(centerPosY2 - i, j - centerPosX2);
+    anglePoint = Math.atan2(cy - y, x - cx);
 
-    distanceCenter = Math.sqrt(Math.abs(i - centerPosY2)
-            * Math.abs(i - centerPosY2) + Math.abs(j - centerPosX2)
-            * Math.abs(j - centerPosX2));
+    distanceCenter = Math.sqrt((y - cy) * (y - cy) + (x - cx) * (x - cx));
+//    System.out.println("dc: " + (distanceCenter < radius)  );
+//    System.out.println("ap>=i: " + (anglePoint >= angleCenterI)  );
+//    System.out.println("ap<=f: " + (anglePoint <= angleCenterF)  );
+    
+    boolean cond = anglePoint >= angleCenterI && anglePoint <= angleCenterF;
+    if (angleCenterI > angleCenterF) {
+      cond = (anglePoint >= angleCenterI || anglePoint <= angleCenterF);
+    }
 
-    if (distanceCenter < radius && Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) > 0 
-    		&& Util.makePositive(angleCenterF) - Util.makePositive(anglePoint) <= Math.toRadians(60.0)) {
-      g.setColor(Color.GREEN);
-      g.fillRect(j, i, 1, 1);
+    if (distanceCenter < radius && cond) {
+      g.setColor(c);
+      g.fillRect(x, y, 1, 1);
     }
   }
 }
