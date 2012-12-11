@@ -37,6 +37,10 @@ public class MapProbabilitiesVisualizer extends Thread {
       for (int y = 0; y < robot.probabilitiesMap.length; y++) {
         for (int x = 0; x < robot.probabilitiesMap[y].length; x++) {
             double cellProb = robot.probabilitiesMap[y][x];
+            if(cellProb == -3.0){
+            	g.setColor(Color.GREEN);
+                g.fillRect(x, y, 1, 1);
+            }
             if (cellProb >= 1) {
                 g.setColor(new Color(wallColor, 0, 0));
                 g.fillRect(x, y, 1, 1);

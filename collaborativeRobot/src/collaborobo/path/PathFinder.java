@@ -15,7 +15,7 @@ public class PathFinder {
     Node goal;
     private double[][] map;
     
-    final double ISWALL = 0.75;
+    final double ISWALL = 0.5;
 
     public PathFinder(double[][] map) {
         this.map = map;
@@ -72,42 +72,42 @@ public class PathFinder {
         int y = node.y;
         
         //baixo
-        if (y < map.length - 1 && map[y + 1][x] <= ISWALL) {
+        if (y < map.length - 1 && map[y + 1][x] < ISWALL) {
             ret.add(new Node(x, y + 1));
         }
 
         //direita
-        if (x < map[0].length - 1 && map[y][x + 1] <= ISWALL) {
+        if (x < map[0].length - 1 && map[y][x + 1] < ISWALL) {
             ret.add(new Node(x + 1, y));
         }
 
         //cima
-        if (y > 0 && map[y - 1][x] <= ISWALL) {
+        if (y > 0 && map[y - 1][x] < ISWALL) {
             ret.add(new Node(x, y - 1));
         }
 
         //esquerda
-        if (x > 0 && map[y][x - 1] <= ISWALL) {
+        if (x > 0 && map[y][x - 1] < ISWALL) {
             ret.add(new Node(x - 1, y));
         }
         
         //cima direita
-        if (y > 0 &&  x < map[0].length - 1 && map[y - 1][x + 1] <= ISWALL) {
+        if (y > 0 &&  x < map[0].length - 1 && map[y - 1][x + 1] < ISWALL) {
             ret.add(new Node(x + 1, y - 1));
         }
         
         //cima esquerda
-        if (y > 0 && x > 0 && map[y - 1][x - 1] <= ISWALL) {
+        if (y > 0 && x > 0 && map[y - 1][x - 1] < ISWALL) {
             ret.add(new Node(x - 1, y - 1));
         }
         
         //baixo direita
-        if (y < map.length - 1 && x < map[0].length - 1 && map[y + 1][x + 1] <= ISWALL) {
+        if (y < map.length - 1 && x < map[0].length - 1 && map[y + 1][x + 1] < ISWALL) {
             ret.add(new Node(x + 1, y + 1));
         }
         
         //baixo esquerda
-        if (y < map.length - 1 && x > 0 && map[y + 1][x - 1] <= ISWALL) {
+        if (y < map.length - 1 && x > 0 && map[y + 1][x - 1] < ISWALL) {
             ret.add(new Node(x - 1, y + 1));
         }
         
