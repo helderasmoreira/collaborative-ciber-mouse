@@ -518,7 +518,7 @@ public void requestInfo() {
         if (ground == 0) { /* Visit Target */
           cif.SetVisitingLed(true);
         } else {
-          wander(false);
+          wander(true);
         }
         break;
       case WAIT: /* Wait for others to visit target */
@@ -552,8 +552,7 @@ public void requestInfo() {
         } else {
           //original_wander(false);
           if (nodes != null && nodes.size() > 0) {
-            //goHome();
-            wander(false);
+            goHome();
           }
         }
         break;
