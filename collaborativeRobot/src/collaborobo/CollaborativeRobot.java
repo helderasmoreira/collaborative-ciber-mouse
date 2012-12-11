@@ -211,7 +211,7 @@ public class CollaborativeRobot extends Observable {
     for (int i = 0; i < probabilitiesMap.length; i++) {
       for (int j = 0; j < probabilitiesMap[i].length; j++) {
         if (probabilitiesMap[i][j] > 0.75) {
-          aStarMatrix[i][j] = 0.70;
+          aStarMatrix[i][j] = 0.80;
         }
       }
     }
