@@ -1,12 +1,13 @@
 package collaborobo.path;
 
-
+import collaborobo.utils.Constants;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class PathFinder {        
+public class PathFinder {
+
     PriorityQueue<Node> open = new PriorityQueue<Node>();
     ArrayList<Node> closed = new ArrayList<Node>();
     public int explored = 0;
@@ -14,13 +15,73 @@ public class PathFinder {
     Node start;
     Node goal;
     private double[][] map;
-    
-    final double ISWALL = 0.75;
+    final double ISWALL = 0.5;
 
     public PathFinder(double[][] map) {
         this.map = map;
         this.maxExpected = map.length * map[0].length;
-        //System.out.println("Max expected:" + this.maxExpected);
+        growWalls(map);
+    }
+
+    private void growWalls(double[][] map) {
+        List<Node> visited = new LinkedList<Node>();
+
+        double step = (int) (Constants.ROBOT_RADIUS * 10 - 1.0);
+        double height = map.length - 1;
+        double width = map[0].length - 1;
+
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[0].length; x++) {
+                Node current = new Node(x, y);
+
+                if (!visited.contains(current) && map[y][x] > ISWALL) {
+                    visited.add(current);
+                    
+                    for (int i = 1; i <= step; i++) {
+                        //baixo
+                        if (y + i < height) {
+                            visited.add(new Node(x, y + i));
+                            map[y + i][x] = map[y][x];
+                        }
+                        //direita    
+                        if (x + i < width) {
+                            visited.add(new Node(x + i, y));
+                            map[y][x + i] = map[y][x];
+                        }
+                        //cima    
+                        if (y - i > 0) {
+                            visited.add(new Node(x, y - i));
+                            map[y - i][x] = map[y][x];
+                        }
+                        //esquerda
+                        if (x - i > 0) {
+                            visited.add(new Node(x - i, y));
+                            map[y][x - i] = map[y][x];
+                        }
+                        //cima direita
+                        if (y - i > 0 && x + i < width) {
+                            visited.add(new Node(x + i, y - i));
+                            map[y - i][x + i] = map[y][x];
+                        }
+                        //cima esquerda
+                        if (y - i > 0 && x - i > 0) {
+                            visited.add(new Node(x - i, y - i));
+                            map[y - i][x - i] = map[y][x];
+                        }
+                        //baixo direita
+                        if (y + i < height && x + i < width) {
+                            visited.add(new Node(x + i, y + i));
+                            map[y + i][x + i] = map[y][x];
+                        }
+                        //baixo esquerda
+                        if (y + i < height && x - i > 0) {
+                            visited.add(new Node(x - i, y + i));
+                            map[y + i][x - i] = map[y][x];
+                        }
+                    }
+                }
+            }
+        }
     }
 
     protected boolean isGoal(Node node) {
@@ -33,7 +94,7 @@ public class PathFinder {
             return 0.0;
         }
 
-        if (map[to.y][to.x] <= ISWALL) {
+        if (map[to.y][to.x] < ISWALL) {
             return 1.0 + map[to.y][to.x]; //maybe change this to probability
         }
 
@@ -43,23 +104,23 @@ public class PathFinder {
     protected Double h(Node from, Node to) {
         /*Using Linear Distance Heuristic as in:
          http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html */
-         double cost = 1; //cost from one place to the adjacent
-         double line = (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y);
-         double h = cost * Math.sqrt(line);
-         
+        double cost = 1; //cost from one place to the adjacent
+        double line = (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y);
+        double h = cost * Math.sqrt(line);
+
 
         /*Using Manhattan distance as in:
          http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
-        double cost = 1; //cost from one place to the adjacent
-        double line = Math.abs(from.x - to.x) + Math.abs(from.y - to.y);
-        double h = cost * line;
-        */
-         
-         /*Using Chebyshev distance as in: h(n) = D * max(abs(n.x-goal.x), abs(n.y-goal.y))
+         double cost = 1; //cost from one place to the adjacent
+         double line = Math.abs(from.x - to.x) + Math.abs(from.y - to.y);
+         double h = cost * line;
+         */
+
+        /*Using Chebyshev distance as in: h(n) = D * max(abs(n.x-goal.x), abs(n.y-goal.y))
          http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html 
-        double cost = 1; //cost from one place to the adjacent
-        double line = Math.max(Math.abs(from.x - to.x), Math.abs(from.y - to.y));
-        double h = cost * line; */
+         double cost = 1; //cost from one place to the adjacent
+         double line = Math.max(Math.abs(from.x - to.x), Math.abs(from.y - to.y));
+         double h = cost * line; */
 
 
 
@@ -70,50 +131,50 @@ public class PathFinder {
         List<Node> ret = new LinkedList<Node>();
         int x = node.x;
         int y = node.y;
-        
+
         //baixo
-        if (y < map.length - 1 && map[y + 1][x] <= ISWALL) {
+        if (y < map.length - 1 && map[y + 1][x] < ISWALL) {
             ret.add(new Node(x, y + 1));
         }
 
         //direita
-        if (x < map[0].length - 1 && map[y][x + 1] <= ISWALL) {
+        if (x < map[0].length - 1 && map[y][x + 1] < ISWALL) {
             ret.add(new Node(x + 1, y));
         }
 
         //cima
-        if (y > 0 && map[y - 1][x] <= ISWALL) {
+        if (y > 0 && map[y - 1][x] < ISWALL) {
             ret.add(new Node(x, y - 1));
         }
 
         //esquerda
-        if (x > 0 && map[y][x - 1] <= ISWALL) {
+        if (x > 0 && map[y][x - 1] < ISWALL) {
             ret.add(new Node(x - 1, y));
         }
-        
+
         //cima direita
-        if (y > 0 &&  x < map[0].length - 1 && map[y - 1][x + 1] <= ISWALL) {
+        if (y > 0 && x < map[0].length - 1 && map[y - 1][x + 1] < ISWALL) {
             ret.add(new Node(x + 1, y - 1));
         }
-        
+
         //cima esquerda
-        if (y > 0 && x > 0 && map[y - 1][x - 1] <= ISWALL) {
+        if (y > 0 && x > 0 && map[y - 1][x - 1] < ISWALL) {
             ret.add(new Node(x - 1, y - 1));
         }
-        
+
         //baixo direita
-        if (y < map.length - 1 && x < map[0].length - 1 && map[y + 1][x + 1] <= ISWALL) {
+        if (y < map.length - 1 && x < map[0].length - 1 && map[y + 1][x + 1] < ISWALL) {
             ret.add(new Node(x + 1, y + 1));
         }
-        
+
         //baixo esquerda
-        if (y < map.length - 1 && x > 0 && map[y + 1][x - 1] <= ISWALL) {
+        if (y < map.length - 1 && x > 0 && map[y + 1][x - 1] < ISWALL) {
             ret.add(new Node(x - 1, y + 1));
         }
-        
 
-        if(ret.isEmpty()){
-            System.out.println("No sucessors of "+node);
+
+        if (ret.isEmpty()) {
+            System.out.println("No sucessors of " + node);
         }
         return ret;
     }
@@ -132,7 +193,7 @@ public class PathFinder {
     public List<Node> calculate(int oX, int oY, int goalX, int goalY) {
         this.goal = new Node(goalX, goalY);
         this.start = new Node(oX, oY);
-        
+
         return this.compute(this.start);
     }
 
@@ -157,7 +218,7 @@ public class PathFinder {
                 List<Node> sucessors = generateSuccessors(current);
 //                System.out.println("Sucessors:" + sucessors);
 //                System.out.println();
-                
+
                 for (Node n : sucessors) {
                     double cost = current.g + movementcost(current, n);
 
@@ -178,7 +239,7 @@ public class PathFinder {
         }
         return path;
     }
-    
+
     public static List<Node> calculate(double[][] map, int oX, int oY, int goalX, int goalY) {
 
         PathFinder pf = new PathFinder(map);
@@ -201,9 +262,6 @@ public class PathFinder {
         return nodes;
 
     }
-    
-    
-   
 
     //just to test
     public static void main(String[] args) {
