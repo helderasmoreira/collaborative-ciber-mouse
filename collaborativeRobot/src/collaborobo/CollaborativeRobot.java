@@ -7,6 +7,8 @@ import ciberIF.ciberIF;
 import collaborobo.utils.Constants;
 import collaborobo.utils.Util;
 import collaborobo.visualizers.*;
+
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Observable;
 
@@ -19,15 +21,15 @@ public class CollaborativeRobot extends Observable {
   public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
   public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
   public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
-  public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
+//  public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
   public int initialPosX, initialPosY;
   private boolean firstReturn = true;
   public double PosX;
   public double PosY;
-  public double PosX_aStar;
-  public double PosY_aStar;
-  public double previousPosX;
-  public double previousPosY;
+  /*public double PosX_aStar;
+  public double PosY_aStar;*/
+//  public double previousPosX;
+//  public double previousPosY;
   public int halfPosX, halfPosY;
   public int frontSensorPosX;
   public int frontSensorPosY;
@@ -73,15 +75,15 @@ public class CollaborativeRobot extends Observable {
       }
     }
 
-    for (int i = 0; i < aStarMatrix.length; i++) {
-      for (int j = 0; j < aStarMatrix[i].length; j++) {
-        aStarMatrix[i][j] = 1.0;
-      }
-    }
-/*
-    MapVisualizer visualizer = new MapVisualizer(this);
-    visualizer.start();
-*/
+//    for (int i = 0; i < aStarMatrix.length; i++) {
+//      for (int j = 0; j < aStarMatrix[i].length; j++) {
+//        aStarMatrix[i][j] = 1.0;
+//      }
+//    }
+
+    /*MapVisualizer visualizer = new MapVisualizer(this);
+    visualizer.start();*/
+
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
 
@@ -95,19 +97,21 @@ public class CollaborativeRobot extends Observable {
     PosX = halfPosX;
     PosY = halfPosY;
 
-    PosX_aStar = PosX;
-    PosY_aStar = PosY;
+   // PosX_aStar = PosX;
+   // PosY_aStar = PosY;
 
-    previousPosX = PosX_aStar;
-    previousPosY = PosY_aStar;
-
-    aStarMatrix[(int) Math.round(PosY)][(int) Math.round(PosX)] = 0.0;
+//    previousPosX = PosX;
+//    previousPosY = PosY;
+//
+//    aStarMatrix[(int) Math.round(PosY)][(int) Math.round(PosX)] = 0.0;
 
     updateMap();
 
     System.out.println(PosX + " " + PosY);
-
-    double cpass = Util.makePositive(this.compass);
+    
+    compass = cif.GetCompassSensor();
+    
+    double cpass = Util.makePositive(compass);
 
     if (cpass > 80 && cpass < 100) {
       orientation = Math.toRadians(90);
@@ -118,9 +122,7 @@ public class CollaborativeRobot extends Observable {
     } else {
       orientation = Math.toRadians(0);
     }
-
-    orientation = Util.normalizeAngle(orientation);
-
+    
     while (true) {
       cif.ReadSensors();
 
@@ -133,6 +135,7 @@ public class CollaborativeRobot extends Observable {
   }
 
   private void DriveMotors(double leftMotorForce, double rightMotorForce) {
+
     boolean emergency = false;
 
     if (frontSensor > 9.0 || leftSensor > 9.0 || rightSensor > 9.0 || cif.GetBumperSensor()) {
@@ -146,9 +149,10 @@ public class CollaborativeRobot extends Observable {
     leftMotorForce = (leftMotorForce + previousMotorPowL) / 2.0;
     rightMotorForce = (rightMotorForce + previousMotorPowR) / 2.0;
 
-    final double rot = (rightMotorForce - leftMotorForce) / (Constants.ROBOT_RADIUS * 2);
+    final double rot = (rightMotorForce - leftMotorForce) / (Constants.ROBOT_RADIUS * 2.0);
     orientation = Util.normalizeAngle(this.orientation + rot);
-
+   // System.out.println("NOSSO: " + Math.toDegrees(orientation));
+   // System.out.println("DELES: " + Util.compassToDeg(compass) + "\n");
     double L = (rightMotorForce + leftMotorForce) / 2.0;
 
     double iX = ((Math.cos(Math.toRadians(compass)) * L)) * Constants.MAP_PRECISION;
@@ -157,36 +161,38 @@ public class CollaborativeRobot extends Observable {
     double robotMapX2 = (PosX + iX);
     double robotMapY2 = (PosY - iY);
 
-    PosX = robotMapX2;
-    PosY = robotMapY2;
-
-    PosY_aStar = initialPosY - cif.GetY()
+    PosX = cif.GetX() * Constants.MAP_PRECISION
+            - initialPosX + halfPosX;;
+    PosY = initialPosY - cif.GetY()
             * Constants.MAP_PRECISION + halfPosY;
-    PosX_aStar = cif.GetX() * Constants.MAP_PRECISION
-            - initialPosX + halfPosX;
-
-    if (firstReturn) {
-      int y = (int) Math.round((PosY_aStar > previousPosY ? PosY_aStar : previousPosY)) + 1;
-      int x = (int) Math.round((PosX_aStar > previousPosX ? PosX_aStar : previousPosX)) + 1;
-      double matrix[][] = new double[y][x];
-
-      List<Node> nodes = PathFinder.calculate(matrix, (int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar), (int) Math.round(previousPosX), (int) Math.round(previousPosY));
-      for (Node n : nodes) {
-        updateAStarMatrix(n.x, n.y);
-      }
-    }
-
+    
     previousMotorPowL = leftMotorForce;
     previousMotorPowR = rightMotorForce;
 
-    previousPosX = PosX_aStar;
-    previousPosY = PosY_aStar;
+   /* PosY_aStar = initialPosY - cif.GetY()
+            * Constants.MAP_PRECISION + halfPosY;
+    PosX_aStar = cif.GetX() * Constants.MAP_PRECISION
+            - initialPosX + halfPosX;
+*/
+    /*if (firstReturn) {
+      int y = (int) Math.round((PosY > previousPosY ? PosY : previousPosY)) + 1;
+      int x = (int) Math.round((PosX > previousPosX ? PosX : previousPosX)) + 1;
+      double matrix[][] = new double[y][x];
 
-    updateAStarMatrix((int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar));
+      List<Node> nodes = PathFinder.calculate(matrix, (int) Math.round(PosX), (int) Math.round(PosY), (int) Math.round(previousPosX), (int) Math.round(previousPosY));
+      for (Node n : nodes) {
+        updateAStarMatrix(n.x, n.y);
+      }
+    }*/
+
+//    previousPosX = PosX;
+//    previousPosY = PosY;
+
+//    updateAStarMatrix((int) Math.round(PosX), (int) Math.round(PosY));
 
     if (emergency) {
       if (!firstReturn) {
-        nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX_aStar), (int) Math.round(PosY_aStar), halfPosX, halfPosY);
+        nodes = PathFinder.calculate(probabilitiesMap, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY);
       }
       if (!firstReturn && (nodes == null || nodes.isEmpty())) {
         cif.DriveMotors(0.0, 0.0);
@@ -196,26 +202,26 @@ public class CollaborativeRobot extends Observable {
 
   }
 
-  private void updateAStarMatrix(int x, int y) {
-
-    aStarMatrix[y][x] = 0.0;
-    aStarMatrix[y][x + 1] = 0.0;
-    aStarMatrix[y][x - 1] = 0.0;
-    aStarMatrix[y + 1][x] = 0.0;
-    aStarMatrix[y - 1][x] = 0.0;
-    aStarMatrix[y + 1][x + 1] = 0.0;
-    aStarMatrix[y - 1][x - 1] = 0.0;
-    aStarMatrix[y + 1][x - 1] = 0.0;
-    aStarMatrix[y - 1][x + 1] = 0.0;
-
-    for (int i = 0; i < probabilitiesMap.length; i++) {
-      for (int j = 0; j < probabilitiesMap[i].length; j++) {
-        if (probabilitiesMap[i][j] > 0.75) {
-          aStarMatrix[i][j] = 0.70;
-        }
-      }
-    }
-  }
+//  private void updateAStarMatrix(int x, int y) {
+//
+//    aStarMatrix[y][x] = 0.0;
+//    aStarMatrix[y][x + 1] = 0.0;
+//    aStarMatrix[y][x - 1] = 0.0;
+//    aStarMatrix[y + 1][x] = 0.0;
+//    aStarMatrix[y - 1][x] = 0.0;
+//    aStarMatrix[y + 1][x + 1] = 0.0;
+//    aStarMatrix[y - 1][x - 1] = 0.0;
+//    aStarMatrix[y + 1][x - 1] = 0.0;
+//    aStarMatrix[y - 1][x + 1] = 0.0;
+//
+//    /*for (int i = 0; i < probabilitiesMap.length; i++) {
+//      for (int j = 0; j < probabilitiesMap[i].length; j++) {
+//        if (probabilitiesMap[i][j] > 0.75) {
+//          aStarMatrix[i][j] = 0.80;
+//        }
+//      }
+//    }*/
+//  }
 
   private void updateMap() {
     // int robotMapY = (int) (initialPosY - cif.GetY() *
@@ -302,11 +308,11 @@ public class CollaborativeRobot extends Observable {
       ground = cif.GetGroundSensor();
     }
     if (cif.IsBeaconReady(Constants.BEACON)) {
-    	if (beacon.beaconVisible)
-    		beacon = cif.GetBeaconSensor(Constants.BEACON);
-    	else {
+    	beacon = cif.GetBeaconSensor(Constants.BEACON);
+    	if (!beacon.beaconVisible) {
     		beacon = createBeaconFromMatrix();
     	}
+    	
     } else {
       beacon.beaconVisible = false;
     }
@@ -325,11 +331,12 @@ public class CollaborativeRobot extends Observable {
 			}
 	
 	beaconMeasure beacon = new beaconMeasure();
-        if(max == 0){
-            beacon.beaconVisible = false;
-        }
+        
 	beacon.beaconDir = Math.toDegrees(Math.atan2(PosY - maxY, maxX - PosX));
 	beacon.beaconVisible = true;
+	if(max == 0){
+        beacon.beaconVisible = false;
+    }
 	return beacon;
 }
 
@@ -362,7 +369,7 @@ public void requestInfo() {
     nodes.remove(nodes.size() - 1);
     Node n = nodes.get(nodes.size() - 1);
 
-    double anglePoint = Util.makePositive(Math.atan2(PosY_aStar - n.y, n.x - PosX_aStar));
+    double anglePoint = Util.makePositive(Math.atan2(PosY - n.y, n.x - PosX));
     /*double angleNow = Util.makePositive(orientation);*/
     double angleNow = Util.makePositive(Math.toRadians(compass));
 
@@ -380,8 +387,8 @@ public void requestInfo() {
 
     updateMap();
 
-    int x = (int) Math.round(PosX_aStar);
-    int y = (int) Math.round(PosY_aStar);
+    int x = (int) Math.round(PosX);
+    int y = (int) Math.round(PosY);
 
     if (nodes != null && (Math.abs(x - n.x) > 2 || Math.abs(y - n.y) > 2)) {
       nodes.add(new Node(n.x, n.y));
@@ -392,46 +399,48 @@ public void requestInfo() {
   }
 
   private void alignRobot(double anglePoint, double angleNow) {
-
-    double dif = Util.angleDifference(Util.normalizeAngle(angleNow),
-            Util.normalizeAngle(anglePoint));
-
-    requestInfo();
-    cif.ReadSensors();
-    getInfo();
-
-    double lPowIn = 0.20 * (2 * Constants.ROBOT_RADIUS * -dif);
-    double rPowIn = 0.20 * (2 * Constants.ROBOT_RADIUS * dif);
-
-    DriveMotors(Util.constrain(lPowIn, -0.15, 0.15), Util.constrain(rPowIn, -0.15, 0.15));
-
-    updateMap();
+	    requestInfo();
+	    cif.ReadSensors();
+	    getInfo();
+	    
+	    double dif = Util.angleDifference(Util.normalizeAngle(angleNow),
+	            Util.normalizeAngle(anglePoint));
+	    
+	    double lPowIn = 0.20 * (2 * Constants.ROBOT_RADIUS * -dif);
+	    double rPowIn = 0.20 * (2 * Constants.ROBOT_RADIUS * dif);
+	    
+	    lPowIn = ((int)(lPowIn*1000))/1000.0;
+	    rPowIn = ((int)(rPowIn*1000))/1000.0;
+	    
+	    DriveMotors(Util.constrain(lPowIn, -0.15, 0.15), Util.constrain(rPowIn, -0.15, 0.15));
+	    
+	    updateMap();
   }
 
-  private void prunePath() {
-
-    if (nodes == null || nodes.isEmpty()) {
-      return;
-    }
-
-    Node n = nodes.get(0);
-
-    double distance = Math.sqrt(Math.abs(n.x - PosX)
-            * Math.abs(n.x - PosX) + Math.abs(n.y - PosY)
-            * Math.abs(n.y - PosY));
-
-    for (int i = 1; i < nodes.size(); i++) {
-      double distance2 = Math.sqrt(Math.abs(nodes.get(i).x - PosX)
-              * Math.abs(nodes.get(i).x - PosX) + Math.abs(nodes.get(i).y - PosY)
-              * Math.abs(nodes.get(i).y - PosY));
-      if (distance <= distance2) {
-        nodes.remove(i - 1);
-        distance = distance2;
-      } else {
-        break;
-      }
-    }
-  }
+//  private void prunePath() {
+//
+//    if (nodes == null || nodes.isEmpty()) {
+//      return;
+//    }
+//
+//    Node n = nodes.get(0);
+//
+//    double distance = Math.sqrt(Math.abs(n.x - PosX)
+//            * Math.abs(n.x - PosX) + Math.abs(n.y - PosY)
+//            * Math.abs(n.y - PosY));
+//
+//    for (int i = 1; i < nodes.size(); i++) {
+//      double distance2 = Math.sqrt(Math.abs(nodes.get(i).x - PosX)
+//              * Math.abs(nodes.get(i).x - PosX) + Math.abs(nodes.get(i).y - PosY)
+//              * Math.abs(nodes.get(i).y - PosY));
+//      if (distance <= distance2) {
+//        nodes.remove(i - 1);
+//        distance = distance2;
+//      } else {
+//        break;
+//      }
+//    }
+//  }
 
   public void wander(boolean followBeacon) {
     // verifica se há algum obstáculo a evitar
@@ -518,7 +527,7 @@ public void requestInfo() {
         if (ground == 0) { /* Visit Target */
           cif.SetVisitingLed(true);
         } else {
-          wander(false);
+          wander(true);
         }
         break;
       case WAIT: /* Wait for others to visit target */
@@ -530,11 +539,11 @@ public void requestInfo() {
         break;
       case RETURN: /* Return to home area */
         if (firstReturn) {
-          nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY);
+          nodes = PathFinder.calculate(probabilitiesMap, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY);
 
           if (nodes != null && nodes.size() > 0) {
             for (int i = 0; i < nodes.size(); i++) {
-              map[nodes.get(i).y][nodes.get(i).x] = -3.0;
+             probabilitiesMap[nodes.get(i).y][nodes.get(i).x] = -3.0;
             }
             System.out.println("GOING HOME!");
             firstReturn = false;
@@ -552,8 +561,7 @@ public void requestInfo() {
         } else {
           //original_wander(false);
           if (nodes != null && nodes.size() > 0) {
-            //goHome();
-            wander(false);
+            goHome();
           }
         }
         break;
