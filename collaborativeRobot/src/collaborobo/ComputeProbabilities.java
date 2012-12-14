@@ -35,8 +35,6 @@ public class ComputeProbabilities implements Observer {
       miny = miny > 0 ? miny : 0;
       maxy = (int) (maxy < Constants.mapSizeY ? maxy : Constants.mapSizeY - 1);
 
-      double prob = A_PROB;
-
       for (int y = miny; y < maxy; y++) {
         for (int x = minx; x < maxx; x++) {
           double distanceCenter = Math.sqrt(Math.abs(y - sb.mapY)
