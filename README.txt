@@ -7,7 +7,10 @@ collaborativeRobot - directory for the Java implementation of the ciber mouse ro
 simulator - directory for the simulator
 Viewer - directory for the viewer
 
-To start the simulation, run the script "start" in the home folder. 
+To start the simulation, run the script "start" in the home folder with the command:
+
+sh start
+
 This will create an instance of the simulator, one of the viewer, and five mouses.
 They will be automatically connected to the simulator, and their individual visualizers will also be initialized.
 Keep in mind that before doing this, you need to compile the robot client, using the instructions below.
