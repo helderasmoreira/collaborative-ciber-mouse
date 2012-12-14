@@ -1,33 +1,32 @@
 package collaborobo;
 
-import collaborobo.path.PathFinder;
-import collaborobo.path.Node;
 import ciberIF.beaconMeasure;
 import ciberIF.ciberIF;
+import collaborobo.path.Node;
+import collaborobo.path.PathFinder;
 import collaborobo.utils.Constants;
 import collaborobo.utils.Util;
 import collaborobo.visualizers.*;
-
 import java.util.List;
 import java.util.Observable;
 
 public class CollaborativeRobot extends Observable {
 
-  enum State {
-
-    RUN, WAIT, RETURN
-  }
   public double[][] map = new double[Constants.mapSizeY][Constants.mapSizeX];
   public double[][] probabilitiesMap = new double[Constants.mapSizeY][Constants.mapSizeX];
   public int[][] beaconProbability = new int[Constants.mapSizeY][Constants.mapSizeX];
   public double[][] aStarMatrix = new double[Constants.mapSizeY][Constants.mapSizeX];
+  
+  public int halfPosX, halfPosY;
   public int initialPosX, initialPosY;
-  private boolean firstReturn = true;
   public double PosX;
   public double PosY;
   public double previousPosX;
   public double previousPosY;
-  public int halfPosX, halfPosY;
+  public double previousMotorPowL = 0.0;
+  public double previousMotorPowR = 0.0;
+  
+  //Sensors
   public int frontSensorPosX;
   public int frontSensorPosY;
   public double frontSensor;
@@ -37,10 +36,8 @@ public class CollaborativeRobot extends Observable {
   public int rightSensorPosX;
   public int rightSensorPosY;
   public double rightSensor;
-  public double turnAround = -1.0;
-  public double previousMotorPowL = 0.0;
-  public double previousMotorPowR = 0.0;
-  public double orientation = 0;
+  
+  private boolean firstReturn = true;
   public List<Node> nodes;
   
   private Communication comm;
@@ -49,10 +46,21 @@ public class CollaborativeRobot extends Observable {
   public int pos;
   public beaconMeasure beacon;
   public double compass;
+  public double orientation = 0; //alternative to compass
   public ciberIF cif;
   private int ground;
   private State state;
+  
+  // Execution Options
   private boolean GPS_ON = true;
+  private boolean USE_PROB = false;
+  private boolean VISUALIZER_ON = false;
+  private boolean BEACON_ON = true;
+  private boolean PROBABILITIES_ON = true;
+  
+  enum State {
+    RUN, WAIT, RETURN
+  }
 
   // Constructor
   CollaborativeRobot() {
@@ -73,20 +81,26 @@ public class CollaborativeRobot extends Observable {
       }
     }
 
-    for (int i = 0; i < aStarMatrix.length; i++) {
-      for (int j = 0; j < aStarMatrix[i].length; j++) {
-        aStarMatrix[i][j] = 1.0;
-      }
+    if(!USE_PROB){
+        for (int i = 0; i < aStarMatrix.length; i++) {
+          for (int j = 0; j < aStarMatrix[i].length; j++) {
+            aStarMatrix[i][j] = 1.0;
+          }
+        }
     }
 
-    /*MapVisualizer visualizer = new MapVisualizer(this);
-    visualizer.start();*/
-
-    MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
-    probVisualizer.start();
-
-/*    BeaconVisualizer bv = new BeaconVisualizer(this);
-    bv.start();*/
+    if(VISUALIZER_ON){
+        MapVisualizer visualizer = new MapVisualizer(this);
+        visualizer.start();
+    }
+    if(PROBABILITIES_ON){
+        MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
+        probVisualizer.start();
+    }
+    if(BEACON_ON){
+        BeaconVisualizer bv = new BeaconVisualizer(this);
+        bv.start();
+    }
  
     cif.ReadSensors();
 
@@ -94,14 +108,6 @@ public class CollaborativeRobot extends Observable {
     initialPosY = (int) (cif.GetY() * Constants.MAP_PRECISION);
     PosX = halfPosX;
     PosY = halfPosY;
-
-   // PosX_aStar = PosX;
-   // PosY_aStar = PosY;
-
-//    previousPosX = PosX;
-//    previousPosY = PosY;
-//
-//    aStarMatrix[(int) Math.round(PosY)][(int) Math.round(PosX)] = 0.0;
 
     updateMap();
 
@@ -172,34 +178,33 @@ public class CollaborativeRobot extends Observable {
 		if (GPS_ON) {
 			PosX = cif.GetX() * Constants.MAP_PRECISION - initialPosX
 					+ halfPosX;
-			;
 			PosY = initialPosY - cif.GetY() * Constants.MAP_PRECISION
 					+ halfPosY;
 		}
+        
+        if(!USE_PROB){
+            if (firstReturn) {
+                int y = (int) Math
+                        .round((PosY > previousPosY ? PosY : previousPosY)) + 1;
+                int x = (int) Math
+                        .round((PosX > previousPosX ? PosX : previousPosX)) + 1;
+                double matrix[][] = new double[y][x];
 
-		if (firstReturn) {
-			int y = (int) Math
-					.round((PosY > previousPosY ? PosY : previousPosY)) + 1;
-			int x = (int) Math
-					.round((PosX > previousPosX ? PosX : previousPosX)) + 1;
-			double matrix[][] = new double[y][x];
+                List<Node> nodes = PathFinder.calculate(matrix,
+                        (int) Math.round(PosX), (int) Math.round(PosY),
+                        (int) Math.round(previousPosX),
+                        (int) Math.round(previousPosY), USE_PROB);
+                for (Node n : nodes) {
+                    updateAStarMatrix(n.x, n.y);
+                }
+            }
 
-			List<Node> nodes = PathFinder.calculate(matrix,
-					(int) Math.round(PosX), (int) Math.round(PosY),
-					(int) Math.round(previousPosX),
-					(int) Math.round(previousPosY));
-			for (Node n : nodes) {
-				updateAStarMatrix(n.x, n.y);
-			}
-		}
-
+            updateAStarMatrix((int) Math.round(PosX), (int) Math.round(PosY));
+            previousPosX = PosX;
+            previousPosY = PosY;
+        }
 		previousMotorPowL = leftMotorForce;
 		previousMotorPowR = rightMotorForce;
-
-		previousPosX = PosX;
-		previousPosY = PosY;
-
-		updateAStarMatrix((int) Math.round(PosX), (int) Math.round(PosY));
 
 		if (emergency) {
 			requestInfo();
@@ -207,16 +212,21 @@ public class CollaborativeRobot extends Observable {
 			getInfo();
 			cif.DriveMotors(0.0, 0.0);
 			if (!firstReturn) {
-				nodes = PathFinder.calculate(aStarMatrix,
+                if(USE_PROB){
+                    nodes = PathFinder.calculate(probabilitiesMap,
 						(int) Math.round(PosX), (int) Math.round(PosY),
-						halfPosX, halfPosY);
+						halfPosX, halfPosY, USE_PROB);
+                }else{
+                    nodes = PathFinder.calculate(aStarMatrix,
+						(int) Math.round(PosX), (int) Math.round(PosY),
+						halfPosX, halfPosY, USE_PROB);
+                }
 			}
 			if (!firstReturn && (nodes == null || nodes.isEmpty())) {
 				cif.DriveMotors(0.0, 0.0);
 				System.exit(0); /* Terminate agent */
 			}
 		}
-
 	}
 
 	private void updateAStarMatrix(int x, int y) {
@@ -242,25 +252,15 @@ public class CollaborativeRobot extends Observable {
 	}
 
   private void updateMap() {
-    // int robotMapY = (int) (initialPosY - cif.GetY() *
-    // Constants.MAP_PRECISION + halfPosY);
-    // int robotMapX = (int) (cif.GetX() * Constants.MAP_PRECISION -
-    // initialPosX + halfPosX);
     int robotMapX = (int) Math.round(PosX);
     int robotMapY = (int) Math.round(PosY);
 
     map[robotMapY][robotMapX] = 1.0;
 
-    // System.out.println("(X1,Y1)=(" + robotMapX + "," + robotMapY + ")");
-    // System.out.println("(X2,Y2)=(" + PosX + "," + PosY + ")\n");
-
     int[] frontSensorPos = Util.frontSensorMapPosition(robotMapX, robotMapY, compass);
     int[] leftSensorPos = Util.leftSensorMapPosition(robotMapX, robotMapY, compass);
     int[] rightSensorPos = Util.rightSensorMapPosition(robotMapX, robotMapY, compass);
-    // System.out.println("Left Sensor X: " + leftSensorPos[0]);
-    // System.out.println("Left Sensor Y: " + leftSensorPos[1]);
-    // System.out.println("Right Sensor X: " + rightSensorPos[0]);
-    // System.out.println("Right Sensor Y: " + rightSensorPos[1]);
+
     
     frontSensorPos[0] = Util.constrain(frontSensorPos[0], 0, Constants.mapSizeX-1);
     frontSensorPos[1] = Util.constrain(frontSensorPos[1], 0, Constants.mapSizeY-1);
@@ -340,13 +340,15 @@ public class CollaborativeRobot extends Observable {
 	  
 	int maxY = 0, maxX = 0;
 	int max = 0;
-	for(int y=0;y<beaconProbability.length;y++)
-		for(int x=0;x<beaconProbability[y].length;x++)
-			if (beaconProbability[y][x] > max) {
-				maxY = y;
-				maxX = x;
-				max = beaconProbability[y][x];
-			}
+	for(int y=0;y<beaconProbability.length;y++) {
+          for(int x=0;x<beaconProbability[y].length;x++) {
+            if (beaconProbability[y][x] > max) {
+                maxY = y;
+                maxX = x;
+                max = beaconProbability[y][x];
+            }
+        }
+      }
 	
 	beaconMeasure beacon = new beaconMeasure();
         
@@ -355,8 +357,9 @@ public class CollaborativeRobot extends Observable {
 	if(max == 0){
         beacon.beaconVisible = false;
     }
-	else
-		System.out.println("beacon from matrix - maxX: " + maxX + "  maxY: " + maxY);
+	else {
+        System.out.println("beacon from matrix - maxX: " + maxX + "  maxY: " + maxY);
+     }
 	return beacon;
 }
 
@@ -440,31 +443,6 @@ public void requestInfo() {
 	    
 	    updateMap();
   }
-
-//  private void prunePath() {
-//
-//    if (nodes == null || nodes.isEmpty()) {
-//      return;
-//    }
-//
-//    Node n = nodes.get(0);
-//
-//    double distance = Math.sqrt(Math.abs(n.x - PosX)
-//            * Math.abs(n.x - PosX) + Math.abs(n.y - PosY)
-//            * Math.abs(n.y - PosY));
-//
-//    for (int i = 1; i < nodes.size(); i++) {
-//      double distance2 = Math.sqrt(Math.abs(nodes.get(i).x - PosX)
-//              * Math.abs(nodes.get(i).x - PosX) + Math.abs(nodes.get(i).y - PosY)
-//              * Math.abs(nodes.get(i).y - PosY));
-//      if (distance <= distance2) {
-//        nodes.remove(i - 1);
-//        distance = distance2;
-//      } else {
-//        break;
-//      }
-//    }
-//  }
 
   public void wander(boolean followBeacon) {
     // verifica se há algum obstáculo a evitar
@@ -563,7 +541,11 @@ public void requestInfo() {
         break;
       case RETURN: /* Return to home area */
         if (firstReturn) {
-          nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY);
+            if(USE_PROB){
+                nodes = PathFinder.calculate(probabilitiesMap, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY, USE_PROB);
+            }else{
+                nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY, USE_PROB);   
+            }
 
           if (nodes != null && nodes.size() > 0) {
             for (int i = 0; i < nodes.size(); i++) {
@@ -589,7 +571,6 @@ public void requestInfo() {
           }
         }
         break;
-
     }
 
     requestInfo();
