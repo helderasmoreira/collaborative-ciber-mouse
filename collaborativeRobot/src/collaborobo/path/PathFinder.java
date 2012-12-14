@@ -26,7 +26,7 @@ public class PathFinder {
     private void growWalls(double[][] map) {
         List<Node> visited = new LinkedList<Node>();
 
-        double step = (int) (Constants.ROBOT_RADIUS * 10 - 1.0);
+        double step = (int) (Constants.ROBOT_RADIUS * Constants.MAP_PRECISION);
         double height = map.length - 1;
         double width = map[0].length - 1;
 
@@ -36,45 +36,45 @@ public class PathFinder {
 
                 if (!visited.contains(current) && map[y][x] > ISWALL) {
                     visited.add(current);
-                    
+
                     for (int i = 1; i <= step; i++) {
                         //baixo
-                        if (y + i < height) {
-                            visited.add(new Node(x, y + i));
-                            map[y + i][x] = map[y][x];
+                        if (y + i < height && map[y + i][x] < map[y][x]) {
+                                visited.add(new Node(x, y + i));
+                                map[y + i][x] = map[y][x];
                         }
                         //direita    
-                        if (x + i < width) {
+                        if (x + i < width && map[y][x + i] < map[y][x]) {
                             visited.add(new Node(x + i, y));
                             map[y][x + i] = map[y][x];
                         }
                         //cima    
-                        if (y - i > 0) {
+                        if (y - i > 0 && map[y - i][x] < map[y][x]) {
                             visited.add(new Node(x, y - i));
                             map[y - i][x] = map[y][x];
                         }
                         //esquerda
-                        if (x - i > 0) {
+                        if (x - i > 0 && map[y][x - i] < map[y][x]) {
                             visited.add(new Node(x - i, y));
                             map[y][x - i] = map[y][x];
                         }
                         //cima direita
-                        if (y - i > 0 && x + i < width) {
+                        if (y - i > 0 && x + i < width && map[y - i][x + i] < map[y][x]) {
                             visited.add(new Node(x + i, y - i));
                             map[y - i][x + i] = map[y][x];
                         }
                         //cima esquerda
-                        if (y - i > 0 && x - i > 0) {
+                        if (y - i > 0 && x - i > 0 && map[y - i][x - i] < map[y][x]) {
                             visited.add(new Node(x - i, y - i));
                             map[y - i][x - i] = map[y][x];
                         }
                         //baixo direita
-                        if (y + i < height && x + i < width) {
+                        if (y + i < height && x + i < width && map[y + i][x + i] < map[y][x]) {
                             visited.add(new Node(x + i, y + i));
                             map[y + i][x + i] = map[y][x];
                         }
                         //baixo esquerda
-                        if (y + i < height && x - i > 0) {
+                        if (y + i < height && x - i > 0 && map[y + i][x - i] < map[y][x]) {
                             visited.add(new Node(x - i, y + i));
                             map[y + i][x - i] = map[y][x];
                         }
