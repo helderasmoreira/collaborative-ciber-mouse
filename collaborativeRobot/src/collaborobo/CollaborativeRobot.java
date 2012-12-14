@@ -83,12 +83,12 @@ public class CollaborativeRobot extends Observable {
 
     /*MapVisualizer visualizer = new MapVisualizer(this);
     visualizer.start();*/
-
+/*
     MapProbabilitiesVisualizer probVisualizer = new MapProbabilitiesVisualizer(this);
     probVisualizer.start();
-
-/*    BeaconVisualizer bv = new BeaconVisualizer(this);
-    bv.start();*/
+*/
+    BeaconVisualizer bv = new BeaconVisualizer(this);
+    bv.start();
  
     cif.ReadSensors();
 
@@ -337,6 +337,8 @@ public class CollaborativeRobot extends Observable {
 	if(max == 0){
         beacon.beaconVisible = false;
     }
+	else
+		System.out.println("beacon from matrix - maxX: " + maxX + "  maxY: " + maxY);
 	return beacon;
 }
 
