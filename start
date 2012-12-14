@@ -5,7 +5,13 @@ sleep 1
 
 sleep 1
 
-(cd Viewer; ./Viewer)
+(cd Viewer; ./Viewer)&
+
+(cd collaborativeRobot/bin/; java collaborobo.Main -pos 1)&
+(cd collaborativeRobot/bin/; java collaborobo.Main -pos 2)&
+(cd collaborativeRobot/bin/; java collaborobo.Main -pos 3)&
+(cd collaborativeRobot/bin/; java collaborobo.Main -pos 4)&
+(cd collaborativeRobot/bin/; java collaborobo.Main -pos 5)
 
 killall simulator 
 
