@@ -16,22 +16,21 @@ To this end, we particularly focus on developing an interesting solution for a m
 
 \section{Introduction}
 Ciber-Rato is a modality of the Micro-Rato contest from University of Aveiro. This modality is a competition between small autonomous robots trying to solve mazes. \cite{Lau2002} 
-In this project, we faced the challenge of developing a collaborative robotic agent architecture using the Simulation Tools created for the Ciber-Rato competition. The agent should be able to solve simple mazes by finding a beacon and returning to his original position, while avoiding obstacles, collisions and dealing with time constraints. Furthermore, in the collaborative competition the maze is only considered solved when all the mice return to their original position, thus the implementation of proper collaboration strategies is encouraged.
+In this project, we faced the challenge of developing a collaborative robotic agent architecture using the Simulation Tools created for the Ciber-Rato competition. The agents should be able to solve simple mazes by finding a beacon and returning to his original position, while avoiding obstacles, collisions and dealing with time constraints. Furthermore, in the collaborative competition, the agents are playing in a team of 5 robots, all the robots, must meet in the target area, and after that return to their original position. The maze is only considered solved when all the mice return to their original position.
 
 At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent efficiency.
 
 In this paper, first we present the simulation system architecture. Then the agent architecture and design are analyzed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{baboehelder}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
-
-
---- ainda não foi alterado a partir daqui ---
 
 \section{Simulation System Architecture}
 To develop this project the Ciber-Rato Simutalion Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and a allows the developed algorithms to be tested\cite{Lau2002}. 
 
 The simulation environment is composed by a Simulator, a Simulation Viewer and Virtual Robots. The first is responsible for modelling all the hardware components of the robots, the maze and ensure that all the execution rules are applied. The Simulation Viewer displays the maze, the robots movements and the remaining execution time. The virtual Robots are detailed in the section bellow.
 
+All the specifications presents in this paper are based on the Ciber-Rato 2011 Rules and Technical Specifications \cite{DepartamentodeElectronica2011}, and only a brief specification is present in here, for a more detailed specification please consult the document mentioned above.
+
 \subsection{Virtual Robots}
-The virtual robots have circular bodies and are equipped with sensors, actuators and command buttons. Only the robots' sensors and actuators used by the agent that we developed are mentioned in this section. All the specifications presents in this paper are based on the Ciber-Rato 2011 Rules and Technical Specifications \cite{DepartamentodeElectronica2011}, and only a brief specification is present in here, for a more detailed specification please consult the document mentioned above.
+The virtual robots have circular bodies and are equipped with sensors, actuators and command buttons. Only the robots' sensors and actuators used by the agent that we developed are mentioned in this section.
 
 \subsubsection{Sensors}\hfill \\
 For the developed agent the following sensors were used, from the ones available in the simulation environment: 
@@ -43,6 +42,11 @@ For the developed agent the following sensors were used, from the ones available
   \item[\textbf{Bumper}]Active when the robot collides.
   \item[\textbf{Ground Sensor}]
   Active when the robot is completely in target area.
+  \item[\textbf{Compass}]
+  Positioned in the center of the robot and measures its angular position with respect to
+the virtual North (X axis).
+  \item[\textbf{GPS}]
+  Returns the position of the robot in the arena, with resolution 0.1. It is located in the center of the robot.
 \end{itemize}
 
 \subsubsection{Actuators}\hfill \\
@@ -56,6 +60,22 @@ The LED is used to signal that the robot has already found the beacon.
 
 \subsubsection{Buttons}\hfill \\
 Two buttons, named Start and Stop, are provided in each robot and are used by the simulator to start and interrupt the competition.
+
+\subsection{Arena}
+The arena is randomly positioned in the world, which means that the starting coordinates of the robot may differ for every attempt to solve the maze, and has a maximum size of 14x28 um.
+The arena is populated with obstacles, a target area, and a starting grid. For the same maze different starting grids can also be used. The obstacles within the arena can be higher then the beacon, making it invisible for the beacon sensor.
+
+\subsection{Communication}
+Communication between robots can be made by sending appropriate commands, through the simulator. The other agents will be then responsible for reading the messages in the simulator. However the following constraints are be applied:
+\begin{itemize}
+ \item Per cycle, a robot can send (broadcast) up to 100 bytes;
+ \item Per cycle, a robot can read up to 400 bytes;
+ \item Per cycle, a robot can read up to 400 bytes;
+ \item Robots can only read messages sent from a maximum of 8 units from its current position;
+ \item Obstacles do not interfere with communication;
+ \item Latency of 1 cycle for sent messages.
+ \end{itemize} 
+
 
 \section{Agent Architecture}
 In this project we faced the challenge of creating a completely autonomous and purely reactive robot. In order to achieve that goal our agent must be able to fully operate in an unstructured environment by avoiding obstacles and finding the beacon in a simple to moderately complex map.
