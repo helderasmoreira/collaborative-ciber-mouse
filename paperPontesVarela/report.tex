@@ -16,9 +16,11 @@ To this end, we particularly focus on developing an interesting solution for a m
 
 \section{Introduction}
 Ciber-Rato is a modality of the Micro-Rato contest from University of Aveiro. This modality is a competition between small autonomous robots trying to solve mazes. \cite{Lau2002} 
-In this project, we faced the challenge of developing a collaborative robotic agent architecture using the Simulation Tools created for the Ciber-Rato competition. The agent should be able to solve simple mazes by finding a beacon and returning to his original position, while avoiding obstacles, collisions and dealing with time constraints. Furthermore in the collaborative competition the maze is only considered solved when all the mice return to their original position, thus an proper collaboration strategies is encouraged.
-At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even the his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent efficiency.
-In this paper, first we present the simulation system architecture. Then the agent architecture and design, mainly focusing in the navigation and target localization strategies are analyzed, since communication and mapping are further discussed in the paper \cite{baboehelder}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
+In this project, we faced the challenge of developing a collaborative robotic agent architecture using the Simulation Tools created for the Ciber-Rato competition. The agent should be able to solve simple mazes by finding a beacon and returning to his original position, while avoiding obstacles, collisions and dealing with time constraints. Furthermore, in the collaborative competition the maze is only considered solved when all the mice return to their original position, thus the implementation of proper collaboration strategies is encouraged.
+
+At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent efficiency.
+
+In this paper, first we present the simulation system architecture. Then the agent architecture and design are analyzed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{baboehelder}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
 
 
 --- ainda não foi alterado a partir daqui ---
@@ -63,7 +65,7 @@ To accomplish this we developed a layered architecture that can be viewed on fig
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.8\textwidth]{layer-architecture}
+  \includegraphics[width=0.8\textwidth]{layer-architecture.png}
   \label{fig:layered}
   \caption{Layered architecture.}
 \end{figure}
