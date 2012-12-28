@@ -23,7 +23,7 @@ At the starting point, the agents have no previous information about the world s
 In this paper, first we present the simulation system architecture. Then the agent architecture and design are analyzed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{baboehelder}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
 
 \section{Simulation System Architecture}
-To develop this project the Ciber-Rato Simutalion Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and a allows the developed algorithms to be tested\cite{Lau2002}. 
+To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and a allows the developed algorithms to be tested\cite{Lau2002}. 
 
 The simulation environment is composed by a Simulator, a Simulation Viewer and Virtual Robots. The first is responsible for modelling all the hardware components of the robots, the maze and ensure that all the execution rules are applied. The Simulation Viewer displays the maze, the robots movements and the remaining execution time. The virtual Robots are detailed in the section bellow.
 
@@ -38,7 +38,7 @@ For the developed agent the following sensors were used, from the ones available
   \item[\textbf{Obstacle Sensors}]
   4 proximity sensors, 3 oriented to the front of the robot (left, middle and right sides), and one in the rear. Each sensor has a 60º aperture angle.
   \item[\textbf{Beacon Sensor}]
-  Measures the angular position of the beacon with respect to the robot’s frontal axis. The measure ranges from −180 to +180 degrees, with a resolution of 1 degree.
+  Measures the angular position of the beacon with respect to the robot's frontal axis. The measure ranges from −180 to +180 degrees, with a resolution of 1 degree.
   \item[\textbf{Bumper}]Active when the robot collides.
   \item[\textbf{Ground Sensor}]
   Active when the robot is completely in target area.
@@ -50,7 +50,7 @@ the virtual North (X axis).
 \end{itemize}
 
 \subsubsection{Actuators}\hfill \\
-The actuators components of the robots used in this project are 2 motors and 1 signalling LED. 
+The actuators components of the robots used in this project are 2 motors and 1 signaling LED. 
 \begin{itemize}
   \item[\textbf{Motors}]
 Motors have inertia and noise in order to more closely represent real motors, and the translation or rotation movements can be achieved by applying different power values to each motor.
@@ -76,12 +76,45 @@ Communication between robots can be made by sending appropriate commands, throug
  \item Latency of 1 cycle for sent messages.
  \end{itemize} 
 
-
 \section{Agent Architecture}
+In this project we faced the challenge of creating a team of 5 robotic agents, playing simultaneously, in the environment provided by the Ciber-Rato Simulation Tools. The Mice have two specific goals: locate the target area and place all the agents inside that area;return all the robots back to their original position.
+
+In order to achieve that goal our agents must be able to fully operate in an unstructured environment by avoiding obstacles and finding the beacon in a simple to moderately complex map.However, at the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agents efficiency.
+
+The developed agent architecture is composed by 6 different modules and is represented in figure 1.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\textwidth]{robot-architecture.png}
+  \label{fig:layered}
+  \caption{System architecture.}
+\end{figure}
+
+Bellow, the description of each module:
+
+\begin{itemize}
+  \item[\textbf{Compute Probabilities}]
+  lorem ipsum
+  \item[\textbf{Communication}]
+  lorem ipsum
+  \item[\textbf{Path Planning}]
+  lorem ipsum
+  \item[\textbf{Visualizers}]
+  lorem ipsum
+  \item[\textbf{Utils}]
+  lorem ipsum
+\end{itemize}
+
+----------------- old description -------------------------
+
 In this project we faced the challenge of creating a completely autonomous and purely reactive robot. In order to achieve that goal our agent must be able to fully operate in an unstructured environment by avoiding obstacles and finding the beacon in a simple to moderately complex map.
 This purely reactive architecture means that the robot acts merely based on its sensors, i.e. it does not keep information on how the current world state is.
 
-To accomplish this we developed a layered architecture that can be viewed on figure 1.
+To accomplish this we developed a layered architecture that can be viewed on figure 2.
+
+With this system architecture the top layers are activated when certain conditions are detected by the sensors, overriding the actions of the bottom layers, e.g. if an obstacle is detected the robot will start its obstacle avoidance routine, instead of moving towards the beacon or wandering around. 
+
+This architecture was inspired by the subsumption layered model that Brooks proposed for mobile robot control system.\cite{Brooks_1986}
 
 \begin{figure}
   \centering
@@ -89,10 +122,6 @@ To accomplish this we developed a layered architecture that can be viewed on fig
   \label{fig:layered}
   \caption{Layered architecture.}
 \end{figure}
-
-With this system architecture the top layers are activated when certain conditions are detected by the sensors, overriding the actions of the bottom layers, e.g. if an obstacle is detected the robot will start its obstacle avoidance routine, instead of moving towards the beacon or wandering around. 
-
-This architecture was inspired by the subsumption layered model that Brooks proposed for mobile robot control system.\cite{Brooks_1986}
 
 Each of these layers will now be described in further detail:
 \begin{description}
@@ -125,14 +154,23 @@ This reactive architecture includes some limitations, such as:
 
 The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
 
-%originalmente tinha muitas colisões devido ao angulo que faziamos ao virar, para tentar evitar isso, colocamos o robo a virar sobre o seu proprio eixo, mas garantido que mesmo assim ele vira mais para o lado onde se quer dirigir para o robo nao ficar preso
-%ao querer melhorar os angulos e andar mais perto das paredes, tempo torna-se um contraint
+----------------- end of old description -------------------------
+
+\subsection{Navigation}
+ou path planning, ainda nao sei bem que nome por
+lorem ipsum
+
+\subsection{Target Localization}
+lorem ipsum
+
+\section{Results}
+lorem ipsum
 
 \section{Conclusion}
-With this assignment we got some good insights on the Ciber-Rato Simulation Tools and we were able to get properly familiarized with the development environment. Some time was lost on finding better documentation for the provided Java interface and this was only solved by adding some debug messages to the provided client.
+lorem ipsum
 
-Also with this simple agent we realized the limitations of a purely reactive architecture and tried different methods to circumvent them.
-
+\section{Future Work}
+lorem ipsum
 \bibliography{report}
 \bibliographystyle{splncs}
 \end{document}
