@@ -1,6 +1,7 @@
 \documentclass[oribibl]{llncs}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{textcomp}       % additional symbols using companion encoding TS1
 
 \title{Collabot}
 \subtitle{A Collaborative Robotic Agent for the CiberRato Competition  }
@@ -109,7 +110,7 @@ Bellow, the description of each module:
 \subsection{Navigation Strategy}
 The navigation strategy followed by our robot can be divided in two fundamental steps: exploring the map before finding and reaching the beacon and returning home after finding it.
 
-\subsubsection{Exploring the Map}
+\subsubsection{Exploring the Map}\hfill \\
 
 For the first phase of navigation the behavior of our mouse was mostly imported from a previously created solution of a purely reactive mouse described in \cite{Moreira2012}. This solution was inspired by the subsumption layered model that Brooks proposed for mobile robot control system\cite{Brooks_1986}, and can be viewed on figure 2.
 
@@ -123,21 +124,32 @@ For the first phase of navigation the behavior of our mouse was mostly imported 
 With this system architecture the top layers are activated when certain conditions are detected by the sensors, overriding the actions of the bottom layers, e.g. if an obstacle is detected the robot will start its obstacle avoidance routine, instead of moving towards the beacon or wandering around. 
 
 Each of these layers will now be described in further detail:
-\begin{description}
+
+\begin{itemize}
   \item[\textbf{Wait}]
   This layer is used to detect if the robot has reached the beacon location and to stop its motion, also signaling to the simulator that the robot has finished the first phase of the competition.
   \item[\textbf{Avoid Obstacle}]
-  In order to avoid obstacles a wall following algorithm was implemented. The mouse moves always in a clockwise direction and the strategy is held until the beacon is framed within 20º degrees of the robot.
+  In order to avoid obstacles a wall following algorithm was implemented. The mouse moves always in a clockwise direction and the strategy is held until the beacon is framed within 20\textdegree degrees of amplitude.
   
-  One example of a complex obstacle that can be avoided by this algorithm is represented in figure 3. At first, the robot is moving forward. When a wall is detected in front of the robot, it turns about 90º to the right, and keeps moving forward. On every inner corner,  C, the mechanism is similar to the previously described. On every outer corner, E, the robot deviates itself in order to turn and move forward without touching the corner. When the robot is rotating, it verifies if the beacon is visible within a 20º amplitude, and if that is the case the wall following is aborted and the robot moves in the direction of the beacon.
+  One example of a complex obstacle that can be avoided by this algorithm is represented in figure 3. At first, the robot is moving forward. When a wall is detected in front of the robot, it turns about 90\textdegree to the right, and keeps moving forward. On every inner corner,  C, the mechanism is similar to the previously described. On every outer corner, E, the robot deviates itself in order to turn and move forward without touching the corner. When the robot is rotating, it verifies if the beacon is visible within a 20\textdegree amplitude, and if that is the case the wall following is aborted and the robot moves in the direction of the beacon.
   
   \item[\textbf{Move to Beacon}]
   This layer detects if the beacon is visible and if it is the robot rotates itself to align with the beacon direction and then moves forward. This rotation value is calculated accordingly to beacon sensor information, e.g. if the beacon direction is opposite to the robot's facing direction then the rotation value is higher than if the beacon direction was only to the left or to the right of the robot.
+  
   \item[\textbf{Wander}]
-  This layer provides the default action which is for the robot to move forward, veering to the left or to the right every 100 iterations, creating an undulatory locomotion similar to that of a snake.
-\end{description}
+  This layer provides the default action which is for the robot to move around the arena until it finds a wall to follow or sees the beacon.
+\end{itemize}
+\hfill \\
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{obstaculo1.png}
+  \label{fig:obstaculo1}
+  \caption{Example of an obstacle that can be avoided.}
+\end{figure}
 
-\subsubsection{Return Home}
+\subsubsection{Return Home}\hfill \\
+
+In order to make the robots return to their original position the robot uses the information gathered until that moment by him and the information collected by the other robots, and calculates the best path using the path planning strategy detailed in the next section of this report. After that, the robot simply iterates through each node of the calculated path, aligns himself with the direction of the child node and then moves forward. This cycle is repeated until the robot reaches its original position.
 
 \subsection{Path Planning}
 
@@ -157,9 +169,14 @@ h(x) = \sqrt{(p_x - q_x)^2 + (p_y - q_y)^2}
 
 Finally, in order to ensure that is always possible to travel through the calculated path without touching the walls, the implemented solution also allows the enlargement of the walls of the the maze in the size of the robot radius. To do so, for every node, \textit{N}, of the provided matrix that is not traversable and has not been visited yet, the surroundings nodes, are calculated and the node \textit{N} is marked as visited. If the cost of a surrounding node, \textit{S}, is smaller then the cost of the current node \textit{N}, the cost of \textit{S} is updated to the cost of \textit{N} and \textit{S} is marked as visited.
 
+The path planning module requires a proper world state representation when calculating the shortest path, otherwise the algorithm may calculate paths that are impossible for a robot to cross (i.e. If a cell that contains a obstacle is present in the calculated path). Therefore, to create a more robust test set, two different solutions were explored:
+\begin{enumerate}
+\item The first was to use the computed probabilities matrix. Originally all the cells of the matrix have the value of 0.5, meaning that the probability of that cell having or not an obstacle is the same. While the robot moves through the arena the values of the matrix are updated. A higher value, means that the probability of having a obstacle in that cell is higher. The algorithm used to update this matrix is further explained in the paper \cite{baboehelder}. Nevertheless, while using this algorithm it is important to ensure that the calculated path always keeps a sufficient distance from the wall, thus it is required to enlarge the walls when using this strategy.
 
+\item The second strategy chosen was to use only the points that were crossed by the robot to calculate the path. With this strategy, the problems related to the sensors noise, or errors in the calculation of the location of the obstacles in the map are avoided, since the robots, only travel through the same tracks they have already crossed. Furthermore, in this strategy, the enlargement of the walls is not required, and the path planning executes faster. However, by not taking all the information available into account, the calculated path may also not be the shortest one.
+\end{enumerate}
 
-
+The results, of both strategies are further detailed in the section Results of this paper.
 
 \subsection{Target Localization}
 lorem ipsum
