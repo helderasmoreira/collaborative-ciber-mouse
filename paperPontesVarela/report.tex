@@ -4,7 +4,7 @@
 \usepackage{textcomp}       % additional symbols using companion encoding TS1
 
 \title{Collabot}
-\subtitle{A Collaborative Robotic Agent for the CiberRato Competition  }
+\subtitle{A Collaborative Robotic Agent for the CiberRato Competition}
 \author{Pedro Pontes \and Tiago Varela}
 \institute{Faculdade de Engenharia da Universidade do Porto}
 
@@ -12,17 +12,18 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-This paper discusses the implementation of the navigation and target localization strategies for a  collaborative robotic agent using the Ciber-Rato Simulation Tools. Nevertheless, communication and mapping strategies were also implemented in the discussed agent, however those implementations are further explained in the paper \cite{baboehelder}.
-To this end, we particularly focus on developing an interesting solution for a maze solver agent and explore the collaboration between robots with similar architectures.
+This paper discusses the implementation of navigation and target localization strategies for a  collaborative robotic agent, using the Ciber-Rato Simulation Tools. Communication and mapping strategies were also implemented in the discussed agent, however those implementations are further explained in the paper \cite{baboehelder}.
+We focused on developing an interesting solution for a maze solver agent and explore the collaboration between robots with similar architectures.
 \end{abstract}
 
 \section{Introduction}
-Ciber-Rato is a modality of the Micro-Rato contest from University of Aveiro. This modality is a competition between small autonomous robots trying to solve mazes. \cite{Lau2002} 
-In this project, we faced the challenge of developing a collaborative robotic agent architecture using the Simulation Tools created for the Ciber-Rato competition. The agents should be able to solve simple mazes by finding a beacon and returning to his original position, while avoiding obstacles, collisions and dealing with time constraints. Furthermore, in the collaborative competition, the agents are playing in a team of 5 robots, all the robots, must meet in the target area, and after that return to their original position. The maze is only considered solved when all the mice return to their original position.
+Ciber-Rato is a category of the Micro-Rato contest from University of Aveiro.
+This category is a competition between small autonomous robots trying to solve mazes. \cite{Lau2002}
+In this project, we faced the challenge of developing a collaborative robotic agent architecture using the Simulation Tools created for the Ciber-Rato competition. The agents should be able to solve simple mazes by finding a beacon and returning to their original position, while avoiding obstacles, collisions and dealing with time constraints. Furthermore, in the collaborative competition, the agents are playing in a team of 5 robots, all the robots must meet in the target area and after that return to their original position. The maze is only considered solved when all the mice return to their original position.
 
-At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent efficiency.
+At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem, so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent's efficiency.
 
-In this paper, first we present the simulation system architecture. Then the agent architecture and design are analyzed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{baboehelder}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
+In this paper, first we present the simulation system architecture. Then the agent architecture and design are analysed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{baboehelder}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
 
 \section{Simulation System Architecture}
 To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and a allows the developed algorithms to be tested\cite{Lau2002}. 
@@ -38,21 +39,21 @@ The virtual robots have circular bodies and are equipped with sensors, actuators
 For the developed agent the following sensors were used, from the ones available in the simulation environment: 
 \begin{itemize}
   \item[\textbf{Obstacle Sensors}]
-  4 proximity sensors, 3 oriented to the front of the robot (left, middle and right sides), and one in the rear. Each sensor has a 60º aperture angle.
+  4 proximity sensors, 3 oriented to the front of the robot (left, middle and right sides), and one in the rear. Each sensor has a $60^{\circ}$ aperture angle.
   \item[\textbf{Beacon Sensor}]
-  Measures the angular position of the beacon with respect to the robot's frontal axis. The measure ranges from −180 to +180 degrees, with a resolution of 1 degree.
+  Measures the angular position of the beacon with respect to the robot's frontal axis. The measure ranges from $-180$ to $+180$ degrees, with a resolution of 1 degree.
   \item[\textbf{Bumper}]Active when the robot collides.
   \item[\textbf{Ground Sensor}]
   Active when the robot is completely in target area.
   \item[\textbf{Compass}]
   Positioned in the center of the robot and measures its angular position with respect to
-the virtual North (X axis).
+the virtual North ($x$ axis).
   \item[\textbf{GPS}]
   Returns the position of the robot in the arena, with resolution 0.1. It is located in the center of the robot.
 \end{itemize}
 
 \subsubsection{Actuators}\hfill \\
-The actuators components of the robots used in this project are 2 motors and 1 signaling LED. 
+The actuators components of the robots used in this project are 2 motors and 1 signalling LED. 
 \begin{itemize}
   \item[\textbf{Motors}]
 Motors have inertia and noise in order to more closely represent real motors, and the translation or rotation movements can be achieved by applying different power values to each motor.
@@ -64,14 +65,13 @@ The LED is used to signal that the robot has already found the beacon.
 Two buttons, named Start and Stop, are provided in each robot and are used by the simulator to start and interrupt the competition.
 
 \subsection{Arena}
-The arena is randomly positioned in the world, which means that the starting coordinates of the robot may differ for every attempt to solve the maze, and has a maximum size of 14x28 um.
+The arena is randomly positioned in the world, which means that the starting coordinates of the robot may differ for every attempt to solve the maze, and has a maximum size of $14\times28$ um.
 The arena is populated with obstacles, a target area, and a starting grid. For the same maze different starting grids can also be used. The obstacles within the arena can be higher then the beacon, making it invisible for the beacon sensor.
 
 \subsection{Communication}
-Communication between robots can be made by sending appropriate commands, through the simulator. The other agents will be then responsible for reading the messages in the simulator. However the following constraints are be applied:
+Communication between robots can be made by sending appropriate commands, through the Simulator. The other agents will be then responsible for reading the messages in the simulator. However the following constraints are be applied:
 \begin{itemize}
  \item Per cycle, a robot can send (broadcast) up to 100 bytes;
- \item Per cycle, a robot can read up to 400 bytes;
  \item Per cycle, a robot can read up to 400 bytes;
  \item Robots can only read messages sent from a maximum of 8 units from its current position;
  \item Obstacles do not interfere with communication;
@@ -79,17 +79,19 @@ Communication between robots can be made by sending appropriate commands, throug
  \end{itemize} 
 
 \section{Agent Architecture}
-In this project we faced the challenge of creating a team of 5 robotic agents, playing simultaneously, in the environment provided by the Ciber-Rato Simulation Tools. The Mice have two specific goals: locate the target area and place all the agents inside that area;return all the robots back to their original position.
+In this project we faced the challenge of creating a team of 5 robotic agents, playing simultaneously, in the environment provided by the Ciber-Rato Simulation Tools.
+The Mice have two specific goals: locate the target area and place all the agents inside that area; return all the robots back to their original position.
 
-In order to achieve that goal our agents must be able to fully operate in an unstructured environment by avoiding obstacles and finding the beacon in a simple to moderately complex map.However, at the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agents efficiency.
+In order to achieve that goal our agents must be able to fully operate in an unstructured environment by avoiding obstacles and finding the beacon in a simple to moderately complex map. 
+However, at the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agents efficiency.
 
-The developed agent architecture is composed by 6 different modules and is represented in figure 1.
+The developed agent architecture is composed by 6 different modules and is represented in figure \ref{fig:robot-arch}.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.9\textwidth]{robot-architecture.png}
-  \label{fig:layered}
   \caption{System architecture.}
+  \label{fig:robot-arch}
 \end{figure}
 
 Bellow, the description of each module:
@@ -112,13 +114,13 @@ The navigation strategy followed by our robot can be divided in two fundamental 
 
 \subsubsection{Exploring the Map}\hfill \\
 
-For the first phase of navigation the behavior of our mouse was mostly imported from a previously created solution of a purely reactive mouse described in \cite{Moreira2012}. This solution was inspired by the subsumption layered model that Brooks proposed for mobile robot control system\cite{Brooks_1986}, and can be viewed on figure 2.
+For the first phase of navigation the behavior of our mouse was mostly imported from a previously created solution of a purely reactive mouse described in \cite{Moreira2012}. This solution was inspired by the subsumption layered model that Brooks proposed for mobile robot control system\cite{Brooks_1986}, and can be viewed on figure \ref{fig:layered}.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.8\textwidth]{layer-architecture.png}
-  \label{fig:layered}
   \caption{Layered architecture.}
+  \label{fig:layered}
 \end{figure}
 
 With this system architecture the top layers are activated when certain conditions are detected by the sensors, overriding the actions of the bottom layers, e.g. if an obstacle is detected the robot will start its obstacle avoidance routine, instead of moving towards the beacon or wandering around. 
@@ -127,14 +129,16 @@ Each of these layers will now be described in further detail:
 
 \begin{itemize}
   \item[\textbf{Wait}]
-  This layer is used to detect if the robot has reached the beacon location and to stop its motion, also signaling to the simulator that the robot has finished the first phase of the competition.
+  This layer is used to detect if the robot has reached the beacon location and to stop its motion, also signalling to the Simulator that the robot has finished the first phase of the competition.
   \item[\textbf{Avoid Obstacle}]
-  In order to avoid obstacles a wall following algorithm was implemented. The mouse moves always in a clockwise direction and the strategy is held until the beacon is framed within 20\textdegree degrees of amplitude.
+  In order to avoid obstacles a wall following algorithm was implemented. The mouse moves always in a clockwise direction and the strategy is held until the beacon is framed within $20^{\circ}$ degrees of amplitude.
   
-  One example of a complex obstacle that can be avoided by this algorithm is represented in figure 3. At first, the robot is moving forward. When a wall is detected in front of the robot, it turns about 90\textdegree to the right, and keeps moving forward. On every inner corner,  C, the mechanism is similar to the previously described. On every outer corner, E, the robot deviates itself in order to turn and move forward without touching the corner. When the robot is rotating, it verifies if the beacon is visible within a 20\textdegree amplitude, and if that is the case the wall following is aborted and the robot moves in the direction of the beacon.
+  One example of a complex obstacle that can be avoided by this algorithm is represented in figure \ref{fig:obstacle1}. At first, the robot is moving forward. When a wall is detected in front of the robot, it turns about $90^{\circ}$ to the right, and keeps moving forward. On every inner corner, $C$, the mechanism is similar to the previously described. On every outer corner, $E$, the robot deviates itself in order to turn and move forward without touching the corner. When the robot is rotating, it verifies if the beacon is visible within a $20^{\circ}$ amplitude, and if that is the case the wall following is aborted and the robot moves in the direction of the beacon.
   
   \item[\textbf{Move to Beacon}]
   This layer detects if the beacon is visible and if it is the robot rotates itself to align with the beacon direction and then moves forward. This rotation value is calculated accordingly to beacon sensor information, e.g. if the beacon direction is opposite to the robot's facing direction then the rotation value is higher than if the beacon direction was only to the left or to the right of the robot.
+  When the beacon is not visible the robot finds in it's beacon probability matrix the most
+probable location of the beacon, if any, and tries to head in that direction. Details of how this is implemented are available in section \ref{sec:target-loc}.
   
   \item[\textbf{Wander}]
   This layer provides the default action which is for the robot to move around the arena until it finds a wall to follow or sees the beacon.
@@ -143,8 +147,8 @@ Each of these layers will now be described in further detail:
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{obstaculo1.png}
-  \label{fig:obstaculo1}
   \caption{Example of an obstacle that can be avoided.}
+  \label{fig:obstacle1}
 \end{figure}
 
 \subsubsection{Return Home}\hfill \\
@@ -179,6 +183,7 @@ The path planning module requires a proper world state representation when calcu
 The results, of both strategies are further detailed in the section Results of this paper.
 
 \subsection{Target Localization}
+\label{sec:target-loc}
 As mentioned on the Virtual Robots section the agent has a ``Beacon''
 sensor that returns the goal's direction, when it is visible. This direction
 is measured in 1 degree intervals, the values range from $-$180 to +180 degrees and
