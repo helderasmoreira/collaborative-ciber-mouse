@@ -1,5 +1,6 @@
 \documentclass[oribibl]{llncs}
 \usepackage{graphicx}
+\usepackage{amsmath}
 
 \title{Collabot}
 \subtitle{A Collaborative Robotic Agent for the CiberRato Competition  }
@@ -156,9 +157,27 @@ The benefits of this type of architecture are that the robot is able to quickly 
 
 ----------------- end of old description -------------------------
 
-\subsection{Navigation}
-ou path planning, ainda nao sei bem que nome por
-lorem ipsum
+\subsection{Navigation Strategy and Path Planning}
+
+The path planing problem in the developed solution consists in finding the best possible path between the beacon area and the original position of the robot, considering the information about the world that the robot gathered until that moment. In order to solve this problem Collabot implements an A* algorithm[] in the Path Planning module. The A* algorithm uses a best-first search based on an heuristic to find the path with the lower cost between the initial and goal points in a map.
+
+The Path Planning module is composed by two classes, Node and PathFinder, and it implementation is not coupled to the robotic agent implementation, meaning that this module could be used to solve any problem requiring the shortest path between two points in a two dimensional matrix of doubles. Each cell of the the matrix encapsulates the cost of traveling through that cell, however if the value of a cell is higher than a preset value, the cell is considered to have an obstacle and so is not traversable. Furthermore, all the surrounding cells of a cell are considered as a neighbor, therefore in best possible situation a cell can have 8 neighbors. A cell that is not traversable is not considered as a neighbor of any cell.
+
+To find the best possible path between two points the A* uses an heuristic function to determine the order in which nodes are visited during the search for that path. Equation 1 defines the cost function \textit{f(x)} as the sum of the distance so far traveled, \textit{g(x)}, and the estimated distance to the target, \textit{h(x)}. The estimated distance, represented in equation 2,  to the target is computed using the Euclidean distance between the current point, \textit{p}, and the goal point, \textit{q}, and returns the length of the line segment connecting the two points.
+
+\begin{equation}
+f(x) = g(x) + h(x)
+\end{equation}
+
+\begin{equation}
+h(x) = \sqrt{(p_x - q_x)^2 + (p_y - q_y)^2}
+\end{equation}
+
+Finally, in order to ensure that is always possible to travel through the calculated path without touching the walls, the implemented solution also allows the enlargement of the walls of the the maze in the size of the robot radius. To do so, for every node, \textit{N}, of the provided matrix that is not traversable and has not been visited yet, the surroundings nodes, are calculated and the node \textit{N} is marked as visited. If the cost of a surrounding node, \textit{S}, is smaller then the cost of the current node \textit{N}, the cost of \textit{S} is updated to the cost of \textit{N} and \textit{S} is marked as visited.
+
+
+
+
 
 \subsection{Target Localization}
 lorem ipsum
