@@ -140,7 +140,6 @@ Each of these layers will now be described in further detail:
   This layer provides the default action which is for the robot to move around the arena until it finds a wall to follow or sees the beacon.
 \end{itemize}
 \hfill \\
-\hfill \\
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{obstaculo1.png}
@@ -166,7 +165,7 @@ f(x) = g(x) + h(x)
 
 \begin{equation}
 h(x) = \sqrt{(p_x - q_x)^2 + (p_y - q_y)^2}
-\end{equation}ytick 
+\end{equation}
 
 Finally, in order to ensure that is always possible to travel through the calculated path without touching the walls, the implemented solution also allows the enlargement of the walls of the the maze in the size of the robot radius. To do so, for every node, \textit{N}, of the provided matrix that is not traversable and has not been visited yet, the surroundings nodes, are calculated and the node \textit{N} is marked as visited. If the cost of a surrounding node, \textit{S}, is smaller then the cost of the current node \textit{N}, the cost of \textit{S} is updated to the cost of \textit{N} and \textit{S} is marked as visited.
 
@@ -177,7 +176,7 @@ The path planning module requires a proper world state representation when calcu
 \item The second strategy chosen was to use only the points that were crossed by the robot to calculate the path. With this strategy, the problems related to the sensors noise, or errors in the calculation of the location of the obstacles in the map are avoided, since the robots, only travel through the same tracks they have already crossed. Furthermore, in this strategy, the enlargement of the walls is not required, and the path planning executes faster. However, by not taking all the information available into account, the calculated path may also not be the shortest one.
 \end{enumerate}
 
-The results of both strategies are further detailed in the section Results of this paper.
+The results, of both strategies are further detailed in the section Results of this paper.
 
 \subsection{Target Localization}
 As mentioned on the Virtual Robots section the agent has a ``Beacon''
@@ -187,33 +186,54 @@ are relative to the agent's orientation. The simulator introduces noise to this 
 using a normal distribution with mean 0 and standard deviation of 2.
 
 To store this information we created a matrix with the same size as the
-mapping matrix, a 14x28 matrix with each of the axis multiplied by the resolution
-used (10), resulting in a 140x280 matrix. Using the beacon sensor direction and the
-robot's position and orientation we draw a ray on the matrix starting on the robot's
+mapping matrix, a $14\times28$ matrix with each of the axis multiplied by the resolution
+used (10), resulting in a $140\times280$ matrix. Using the beacon sensor direction and the
+robot's position and orientation we draw a ray on the matrix starting on the agent's
 position and aimed at the beacon.
 
-To achieve this we calculate the possible beacon direction using:
+To achieve this we calculate the possible beacon direction and the starting and ending
+angle for the ray.
 \begin{equation}
 BeaconDir = AgentDir + BeaconRelativeDir
 \end{equation}
+\begin{equation}
+StartAngle = BeaconDir - 1
+\end{equation}
+\begin{equation}
+EndAngle = BeaconDir + 1
+\end{equation}
+
+After the values are normalized to be in the range of $-\pi$ to $\pi$ we can now
+iterate through the matrix and calculate the angle of each
+point relative to the agent's position using the atan2 function.
+\begin{equation}
+PntAngle = atan2(AgentY - MatrixPntY, MatrixPntX - AgentX);
+\end{equation}
+
+If the $PntAngle$ is in between the $StartAngle$ and the $EndAngle$ then that point in the
+matrix is incremented by 1.
+
+The visualizer represents this values using different color ranges:
+\begin{itemize}
+  \item[\textbf{Yellow}] For values below 8
+  \item[\textbf{Orange}] For values between 8 and 12
+  \item[\textbf{Red}] For values between 12 and 100
+  \item[\textbf{Black}]For values larger than 100
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{beacon-1.png}
+  \caption{Beacon visualizer with beacon on the right and robot on the left.}
+  \label{fig:beacon1}
+\end{figure}
+
+Figure \ref{fig:beacon1} represents the beacon visualizer after the first sightings of the objective
+in a map where the beacon is on the right and the robots starts on the left.
 
 \section{Results}
-Podemos dividir em seccoes  tipo:
-
-\subsection{Navigation Strategy}
-Como a soluçao ainda e maioritariamente reactiva existem cantos que nao conseguem ser atravessados.
-Devido a forma como e calculado a posicao, e aos erros acumulados, o uso de gps revelou ser mais util, caso nao haja ruido, caso contrario, a tal formula.
-
-\subsection{Path Planning}
-O uso da matrix de probabilidades, necessita de crescer as paredes, caso contrario o caminho calculado pode passar muito junto a paredes.
-O uso de informacao coloborativa nao foi muito explorado, fazendo que a informacao sobre o mudo seja relativamente pouca, o que faz com que o resultado obtido possa nao ser o melhor caminho
-
-O uso da matrix de a*, faz com que a computação seja mais rapida, no entanto, discarda muita informacao valiosa, nao tirando uso da parte colaborativa nem da info dos sensores. Necessita tb que a posicao do robo seja calculada com muita precisao, o que não se verifica qd há ruido.
-
-Em termos gerais, acabaram por revelar resultados semelhantes, com o uso de GPS e sem ruido.
-
-
------------------ old stuff -------------------------
+lorem ipsum
+----------------- old description -------------------------
 \subsection{Limitations and Benefits}
 This reactive architecture includes some limitations, such as:
 
@@ -224,16 +244,14 @@ This reactive architecture includes some limitations, such as:
 
 The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
 
------------------ end of old stuff -------------------------
+----------------- end of old description -------------------------
 
 
 \section{Conclusion}
 lorem ipsum
 
 \section{Future Work}
-era bonito usar mais a colaboracao.
-Filtros de kalman para o GPS
-
+lorem ipsum
 \bibliography{report}
 \bibliographystyle{splncs}
 \end{document}
