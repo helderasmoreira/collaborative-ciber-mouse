@@ -140,6 +140,7 @@ Each of these layers will now be described in further detail:
   This layer provides the default action which is for the robot to move around the arena until it finds a wall to follow or sees the beacon.
 \end{itemize}
 \hfill \\
+\hfill \\
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{obstaculo1.png}
@@ -165,7 +166,7 @@ f(x) = g(x) + h(x)
 
 \begin{equation}
 h(x) = \sqrt{(p_x - q_x)^2 + (p_y - q_y)^2}
-\end{equation}
+\end{equation}ytick 
 
 Finally, in order to ensure that is always possible to travel through the calculated path without touching the walls, the implemented solution also allows the enlargement of the walls of the the maze in the size of the robot radius. To do so, for every node, \textit{N}, of the provided matrix that is not traversable and has not been visited yet, the surroundings nodes, are calculated and the node \textit{N} is marked as visited. If the cost of a surrounding node, \textit{S}, is smaller then the cost of the current node \textit{N}, the cost of \textit{S} is updated to the cost of \textit{N} and \textit{S} is marked as visited.
 
@@ -176,14 +177,28 @@ The path planning module requires a proper world state representation when calcu
 \item The second strategy chosen was to use only the points that were crossed by the robot to calculate the path. With this strategy, the problems related to the sensors noise, or errors in the calculation of the location of the obstacles in the map are avoided, since the robots, only travel through the same tracks they have already crossed. Furthermore, in this strategy, the enlargement of the walls is not required, and the path planning executes faster. However, by not taking all the information available into account, the calculated path may also not be the shortest one.
 \end{enumerate}
 
-The results, of both strategies are further detailed in the section Results of this paper.
+The results of both strategies are further detailed in the section Results of this paper.
 
 \subsection{Target Localization}
 lorem ipsum
 
 \section{Results}
-lorem ipsum
------------------ old description -------------------------
+Podemos dividir em seccoes  tipo:
+
+\subsection{Navigation Strategy}
+Como a soluçao ainda e maioritariamente reactiva existem cantos que nao conseguem ser atravessados.
+Devido a forma como e calculado a posicao, e aos erros acumulados, o uso de gps revelou ser mais util, caso nao haja ruido, caso contrario, a tal formula.
+
+\subsection{Path Planning}
+O uso da matrix de probabilidades, necessita de crescer as paredes, caso contrario o caminho calculado pode passar muito junto a paredes.
+O uso de informacao coloborativa nao foi muito explorado, fazendo que a informacao sobre o mudo seja relativamente pouca, o que faz com que o resultado obtido possa nao ser o melhor caminho
+
+O uso da matrix de a*, faz com que a computação seja mais rapida, no entanto, discarda muita informacao valiosa, nao tirando uso da parte colaborativa nem da info dos sensores. Necessita tb que a posicao do robo seja calculada com muita precisao, o que não se verifica qd há ruido.
+
+Em termos gerais, acabaram por revelar resultados semelhantes, com o uso de GPS e sem ruido.
+
+
+----------------- old stuff -------------------------
 \subsection{Limitations and Benefits}
 This reactive architecture includes some limitations, such as:
 
@@ -194,14 +209,16 @@ This reactive architecture includes some limitations, such as:
 
 The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
 
------------------ end of old description -------------------------
+----------------- end of old stuff -------------------------
 
 
 \section{Conclusion}
 lorem ipsum
 
 \section{Future Work}
-lorem ipsum
+era bonito usar mais a colaboracao.
+Filtros de kalman para o GPS
+
 \bibliography{report}
 \bibliographystyle{splncs}
 \end{document}
