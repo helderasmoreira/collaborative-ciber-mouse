@@ -52,10 +52,10 @@ public class CollaborativeRobot extends Observable {
   private State state;
   
   // Execution Options
-  private boolean GPS_ON = true;
+  private boolean GPS_ON = false;
   private boolean USE_PROB = false;
   private boolean VISUALIZER_ON = false;
-  private boolean BEACON_ON = true;
+  private boolean BEACON_ON = false;
   private boolean PROBABILITIES_ON = true;
   
   enum State {
