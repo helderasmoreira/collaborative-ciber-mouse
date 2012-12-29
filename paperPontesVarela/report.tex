@@ -106,16 +106,12 @@ Bellow, the description of each module:
   lorem ipsum
 \end{itemize}
 
------------------ old description -------------------------
+\subsection{Navigation Strategy}
+The navigation strategy followed by our robot can be divided in two fundamental steps: exploring the map before finding and reaching the beacon and returning home after finding it.
 
-In this project we faced the challenge of creating a completely autonomous and purely reactive robot. In order to achieve that goal our agent must be able to fully operate in an unstructured environment by avoiding obstacles and finding the beacon in a simple to moderately complex map.
-This purely reactive architecture means that the robot acts merely based on its sensors, i.e. it does not keep information on how the current world state is.
+\subsubsection{Exploring the Map}
 
-To accomplish this we developed a layered architecture that can be viewed on figure 2.
-
-With this system architecture the top layers are activated when certain conditions are detected by the sensors, overriding the actions of the bottom layers, e.g. if an obstacle is detected the robot will start its obstacle avoidance routine, instead of moving towards the beacon or wandering around. 
-
-This architecture was inspired by the subsumption layered model that Brooks proposed for mobile robot control system.\cite{Brooks_1986}
+For the first phase of navigation the behavior of our mouse was mostly imported from a previously created solution of a purely reactive mouse described in \cite{Moreira2012}. This solution was inspired by the subsumption layered model that Brooks proposed for mobile robot control system\cite{Brooks_1986}, and can be viewed on figure 2.
 
 \begin{figure}
   \centering
@@ -124,46 +120,32 @@ This architecture was inspired by the subsumption layered model that Brooks prop
   \caption{Layered architecture.}
 \end{figure}
 
+With this system architecture the top layers are activated when certain conditions are detected by the sensors, overriding the actions of the bottom layers, e.g. if an obstacle is detected the robot will start its obstacle avoidance routine, instead of moving towards the beacon or wandering around. 
+
 Each of these layers will now be described in further detail:
 \begin{description}
-  \item[\textbf{Stop}]
-  This layer is used to detect if the robot has reached the beacon location and to stop its motion, also signalling to the simulator that the robot has finished the course.
+  \item[\textbf{Wait}]
+  This layer is used to detect if the robot has reached the beacon location and to stop its motion, also signaling to the simulator that the robot has finished the first phase of the competition.
   \item[\textbf{Avoid Obstacle}]
-  In this layer we detect if an object is close to the robot by comparing the sensor measurement with a threshold that we defined. If the sensors exceed this threshold we proceed to the avoiding obstacle routine. In this routine we check the sensors' values and proceed accordingly: 
+  In order to avoid obstacles a wall following algorithm was implemented. The mouse moves always in a clockwise direction and the strategy is held until the beacon is framed within 20º degrees of the robot.
   
-  If the threshold is exceeded on the frontal sensor we avoid to the right with an 85\% probability and to the left with 15\% probability. In the beginning we had a 50\% probability for each side but we encountered a problem where the robot steered to right and then the to the left on following iteration eventually colliding with the wall.
+  One example of a complex obstacle that can be avoided by this algorithm is represented in figure 3. At first, the robot is moving forward. When a wall is detected in front of the robot, it turns about 90º to the right, and keeps moving forward. On every inner corner,  C, the mechanism is similar to the previously described. On every outer corner, E, the robot deviates itself in order to turn and move forward without touching the corner. When the robot is rotating, it verifies if the beacon is visible within a 20º amplitude, and if that is the case the wall following is aborted and the robot moves in the direction of the beacon.
   
-  If the threshold is exceeded on one of the lateral sensors the robot avoids the wall by turning to the opposite direction.
-  
-  The lateral sensors threshold is lower than the frontal one to give them priority when avoiding an obstacle.
   \item[\textbf{Move to Beacon}]
   This layer detects if the beacon is visible and if it is the robot rotates itself to align with the beacon direction and then moves forward. This rotation value is calculated accordingly to beacon sensor information, e.g. if the beacon direction is opposite to the robot's facing direction then the rotation value is higher than if the beacon direction was only to the left or to the right of the robot.
-  
-  An important component of this layer is that it is only active on every 50 iterations and lasts 10 iterations, i.e. it's active on iterations 50 through 60, 100 through 110, 150 through 160 and so forth. This is done to avoid cycles between the layers "Move to Beacon" and "Avoid Obstacle", with this in place the robot does not try to move to the beacon right after avoiding an obstacle, allowing it to somewhat contour the obstacle.
   \item[\textbf{Wander}]
   This layer provides the default action which is for the robot to move forward, veering to the left or to the right every 100 iterations, creating an undulatory locomotion similar to that of a snake.
 \end{description}
 
+\subsubsection{Return Home}
 
-\subsection{Limitations and Benefits}
-This reactive architecture includes some limitations, such as:
-
-\begin{itemize}
-  \item if the robot is following the beacon and there is an concave obstacle in the way, most of the times, the robot will be stuck around the same place with conflicting orders to follow the beacon and to avoid the obstacle in front. The rule to only follow the beacon on every 50 iterations was developed to try to circumvent this cases and provided promising results;
-  \item by not being able to store the world state the robot wanders around the map without knowing if it has already been there, and this can also create cycles, specially if the robot is surrounded by walls and there is only one way out.
-\end{itemize}
-
-The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
-
------------------ end of old description -------------------------
-
-\subsection{Navigation Strategy and Path Planning}
+\subsection{Path Planning}
 
 The path planing problem in the developed solution consists in finding the best possible path between the beacon area and the original position of the robot, considering the information about the world that the robot gathered until that moment. In order to solve this problem Collabot implements an A* algorithm[] in the Path Planning module. The A* algorithm uses a best-first search based on an heuristic to find the path with the lower cost between the initial and goal points in a map.
 
 The Path Planning module is composed by two classes, Node and PathFinder, and it implementation is not coupled to the robotic agent implementation, meaning that this module could be used to solve any problem requiring the shortest path between two points in a two dimensional matrix of doubles. Each cell of the the matrix encapsulates the cost of traveling through that cell, however if the value of a cell is higher than a preset value, the cell is considered to have an obstacle and so is not traversable. Furthermore, all the surrounding cells of a cell are considered as a neighbor, therefore in best possible situation a cell can have 8 neighbors. A cell that is not traversable is not considered as a neighbor of any cell.
 
-To find the best possible path between two points the A* uses an heuristic function to determine the order in which nodes are visited during the search for that path. Equation 1 defines the cost function \textit{f(x)} as the sum of the distance so far traveled, \textit{g(x)}, and the estimated distance to the target, \textit{h(x)}. The estimated distance, represented in equation 2,  to the target is computed using the Euclidean distance between the current point, \textit{p}, and the goal point, \textit{q}, and returns the length of the line segment connecting the two points.
+To find the best possible path between two points the A* uses an heuristic function to determine the order in which nodes are visited during the search for that path. Equation 1 defines the cost function \textit{f(x)} as the sum of the distance so far traveled, \textit{g(x)}, and the estimated distance to the target, \textit{h(x)}. The estimated distance to the target, represented in equation 2, is computed using the euclidean distance[] between the current point, \textit{p}, and the goal point, \textit{q}, and returns the length of the line segment connecting the two points.
 
 \begin{equation}
 f(x) = g(x) + h(x)
@@ -184,6 +166,19 @@ lorem ipsum
 
 \section{Results}
 lorem ipsum
+----------------- old description -------------------------
+\subsection{Limitations and Benefits}
+This reactive architecture includes some limitations, such as:
+
+\begin{itemize}
+  \item if the robot is following the beacon and there is an concave obstacle in the way, most of the times, the robot will be stuck around the same place with conflicting orders to follow the beacon and to avoid the obstacle in front. The rule to only follow the beacon on every 50 iterations was developed to try to circumvent this cases and provided promising results;
+  \item by not being able to store the world state the robot wanders around the map without knowing if it has already been there, and this can also create cycles, specially if the robot is surrounded by walls and there is only one way out.
+\end{itemize}
+
+The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
+
+----------------- end of old description -------------------------
+
 
 \section{Conclusion}
 lorem ipsum
