@@ -179,7 +179,22 @@ The path planning module requires a proper world state representation when calcu
 The results, of both strategies are further detailed in the section Results of this paper.
 
 \subsection{Target Localization}
-lorem ipsum
+As mentioned on the Virtual Robots section the agent has a ``Beacon''
+sensor that returns the goal's direction, when it is visible. This direction
+is measured in 1 degree intervals, the values range from $-$180 to +180 degrees and
+are relative to the agent's orientation. The simulator introduces noise to this sensor
+using a normal distribution with mean 0 and standard deviation of 2.
+
+To store this information we created a matrix with the same size as the
+mapping matrix, a 14x28 matrix with each of the axis multiplied by the resolution
+used (10), resulting in a 140x280 matrix. Using the beacon sensor direction and the
+robot's position and orientation we draw a ray on the matrix starting on the robot's
+position and aimed at the beacon.
+
+To achieve this we calculate the possible beacon direction using:
+\begin{equation}
+BeaconDir = AgentDir + BeaconRelativeDir
+\end{equation}
 
 \section{Results}
 lorem ipsum

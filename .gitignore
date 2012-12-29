@@ -10,3 +10,7 @@ manifest.mf
 nbproject/
 
 /collaborativeRobot/build/
+
+*.aux
+*.log
+*.synctex.gz
