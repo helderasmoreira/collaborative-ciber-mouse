@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{textcomp}       % additional symbols using companion encoding TS1
 \usepackage{epstopdf}
+\usepackage{nameref}
 
 \title{Collabot}
 \subtitle{A Collaborative Robotic Agent for the CiberRato Competition}
@@ -155,6 +156,54 @@ As the positions have already a probability value, at every instant \emph{t} the
 
 There are two conditions in order to a cell to be in the sensor area. First, the distance between the center and the given cell has to be less than the inverse of the read value from the sensor. Second, the atan2 value, that represent the angle in radians between the positive x-axis of a plane and the point given by the coordinates (x, y) on it, has to be in the sensor vision angle range. If this two conditions are true, the cell probability is updated using the previous described method.
 
+\section{Communication}
+\label{communication}
+
+The communication between the robots is handled by the simulator, which receives the messages from the sender and is responsible for propagating it to all the other robots that are registered in it. 
+
+While these messages allow the robots to share knowledge among them, there are some limitations as detailed previously. Each robot, per cycle, is only able to send messages up to 100 bytes and able to receive up to 400 bytes (one message from each one of the other four). Besides these size limitations, there are also constraints regarding the distance the robots need to be from each other to be able to share the messages, that being 8 distance units, and regarding the latency of the communication, which is of 1 cycle per message.
+
+With these limitations and the importance that the communication takes in a collaborative scenario in mind, the task of choosing what information to send in the messages, and how to send it, was, without a doubt, challenging. In this robot we opted for a strategy where two types of messages are transmitted (alternating in each cycle) when the robots are within range: sensors messages and beacon messages.
+
+\subsection{Sensors messages}
+
+Sharing the information gathered so far from the external environment was one of the goals of the communication module, but given the message size limitations, and the fact that we represented the map with a precision of 10 (i.e. each unit of the real map is represented by 10 cells in our matrix), the (ideal) option of transmitting the entire matrix was discarded and we opted for an approach that sends the readings from the robot sensors and it's position.
+
+This approach allows the robot to "see" what the others robots are seeing, interpret that data  and map the environment in a more efficient way than compared to one where no information is transmitted.
+
+Below we can see a template for the sensors message:
+
+\begin{verbatim}
+
+"sensors|x|offsetX|y|offsetY|frontsensor|leftsensor|rightsensor|compass"
+
+\end{verbatim}
+
+The values x and y represent the robot coordinates in the position matrix.
+
+The values offsetY and offsetX represent the offset of the robot position, calculated with the aid of the GPS in the first cycle, and allow for the robots to establish the teammate position in their own map, which otherwise would be misleading since the arena is randomly positioned in a world, being the origin coordinates (the left, bottom corner) assigned a pair of values in the range 0 to 1000.
+
+After that, the values of the sensors are passed, front sensor, left sensor, right sensor and compass, to allow the recipient robot to map the environment, the same way the sender robot would do.
+Since these messages are sent from all the robots to all, given the necessary exchanges, the robots will share the same map, and be aware of areas that they may have not yet visited, improving the overall performance of the team.
+
+\subsection{Beacon messages}
+
+The beacon messages goal is to share with the rest of the team, the information about the beacon gathered so far. The limitations explained above were again an issue, and with that in mind we opted for a strategy where we calculate the area where it is most probable for the beacon to be and share that in a message with the following template:
+
+\begin{verbatim}
+
+"y-offsetY-x-offsetX-value|value;value;value|value..."
+
+\end{verbatim}
+
+The values x and y represent the robot coordinates in the position matrix.
+
+The values offsetY and offsetX represent the offset of the robot position, calculated with the aid of the GPS in the first cycle, and allow for the robots to establish the teammate position in their own map, which otherwise would be misleading since the arena is randomly positioned in a world, being the origin coordinates (the left, bottom corner) assigned a pair of values in the range 0–1000.
+
+After that, the values from the area are passed, from the top left to the bottom right.
+This allows for the robots to have information about the beacon even if they themselves haven’t seen it and in a scenario where enough messages are transmitted, allows for the robots to perfect each other’s matrixes and map the beacon position much more efficiently.
+
+
 \section{Results}
 
 In order to evaluate the agent implementation, the developed solution was tested in different maps and multiple times.
@@ -171,6 +220,13 @@ The results shown that the mapping algorithm can create a good visualization of 
 \end{figure}
 
 As can be seen on figure \ref{fig:screenmap}, this model isn't perfect, but has a good effectiveness. The probabilities matrix is mainly used to calculate the path when returning home, after finding the beacon.
+
+\subsection{Communication}
+
+As has been detailed in the \nameref{communication} chapter, the communication module introduces a way for robots to share their knowledge and improve the overall performance of the team.
+In the following scenario, it is possible to see that even though robot no. 1 has obstacles impeding him from seeing the beacon and the other parts of the environment, after being in range with robot no. 2 and exchanging a few messages, the environment and the beacon start to appear on robot’s no. 2 map.
+
+lorem ipsum
 
 \subsection{Limitations and Benefits}
 This reactive architecture includes some limitations, such as:
