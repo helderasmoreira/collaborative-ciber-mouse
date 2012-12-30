@@ -248,11 +248,11 @@ This reactive architecture includes some limitations, such as:
 
 The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
 
-\section{Conclusion}
-lorem ipsum
+\section{Conclusion and Future Work}
 
-\section{Future Work}
-In terms of mapping, it would be possible to improve corners detection, allowing a better arena representation.
+In general, the developed agent can solve different types of maps and return home with success. Although it has some problems avoiding some obstacles structures, the results were generally positive.
+
+Regarding the mapping solution, the algorithm builds a good representation of the arena and produces good results that can be used later. As described in the paper by  Varela and Pontes \cite{varelaepontes}, the probabilities matrix was used to calculate the path when returning home after some changes and considerations. In terms of improvements, it would be possible to improve corners detection, allowing a better arena representation.
 
 \bibliography{report}
 \bibliographystyle{splncs}
