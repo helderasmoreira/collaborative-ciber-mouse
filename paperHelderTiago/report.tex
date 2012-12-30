@@ -19,7 +19,7 @@ We focused on developing an interesting solution for a maze solver agent and exp
 
 \section{Introduction}
 Ciber-Rato is a category of the Micro-Rato contest from University of Aveiro.
-This category is a competition between small autonomous robots trying to solve mazes. \cite{Lau2002}
+This category is a competition between small autonomous robots trying to solve mazes \cite{Lau2002}. 
 In this project, we faced the challenge of developing a collaborative robotic agent architecture using the Simulation Tools created for the Ciber-Rato competition. The agents should be able to solve simple mazes by finding a beacon and returning to their original position, while avoiding obstacles, collisions and dealing with time constraints. Furthermore, in the collaborative competition, the agents are playing in a team of 5 robots, all the robots must meet in the target area and after that return to their original position. The maze is only considered solved when all the mice return to their original position.
 
 At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem, so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent's efficiency.
@@ -29,7 +29,7 @@ In this paper, first we present the simulation system architecture. Then the age
 \section{Simulation System Architecture}
 To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and a allows the developed algorithms to be tested\cite{Lau2002}. 
 
-The simulation environment is composed by a Simulator, a Simulation Viewer and Virtual Robots. The first is responsible for modelling all the hardware components of the robots, the maze and ensure that all the execution rules are applied. The Simulation Viewer displays the maze, the robots movements and the remaining execution time. The virtual Robots are detailed in the section bellow.
+The simulation environment is composed by a Simulator, a Simulation Viewer and Virtual Robots. The first is responsible for modeling all the hardware components of the robots, the maze and ensure that all the execution rules are applied. The Simulation Viewer displays the maze, the robots movements and the remaining execution time. The virtual Robots are detailed in the section bellow.
 
 All the specifications presents in this paper are based on the Ciber-Rato 2011 Rules and Technical Specifications \cite{DepartamentodeElectronica2011}, and only a brief specification is present in here, for a more detailed specification please consult the document mentioned above.
 
@@ -54,7 +54,7 @@ the virtual North ($x$ axis).
 \end{itemize}
 
 \subsubsection{Actuators}\hfill \\
-The actuators components of the robots used in this project are 2 motors and 1 signalling LED. 
+The actuators components of the robots used in this project are 2 motors and 1 signaling LED. 
 \begin{itemize}
   \item[\textbf{Motors}]
 Motors have inertia and noise in order to more closely represent real motors, and the translation or rotation movements can be achieved by applying different power values to each motor.
@@ -116,7 +116,7 @@ As previously mentioned, the map arena has a maximum size of 14 x 28 um and the 
 
 Given that the agent has three sensors that allow him to detect, with noise, obstacles in the environment and that is only known that there is an obstacle in a given distance, it is not possible to have completely certainty about the obstacles position. The values provided by the sensors follow an additive white Gaussian noise deviation of 0.1 and they are the inverse to the distance of the closest obstacle detected. In order to minimize this constraint, the arena is mapped using a probabilities matrix. At start, the arena is not yet explored, hence all positions of the matrix have a probability of being an obstacle of 0.5.  
 
-As the agent moves, the probabilities matrix is updated with new values, allowing to visualize and create a close to reality arena representation. To better use the sensor values, the area represented by the read values is divided in three sections.  
+As the agent moves, the probabilities matrix is updated with new values, allowing to visualize and create a close to reality arena representation. To better use the sensor values, the area represented by the read values is divided in three sections. This implementation use the same approach of YAM \cite{Ribeiro2002}.
 
 \begin{figure}
   \centering
@@ -127,20 +127,11 @@ As the agent moves, the probabilities matrix is updated with new values, allowin
 
 \begin{itemize}
   \item[\textbf{A}]
-  The area up to \begin{equation}
-     \dfrac{1}{reading + noise}
-    \end{equation}
-   is marked has having a low probability of being a wall.
+  The area up to $\dfrac{1}{reading + noise}$ is marked has having a low probability of being a wall.
   \item[\textbf{B}]
-The area up to \begin{equation}
-      \dfrac{1}{reading} - wall width
-    \end{equation}
-   is marked has having a moderate probability of being a wall.
+The area up to $\dfrac{1}{reading} - wall width$ is marked has having a moderate probability of being a wall.
   \item[\textbf{C}]
-  The area up to \begin{equation}
-      \dfrac{1}{reading} + wall width
-    \end{equation}
-   is marked has having a high probability of being a wall.
+  The area up to $\dfrac{1}{reading} + wall width$ is marked has having a high probability of being a wall.
 \end{itemize}
 
 Furthermore, when the agent is moving, the positions where he passes have zero probability of being a wall, so they are marked accordingly with that rule. 
@@ -153,11 +144,23 @@ As the positions have already a probability value, at every instant \emph{t} the
 
  $P_{ij}(H|s_n)$ is the probability of the \emph{(i,j)} cell being occupied given a certain measure $s_n$.
 
-There are two conditions in order to a cell to be in the sensor area. First, the distance between the center and the given cell has to be less than the inverse of the read value from the sensor. Second, the atan2 value, that represent the angle in radians between the positive x-axis of a plane and the point given by the coordinates (x, y) on it, has to be in the sensor vision angle range. If this two conditions are true, the cell probability is updated using the previous described method.
+There are two conditions in order to a cell to be in the sensor area. First, the distance between the center and the given cell has to be less than the inverse of the read value from the sensor plus the wall width. 
+
+ \begin{equation}
+    \sqrt{(P_i-C_i)^2 + (P_j-C_j)^2} < \dfrac{1}{reading} + wall width
+\end{equation}
+
+Second, the atan2 value, that represent the angle in radians between the positive x-axis of a plane and the point given by the coordinates (x, y) on it, has to be in the sensor vision angle range.
+
+ \begin{equation}
+    atan2(P_j-C_j, P_i-C_i) >= angleBegin \,\,\&\,\,\,  atan2(P_j-C_j, P_i-C_i) <= angleEnd 
+\end{equation}
+
+If this two conditions are true, the cell probability is updated using the previous described method.
 
 \section{Results}
 
-In order to evaluate the agent implementation, the developed solution was tested in different maps and multiple times.
+In order to evaluate the agent implementation, the developed solution was tested in different arenas and multiple times.
 
 \subsection{Mapping}
 
