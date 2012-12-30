@@ -213,16 +213,23 @@ In order to evaluate the agent implementation, the developed solution was tested
 
 \subsection{Mapping}
 
-The results shown that the mapping algorithm can create a good visualization of the world state, without consuming to much resources. The major problem encountered was in mapping corners as rounded - when the agent was far from them. This happens because the sensor area is interpreted has a semi-circular form. 
+The results showed that the mapping algorithm can create a good visualization of the world state, without consuming too much resources. The major problem encountered was in mapping corners as rounded - when the agent was far from them. This happens because the sensor area is interpreted has a semi-circular form. 
 
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{screenmap.png}
-  \caption{Mapping example.}
+  \caption{Partial mapping example. The red areas represent high probability of an obstacle and the black ones passable zones.}
   \label{fig:screenmap}
 \end{figure}
 
-As can be seen on figure \ref{fig:screenmap}, this model isn't perfect, but has a good effectiveness. The probabilities matrix is mainly used to calculate the path when returning home, after finding the beacon.
+As can be seen on figure \ref{fig:screenmap}, this model isn't perfect, but has a good effectiveness. The probabilities matrix is mainly used to calculate the path when returning home, after finding the beacon. The represented arena is on figure \ref{fig:originalmap}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{originalmap.png}
+  \caption{Original arena.}
+  \label{fig:originalmap}
+\end{figure}
 
 \subsection{Communication}
 
