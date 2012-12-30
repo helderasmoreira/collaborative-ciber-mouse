@@ -156,7 +156,7 @@ probable location of the beacon, if any, and tries to head in that direction. De
 In order to make the robots return to their original position the robot uses the information gathered until that moment by him and the information collected by the other robots, and calculates the best path using the path planning strategy detailed in the next section of this report. After that, the robot simply iterates through each node of the calculated path, aligns himself with the direction of the child node and then moves forward. This cycle is repeated until the robot reaches its original position.
 
 \subsection{Path Planning}
-
+\label{sec:path-planning}
 The path planing problem in the developed solution consists in finding the best possible path between the beacon area and the original position of the robot, considering the information about the world that the robot gathered until that moment. In order to solve this problem Collabot implements an A* algorithm[] in the Path Planning module. The A* algorithm uses a best-first search based on an heuristic to find the path with the lower cost between the initial and goal points in a map.
 
 The Path Planning module is composed by two classes, Node and PathFinder, and it implementation is not coupled to the robotic agent implementation, meaning that this module could be used to solve any problem requiring the shortest path between two points in a two dimensional matrix of doubles. Each cell of the the matrix encapsulates the cost of traveling through that cell, however if the value of a cell is higher than a preset value, the cell is considered to have an obstacle and so is not traversable. Furthermore, all the surrounding cells of a cell are considered as a neighbor, therefore in best possible situation a cell can have 8 neighbors. A cell that is not traversable is not considered as a neighbor of any cell.
@@ -180,7 +180,7 @@ The path planning module requires a proper world state representation when calcu
 \item The second strategy chosen was to use only the points that were crossed by the robot to calculate the path. With this strategy, the problems related to the sensors noise, or errors in the calculation of the location of the obstacles in the map are avoided, since the robots, only travel through the same tracks they have already crossed. Furthermore, in this strategy, the enlargement of the walls is not required, and the path planning executes faster. However, by not taking all the information available into account, the calculated path may also not be the shortest one.
 \end{enumerate}
 
-The results, of both strategies are further detailed in the section Results of this paper.
+The results of both strategies are further detailed in the section Results of this paper.
 
 \subsection{Target Localization}
 \label{sec:target-loc}
@@ -237,7 +237,68 @@ Figure \ref{fig:beacon1} represents the beacon visualizer after the first sighti
 in a map where the beacon is on the right and the robots starts on the left.
 
 \section{Results}
-lorem ipsum
+
+\subsection{Navigation Strategy}
+As stated in the section 3.1 of this report, the navigation strategy followed by our agent in its first phase of map exploration is mostly reactive and imported from the solution described in \cite{Moreira2012}. This solution, has some well known problems of reactive solutions, namely in solving some types of corners or cycles. Due to time constrains and the specific goal of this project, in our solution we didn't approach such problems. For a more detailed info in this specific solution \cite{Moreira2012} should be consulted.
+
+In order to store the robot movements and location to update the map, we decided to use the same approach of YAM \cite{Ribeiro2002}, since the solution developed by its authors was already validated by winning a the ciber mouse competition in 2002. 
+To a cycle n, if X[n] is the horizontal axis coordinate, Y[n] the vertical one, D[n] the power applied to the right motor, E[n] the power applied to the left one and $\theta[n]$ the orientation given by the compass, so:
+\begin{equation}
+Lin[n] = (D[n] + E[n]) / 2.0
+\end{equation}
+\begin{equation}
+X[n+1] = X[n] + cos(θ[n]).Lin[n]
+\end{equation}
+\begin{equation}
+Y[n+1] = X[n] + sen(θ[n]).Lin[n]
+\end{equation}
+
+Despite the good results obtained when using this approach to map the walls off the map, when using this solution to follow a specific path (i.e. return home), the precision of the method has proven to be low, and so in order to further evolve our work, we decided to use the GPS sensor (without noise), to map the robot position in  those situations.
+
+\subsection{Path Planning}
+To assess the performance of the path planing strategy a lot of tests were done. Bellow, a demonstrative example of a complex map is analyzed. 
+
+The path returned by the path planning algorithm is represented in green, the areas that we have no information about are represented in white. The obstacles are represented in a gradient from white to red. A cell is more red if the probability of having a wall is higher. The same reasoning is applied to represent the areas without obstacles in a gradient from white to black.
+
+In figure \ref{fig:map} the original map is represented. Figures \ref{fig:pathProb} and  \ref{fig:pathProbEnlarge} represent the calculated path by the second method described in section \ref{sec:path-planning} of this paper, without and with wall growing respectively. Figure \ref{fig:pathAStar} represents the same problem resolved by using the second method described in \ref{sec:path-planning}.
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.45\linewidth}
+\centering
+\includegraphics[width=\textwidth]{map.png}
+\caption{CiberRTSS08 Stage 2 Map.}
+\label{fig:map}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.45\linewidth}
+\centering
+\includegraphics[width=\textwidth]{pathAStar.png}
+\caption{Calculated Path method 2.}
+\label{fig:pathAStar}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.45\linewidth}
+\centering
+\includegraphics[width=\textwidth]{pathProb.png}
+\caption{Calculated Path method 1.}
+\label{fig:pathProb}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.45\linewidth}
+\centering
+\includegraphics[width=\textwidth]{pathProbEnlarge.png}
+\caption{Calculated Path method 1, with wall growing.}
+\label{fig:pathProbEnlarge}
+\end{minipage}
+\end{figure}
+
+As it is possible to observe in the figures, the results showed that when using the calculated probabilities matrix it is essential to grow the walls before calculating the returning path, otherwise the path will be impossible for the robot to cross. This can be explained by two motives: First, the noise of the sensors can lead to bad mapping of the walls, making cells be marked with a low probability when there is actually a wall on them. Secondly, even if the walls are properly mapped, the returned path is often to close to corners and walls, producing a lot of collisions when being followed. Both problems are illustrated in figure \ref{fig:pathProb}.
+
+Finally, when comparing the results obtained by both methods it is clear that, for our solution, method 2 has proven to produce better results. By not having to deal with problems related to bad mapping of obstacles and even the size of the walls, the calculated path is always possible to cross since it has already been by the robot before. Furthermore, the wall growing method developed, produces a lot of noise, making the calculated path, more difficult to follow, since a lot of direction changes have to be done.
+
+
 ----------------- old description -------------------------
 \subsection{Limitations and Benefits}
 This reactive architecture includes some limitations, such as:
@@ -252,11 +313,10 @@ The benefits of this type of architecture are that the robot is able to quickly 
 ----------------- end of old description -------------------------
 
 
-\section{Conclusion}
-lorem ipsum
+\section{Conclusion e Future Work}
+era bonito usar mais a colaboracao.
+Filtros de kalman para o GPS
 
-\section{Future Work}
-lorem ipsum
 \bibliography{report}
 \bibliographystyle{splncs}
 \end{document}
