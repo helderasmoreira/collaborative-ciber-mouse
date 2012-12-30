@@ -52,8 +52,8 @@ public class CollaborativeRobot extends Observable {
   private State state;
   
   // Execution Options
-  private boolean GPS_ON = false;
-  private boolean USE_PROB = false;
+  private boolean GPS_ON = true;
+  private boolean USE_PROB = true;
   private boolean VISUALIZER_ON = false;
   private boolean BEACON_ON = false;
   private boolean PROBABILITIES_ON = true;
@@ -193,7 +193,7 @@ public class CollaborativeRobot extends Observable {
                 List<Node> nodes = PathFinder.calculate(matrix,
                         (int) Math.round(PosX), (int) Math.round(PosY),
                         (int) Math.round(previousPosX),
-                        (int) Math.round(previousPosY), USE_PROB);
+                        (int) Math.round(previousPosY), false);
                 for (Node n : nodes) {
                     updateAStarMatrix(n.x, n.y);
                 }
@@ -215,11 +215,11 @@ public class CollaborativeRobot extends Observable {
                 if(USE_PROB){
                     nodes = PathFinder.calculate(probabilitiesMap,
 						(int) Math.round(PosX), (int) Math.round(PosY),
-						halfPosX, halfPosY, USE_PROB);
+						halfPosX, halfPosY, false);
                 }else{
                     nodes = PathFinder.calculate(aStarMatrix,
 						(int) Math.round(PosX), (int) Math.round(PosY),
-						halfPosX, halfPosY, USE_PROB);
+						halfPosX, halfPosY, false);
                 }
 			}
 			if (!firstReturn && (nodes == null || nodes.isEmpty())) {
@@ -542,9 +542,9 @@ public void requestInfo() {
       case RETURN: /* Return to home area */
         if (firstReturn) {
             if(USE_PROB){
-                nodes = PathFinder.calculate(probabilitiesMap, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY, USE_PROB);
+                nodes = PathFinder.calculate(probabilitiesMap, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY, false);
             }else{
-                nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY, USE_PROB);   
+                nodes = PathFinder.calculate(aStarMatrix, (int) Math.round(PosX), (int) Math.round(PosY), halfPosX, halfPosY, false);   
             }
 
           if (nodes != null && nodes.size() > 0) {

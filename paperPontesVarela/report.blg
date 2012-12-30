@@ -4,11 +4,12 @@ The top-level auxiliary file: report.aux
 The style file: splncs.bst
 Database file #1: report.bib
 Warning--I didn't find a database entry for "baboehelder"
+Warning--I didn't find a database entry for "Ribeiro2002"
 Warning--empty journal in DepartamentodeElectronica2011
 Warning--empty note in Moreira2012
 You've used 4 entries,
             2087 wiz_defined-function locations,
-            517 strings with 4416 characters,
+            519 strings with 4438 characters,
 and the built_in function-call counts, 878 in all, are:
 = -- 84
 > -- 31
@@ -47,4 +48,4 @@ warning$ -- 2
 while$ -- 10
 width$ -- 5
 write$ -- 44
-(There were 3 warnings)
+(There were 4 warnings)
