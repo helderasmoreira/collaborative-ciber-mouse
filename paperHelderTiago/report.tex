@@ -145,16 +145,16 @@ As the positions have already a probability value, at every instant \emph{t} the
 
  $P_{ij}(H|s_n)$ is the probability of the \emph{(i,j)} cell being occupied given a certain measure $s_n$.
 
-There are two conditions in order to a cell to be in the sensor area. First, the distance between the center and the given cell has to be less than the inverse of the read value from the sensor plus the wall width. 
+There are two conditions in order to a cell to be in the sensor area. First, the euclidean distance between the center and the given cell \emph{(ij)} has to be less than the inverse of the read value from the sensor plus the wall width. 
 
  \begin{equation}
-    \sqrt{(P_i-C_i)^2 + (P_j-C_j)^2} < \dfrac{1}{reading} + wall width
+    \sqrt{(X_{ij}-X_c)^2 + (Y_{ij}-Y_c)^2} < \dfrac{1}{reading} + wall width
 \end{equation}
 
-Second, the atan2 value, that represent the angle in radians between the positive x-axis of a plane and the point given by the coordinates (x, y) on it, has to be in the sensor vision angle range.
+Second, the atan2 value, that represents the angle in radians between the positive x-axis of a plane and the point given by the coordinates (x, y) on it, has to be in the sensor vision angle range.
 
  \begin{equation}
-    atan2(P_j-C_j, P_i-C_i) >= angleBegin \,\,\&\,\,\,  atan2(P_j-C_j, P_i-C_i) <= angleEnd 
+    atan2(Y_{ij}-Y_c, X_{ij} - X_c) >= angleBegin \,\,\&\,\,\, atan2(Y_{ij}-Y_c, X_{ij} - X_c) <= angleEnd 
 \end{equation}
 
 If this two conditions are true, the cell probability is updated using the previous described method.
