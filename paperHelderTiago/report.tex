@@ -234,9 +234,31 @@ As can be seen on figure \ref{fig:screenmap}, this model isn't perfect, but has 
 \subsection{Communication}
 
 As has been detailed in the \nameref{communication} chapter, the communication module introduces a way for robots to share their knowledge and improve the overall performance of the team.
-In the following scenario, it is possible to see that even though robot no. 1 has obstacles impeding him from seeing the beacon and the other parts of the environment, after being in range with robot no. 2 and exchanging a few messages, the environment and the beacon start to appear on robot’s no. 2 map.
+In the following scenario, figure \ref{fig:viewer}, robot 1 doesn't receive any information related to the beacon due to it being blocked by an obstacle. On the other hand, robot 2 after a while starts to see the beacon in a straight line and gets also in a position where he can communicate with robot 1, making this the perfect scenario to test the communication module.
 
-lorem ipsum
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{viewer.png}
+  \caption{Scenario where one of the robots has an obstacle blocking the beacon and the other is able to see it.}
+  \label{fig:viewer}
+\end{figure}
+
+The following figures ( \ref{fig:visualizer1} and \ref{fig:visualizer2} ) represent each robot's knowledge about the beacon at that time. As can be seen, even though robot 1 is not able to receive the beacon sensor, he still gathers information about his target through communication with the robot 2, improving his performance.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{visualizer1.png}
+  \caption{Robot 1 beacon visualizer}
+  \label{fig:visualizer1}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{visualizer2.png}
+  \caption{Robot 2 beacon visualizer}
+  \label{fig:visualizer2}
+\end{figure}
+
 
 \subsection{Limitations and Benefits}
 This reactive architecture includes some limitations, such as:
