@@ -184,6 +184,8 @@ The results of both strategies are further detailed in the section Results of th
 
 \subsection{Target Localization}
 \label{sec:target-loc}
+\subsubsection{Storing and visualization}\hfill \\
+
 As mentioned on the Virtual Robots section the agent has a ``Beacon''
 sensor that returns the goal's direction, when it is visible. This direction
 is measured in 1 degree intervals, the values range from $-$180 to +180 degrees and
@@ -210,7 +212,9 @@ EndAngle = BeaconDir + 1
 
 After the values are normalized to be in the range of $-\pi$ to $\pi$ we can now
 iterate through the matrix and calculate the angle of each
-point relative to the agent's position using the atan2 function.
+point relative to the agent's position using the $atan2$ function.
+The values are normalized because the $atan2$ function also returns values in the range of
+$-\pi$ to $\pi$.
 \begin{equation}
 PntAngle = atan2(AgentY - MatrixPntY, MatrixPntX - AgentX);
 \end{equation}
@@ -233,8 +237,20 @@ The visualizer represents this values using different color ranges:
   \label{fig:beacon1}
 \end{figure}
 
-Figure \ref{fig:beacon1} represents the beacon visualizer after the first sightings of the objective
-in a map where the beacon is on the right and the robots starts on the left.
+Figure \ref{fig:beacon1} represents the beacon visualizer after the first sightings
+of the objective in a map where the beacon is on the right and the agent starts
+on the left.
+
+\subsubsection{Using the information}\hfill \\
+
+When the agent is searching for the beacon and the sensor is available it always
+uses that information to align itself with the target, because that information is the
+most recent and the most accurate one.
+
+However, if the sensor is not available, because the path is obstructed by a wall,
+and the agent has some information stored in the beacon probability matrix, he searches for
+the highest value on the matrix and uses the position where that value is to align
+itself to that direction.
 
 \section{Results}
 
@@ -256,7 +272,7 @@ Y[n+1] = X[n] + sen(θ[n]).Lin[n]
 Despite the good results obtained when using this approach to map the walls off the map, when using this solution to follow a specific path (i.e. return home), the precision of the method has proven to be low, and so in order to further evolve our work, we decided to use the GPS sensor (without noise), to map the robot position in  those situations.
 
 \subsection{Path Planning}
-To assess the performance of the path planing strategy a lot of tests were done. Bellow, a demonstrative example of a complex map is analyzed. 
+To assess the performance of the path planing strategy a lot of tests were done. Bellow, a demonstrative example of a complex map is analysed. 
 
 The path returned by the path planning algorithm is represented in green, the areas that we have no information about are represented in white. The obstacles are represented in a gradient from white to red. A cell is more red if the probability of having a wall is higher. The same reasoning is applied to represent the areas without obstacles in a gradient from white to black.
 
@@ -299,18 +315,16 @@ As it is possible to observe in the figures, the results showed that when using 
 Finally, when comparing the results obtained by both methods it is clear that, for our solution, method 2 has proven to produce better results. By not having to deal with problems related to bad mapping of obstacles and even the size of the walls, the calculated path is always possible to cross since it has already been by the robot before. Furthermore, the wall growing method developed, produces a lot of noise, making the calculated path, more difficult to follow, since a lot of direction changes have to be done.
 
 
------------------ old description -------------------------
-\subsection{Limitations and Benefits}
-This reactive architecture includes some limitations, such as:
+\subsection{Target Localization}
+The target localization used in this agent was inspired by the method used on the
+YAM robotic agent.\cite{Ribeiro2002}
 
-\begin{itemize}
-  \item if the robot is following the beacon and there is an concave obstacle in the way, most of the times, the robot will be stuck around the same place with conflicting orders to follow the beacon and to avoid the obstacle in front. The rule to only follow the beacon on every 50 iterations was developed to try to circumvent this cases and provided promising results;
-  \item by not being able to store the world state the robot wanders around the map without knowing if it has already been there, and this can also create cycles, specially if the robot is surrounded by walls and there is only one way out.
-\end{itemize}
+This method creates \textit{beacon heat maps} where it is easy to visualize an approximate
+area for the location of the beacon. This can seen on figure \ref{fig:beaconXX}.
 
-The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
-
------------------ end of old description -------------------------
+However, one of the disadvantages of the way this method was implemented is that when the agent
+is moving towards the beacon it creates a large area with high probability past the beacon.
+In figure \ref{fig:beacon1} cones with high probability are represented and the beacon is only in a small area of that cone.
 
 
 \section{Conclusion e Future Work}
