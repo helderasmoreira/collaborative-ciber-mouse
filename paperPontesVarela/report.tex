@@ -272,7 +272,7 @@ Y[n+1] = X[n] + sen(θ[n]).Lin[n]
 Despite the good results obtained when using this approach to map the walls off the map, when using this solution to follow a specific path (i.e. return home), the precision of the method has proven to be low, and so in order to further evolve our work, we decided to use the GPS sensor (without noise), to map the robot position in  those situations.
 
 \subsection{Path Planning}
-To assess the performance of the path planing strategy a lot of tests were done. Bellow, a demonstrative example of a complex map is analysed. 
+To assess the performance of the path planing strategy a lot of tests were performed. Bellow, a demonstrative example of a complex map is analyzed. 
 
 The path returned by the path planning algorithm is represented in green, the areas that we have no information about are represented in white. The obstacles are represented in a gradient from white to red. A cell is more red if the probability of having a wall is higher. The same reasoning is applied to represent the areas without obstacles in a gradient from white to black.
 
@@ -312,7 +312,7 @@ In figure \ref{fig:map} the original map is represented. Figures \ref{fig:pathPr
 
 As it is possible to observe in the figures, the results showed that when using the calculated probabilities matrix it is essential to grow the walls before calculating the returning path, otherwise the path will be impossible for the robot to cross. This can be explained by two motives: First, the noise of the sensors can lead to bad mapping of the walls, making cells be marked with a low probability when there is actually a wall on them. Secondly, even if the walls are properly mapped, the returned path is often to close to corners and walls, producing a lot of collisions when being followed. Both problems are illustrated in figure \ref{fig:pathProb}.
 
-Finally, when comparing the results obtained by both methods it is clear that, for our solution, method 2 has proven to produce better results. By not having to deal with problems related to bad mapping of obstacles and even the size of the walls, the calculated path is always possible to cross since it has already been by the robot before. Furthermore, the wall growing method developed, produces a lot of noise, making the calculated path, more difficult to follow, since a lot of direction changes have to be done.
+Finally, when comparing the results obtained by both methods it is clear that, for our solution, method 2 has proven to produce better results. By not having to deal with problems related to bad mapping of obstacles and even the size of the walls, the calculated path is always possible to cross since it has already been by the robot before. Furthermore, the wall growing method developed, produces a lot of noise, making the calculated path more difficult to follow, since a lot of direction changes have to be done.
 
 
 \subsection{Target Localization}
