@@ -276,6 +276,9 @@ In general, the developed agent can solve different types of maps and return hom
 
 Regarding the mapping solution, the algorithm builds a good representation of the arena and produces good results that can be used later. As described in the paper by  Varela and Pontes \cite{varelaepontes}, the probabilities matrix was used to calculate the path when returning home after some changes and considerations. In terms of improvements, it would be possible to improve corners detection, allowing a better arena representation.
 
+As for the communication module, the approaches chosen have proven to improve the team's overall performance, allowing them to share information and knowledge about the external environment. Since the probabilities matrix is used mainly to calculate the return home path, and every robot will know at least one path home, we focused on sharing the beacon position knowledge to improve the performance in the first part of the competition. This way, improvements could be made to the sensors message, even though a functional version is implemented and working, to increase the amount of information transmitted, thus increasing the optimality of the return home path.
+
+
 \bibliography{report}
 \bibliographystyle{splncs}
 \end{document}
