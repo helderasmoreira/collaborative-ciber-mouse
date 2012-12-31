@@ -4,48 +4,48 @@ The top-level auxiliary file: report.aux
 The style file: splncs.bst
 Database file #1: report.bib
 Warning--I didn't find a database entry for "baboehelder"
-Warning--I didn't find a database entry for "Ribeiro2002"
 Warning--empty journal in DepartamentodeElectronica2011
 Warning--empty note in Moreira2012
-You've used 4 entries,
+Warning--empty journal in Ribeiro2002
+You've used 5 entries,
             2087 wiz_defined-function locations,
-            519 strings with 4438 characters,
-and the built_in function-call counts, 878 in all, are:
-= -- 84
-> -- 31
-< -- 2
-+ -- 12
-- -- 8
-* -- 65
-:= -- 134
-add.period$ -- 4
-call.type$ -- 4
-change.case$ -- 4
+            522 strings with 4578 characters,
+and the built_in function-call counts, 1143 in all, are:
+= -- 111
+> -- 39
+< -- 3
++ -- 15
+- -- 10
+* -- 84
+:= -- 169
+add.period$ -- 5
+call.type$ -- 5
+change.case$ -- 5
 chr.to.int$ -- 0
-cite$ -- 6
-duplicate$ -- 47
-empty$ -- 78
-format.name$ -- 8
-if$ -- 198
+cite$ -- 8
+duplicate$ -- 62
+empty$ -- 102
+format.name$ -- 10
+if$ -- 261
 int.to.chr$ -- 0
-int.to.str$ -- 4
-missing$ -- 3
-newline$ -- 23
-num.names$ -- 4
-pop$ -- 9
+int.to.str$ -- 5
+missing$ -- 4
+newline$ -- 28
+num.names$ -- 5
+pop$ -- 12
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 24
+skip$ -- 33
 stack$ -- 0
-substring$ -- 40
-swap$ -- 22
-text.length$ -- 2
+substring$ -- 56
+swap$ -- 29
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 2
-while$ -- 10
-width$ -- 5
-write$ -- 44
+warning$ -- 3
+while$ -- 14
+width$ -- 6
+write$ -- 55
 (There were 4 warnings)
