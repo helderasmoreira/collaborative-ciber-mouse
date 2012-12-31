@@ -13,6 +13,9 @@ nbproject/
 
 *.aux
 *.log
+*.bbl
+*.blg
+
 *.synctex.gz
 
 /paperHelderTiago/*.pdf
