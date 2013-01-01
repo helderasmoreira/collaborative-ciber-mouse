@@ -170,9 +170,9 @@ With these limitations and the importance that the communication takes in a coll
 
 \subsection{Sensors messages}
 
-Sharing the information gathered so far from the external environment was one of the goals of the communication module, but given the message size limitations, and the fact that we represented the map with a precision of 10 (i.e. each unit of the real map is represented by 10 cells in our matrix), the (ideal) option of transmitting the entire matrix was discarded and we opted for an approach that sends the readings from the robot sensors and it's position.
+Sharing the information gathered so far from the external environment was one of the goals of the communication module, but given the message size limitations, and the fact that we represented the map with a precision of 10 (i.e. each unit of the real map is represented by 10 cells in our matrix), the (ideal) option of transmitting the entire matrix was discarded and we opted for an approach that sends the readings from the robot sensors and its position.
 
-This approach allows the robot to "see" what the others robots are seeing, interpret that data  and map the environment in a more efficient way than compared to one where no information is transmitted.
+This approach allows the robot to "see" what the other robots are seeing, interpret that data  and map the environment in a more efficient way than compared to one where no information is transmitted.
 
 Below we can see a template for the sensors message:
 
