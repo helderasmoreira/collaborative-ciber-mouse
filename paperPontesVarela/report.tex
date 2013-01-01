@@ -4,7 +4,8 @@
 \usepackage{textcomp}       % additional symbols using companion encoding TS1
 
 \title{Collabot}
-\subtitle{A Collaborative Robotic Agent for the CiberRato Competition}
+\subtitle{A Collaborative Robotic Agent for the CiberRato Competition ---\\
+Navigation and Target Localization}
 \author{Pedro Pontes \and Tiago Varela}
 \institute{Faculdade de Engenharia da Universidade do Porto}
 
@@ -26,7 +27,7 @@ At the starting point, the agents have no previous information about the world s
 In this paper, first we present the simulation system architecture. Then the agent architecture and design are analysed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{baboehelder}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
 
 \section{Simulation System Architecture}
-To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and a allows the developed algorithms to be tested\cite{Lau2002}. 
+To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and allows the developed algorithms to be tested\cite{Lau2002}. 
 
 The simulation environment is composed by a Simulator, a Simulation Viewer and Virtual Robots. The first is responsible for modelling all the hardware components of the robots, the maze and ensure that all the execution rules are applied. The Simulation Viewer displays the maze, the robots movements and the remaining execution time. The virtual Robots are detailed in the section bellow.
 
@@ -98,15 +99,16 @@ Bellow, the description of each module:
 
 \begin{itemize}
   \item[\textbf{Compute Probabilities}]
-  lorem ipsum
+  An observer that receives information from the sensors and updates the agent's
+wall probability matrix.
   \item[\textbf{Communication}]
-  lorem ipsum
+  Handles the communication between the agent and the simulator, sending and receiving messages and updating the agent's knowledge accordingly. 
   \item[\textbf{Path Planning}]
-  lorem ipsum
+  Traces the way back to the starting position after the agent reaches the objective.
   \item[\textbf{Visualizers}]
-  lorem ipsum
+  Responsible for the windows that show the agent's internal information.
   \item[\textbf{Utils}]
-  lorem ipsum
+  Used to store some constrained parameters, like arena size, map precision and other settings values.
 \end{itemize}
 
 \subsection{Navigation Strategy}
@@ -159,9 +161,9 @@ In order to make the robots return to their original position the robot uses the
 \label{sec:path-planning}
 The path planing problem in the developed solution consists in finding the best possible path between the beacon area and the original position of the robot, considering the information about the world that the robot gathered until that moment. In order to solve this problem Collabot implements an A* algorithm[] in the Path Planning module. The A* algorithm uses a best-first search based on an heuristic to find the path with the lower cost between the initial and goal points in a map.
 
-The Path Planning module is composed by two classes, Node and PathFinder, and it implementation is not coupled to the robotic agent implementation, meaning that this module could be used to solve any problem requiring the shortest path between two points in a two dimensional matrix of doubles. Each cell of the the matrix encapsulates the cost of traveling through that cell, however if the value of a cell is higher than a preset value, the cell is considered to have an obstacle and so is not traversable. Furthermore, all the surrounding cells of a cell are considered as a neighbor, therefore in best possible situation a cell can have 8 neighbors. A cell that is not traversable is not considered as a neighbor of any cell.
+The Path Planning module is composed by two classes, Node and PathFinder, and it implementation is not coupled to the robotic agent implementation, meaning that this module could be used to solve any problem requiring the shortest path between two points in a two dimensional matrix of doubles. Each cell of the the matrix encapsulates the cost of travelling through that cell, however if the value of a cell is higher than a preset value, the cell is considered to have an obstacle and so is not traversable. Furthermore, all the surrounding cells of a cell are considered as a neighbour, therefore in best possible situation a cell can have 8 neighbours. A cell that is not traversable is not considered as a neighbour of any cell.
 
-To find the best possible path between two points the A* uses an heuristic function to determine the order in which nodes are visited during the search for that path. Equation 1 defines the cost function \textit{f(x)} as the sum of the distance so far traveled, \textit{g(x)}, and the estimated distance to the target, \textit{h(x)}. The estimated distance to the target, represented in equation 2, is computed using the euclidean distance[] between the current point, \textit{p}, and the goal point, \textit{q}, and returns the length of the line segment connecting the two points.
+To find the best possible path between two points the A* uses an heuristic function to determine the order in which nodes are visited during the search for that path. Equation 1 defines the cost function \textit{f(x)} as the sum of the distance so far travelled, \textit{g(x)}, and the estimated distance to the target, \textit{h(x)}. The estimated distance to the target, represented in equation 2, is computed using the euclidean distance[] between the current point, \textit{p}, and the goal point, \textit{q}, and returns the length of the line segment connecting the two points.
 
 \begin{equation}
 f(x) = g(x) + h(x)
@@ -186,7 +188,7 @@ The results of both strategies are further detailed in the section Results of th
 \label{sec:target-loc}
 \subsubsection{Storing and visualization}\hfill \\
 
-As mentioned on the Virtual Robots section the agent has a ``Beacon''
+As mentioned on the Virtual Robots section the agent has a beacon
 sensor that returns the goal's direction, when it is visible. This direction
 is measured in 1 degree intervals, the values range from $-$180 to +180 degrees and
 are relative to the agent's orientation. The simulator introduces noise to this sensor
@@ -272,11 +274,11 @@ Y[n+1] = X[n] + sen(θ[n]).Lin[n]
 Despite the good results obtained when using this approach to map the walls off the map, when using this solution to follow a specific path (i.e. return home), the precision of the method has proven to be low, and so in order to further evolve our work, we decided to use the GPS sensor (without noise), to map the robot position in  those situations.
 
 \subsection{Path Planning}
-To assess the performance of the path planing strategy a lot of tests were performed. Bellow, a demonstrative example of a complex map is analyzed. 
+To assess the performance of the path planing strategy a lot of tests were performed. Bellow, a demonstrative example of a complex map is analysed. 
 
 The path returned by the path planning algorithm is represented in green, the areas that we have no information about are represented in white. The obstacles are represented in a gradient from white to red. A cell is more red if the probability of having a wall is higher. The same reasoning is applied to represent the areas without obstacles in a gradient from white to black.
 
-In figure \ref{fig:map} the original map is represented. Figures \ref{fig:pathProb} and  \ref{fig:pathProbEnlarge} represent the calculated path by the second method described in section \ref{sec:path-planning} of this paper, without and with wall growing respectively. Figure \ref{fig:pathAStar} represents the same problem resolved by using the second method described in \ref{sec:path-planning}.
+In figure \ref{fig:map} the original map is represented. Figures \ref{fig:pathProb} and  \ref{fig:pathProbEnlarge} represent the calculated path by the first method described in section \ref{sec:path-planning} of this paper, without and with wall growing respectively. Figure \ref{fig:pathAStar} represents the same problem resolved by using the second method described in \ref{sec:path-planning}.
 
 \begin{figure}[ht]
 \begin{minipage}[b]{0.45\linewidth}
@@ -317,10 +319,18 @@ Finally, when comparing the results obtained by both methods it is clear that, f
 
 \subsection{Target Localization}
 The target localization used in this agent was inspired by the method used on the
-YAM robotic agent.\cite{Ribeiro2002}
+YAM robotic agent\cite{Ribeiro2002}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.7\textwidth]{beacon-2.png}
+  \caption{Beacon visualizer for an agent roaming the map on figure \ref{fig:map}.}
+  \label{fig:beacon2}
+\end{figure}
 
 This method creates \textit{beacon heat maps} where it is easy to visualize an approximate
-area for the location of the beacon. This can seen on figure \ref{fig:beaconXX}.
+area for the location of the beacon. This can seen on figure \ref{fig:beacon2} where it shows
+the \textit{beacon heat map} for an agent roaming through the map of figure \ref{fig:map}.
 
 However, one of the disadvantages of the way this method was implemented is that when the agent
 is moving towards the beacon it creates a large area with high probability past the beacon.
@@ -328,8 +338,23 @@ In figure \ref{fig:beacon1} cones with high probability are represented and the 
 
 
 \section{Conclusion e Future Work}
-era bonito usar mais a colaboracao.
-Filtros de kalman para o GPS
+In general, the developed agent can solve different types of maps and return home with success. Although it has some problems avoiding some obstacles structures, the results were generally positive.
+
+Regarding the navigation strategy, it provided accurate tracking of the agent's position
+when searching for the the beacon, however when returning home this tracking was no longer
+accurate hence the use of GPS for this final part of the process.
+
+Path planning, using the route that the agent had already travelled, proved to be the one
+that got better results, over the method of using calculated wall probabilities.
+Some improvements could be made on this part such as improving the wall growing algorithm to
+provide smoother results and using more information from other robots to calculate alternative
+routes when choosing the path to return to the starting position.
+
+The target localization part of the project allowed the agent to always have some information
+about the location of the beacon, even when the beacon is no longer visible. This information
+is very accurate but can be misleading if the robot is only moving towards the goal, creating
+cones of false high probability. An improvement could be made on this part, decreasing the
+values on the beacon probability matrix over time, which could reveal some outliers while maintaining the beacon probable location accurate.
 
 \bibliography{report}
 \bibliographystyle{splncs}
