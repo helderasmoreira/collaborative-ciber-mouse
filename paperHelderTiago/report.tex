@@ -168,7 +168,7 @@ While these messages allow the robots to share knowledge among them, there are s
 
 With these limitations and the importance that the communication takes in a collaborative scenario in mind, the task of choosing what information to send in the messages, and how to send it, was, without a doubt, challenging. In this robot we opted for a strategy where two types of messages are transmitted (alternating in each cycle) when the robots are within range: sensors messages and beacon messages.
 
-\subsection{Sensors messages}
+\subsection{Sensors messages} \label{subsec:sensor_messages}
 
 Sharing the information gathered so far from the external environment was one of the goals of the communication module, but given the message size limitations, and the fact that we represented the map with a precision of 10 (i.e. each unit of the real map is represented by 10 cells in our matrix), the (ideal) option of transmitting the entire matrix was discarded and we opted for an approach that sends the readings from the robot sensors and its position.
 
@@ -189,7 +189,7 @@ The values offsetY and offsetX represent the offset of the robot position, calcu
 After that, the values of the sensors are passed, front sensor, left sensor, right sensor and compass, to allow the recipient robot to map the environment, the same way the sender robot would do.
 Since these messages are sent from all the robots to all, given the necessary exchanges, the robots will share the same map, and be aware of areas that they may have not yet visited, improving the overall performance of the team.
 
-\subsection{Beacon messages}
+\subsection{Beacon messages} \label{subsec:beacon_messages}
 
 The beacon messages goal is to share with the rest of the team, the information about the beacon gathered so far. The limitations explained above were again an issue, and with that in mind we opted for a strategy where we calculate the area where it is most probable for the beacon to be and share that in a message with the following template:
 
@@ -201,7 +201,7 @@ The beacon messages goal is to share with the rest of the team, the information 
 
 The values x and y represent the robot coordinates in the position matrix.
 
-The values offsetY and offsetX represent the offset of the robot position, calculated with the aid of the GPS in the first cycle, and allow for the robots to establish the teammate position in their own map, which otherwise would be misleading since the arena is randomly positioned in a world, being the origin coordinates (the left, bottom corner) assigned a pair of values in the range 0–1000.
+The values offsetY and offsetX represent the offset of the robot position, as detailed in section \ref{subsec:sensor_messages}.
 
 After that, the values from the area are passed, from the top left to the bottom right.
 This allows for the robots to have information about the beacon even if they themselves haven't seen it and in a scenario where enough messages are transmitted, allows for the robots to perfect each other's matrices and map the beacon position much more efficiently.
