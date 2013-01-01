@@ -14,7 +14,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-This paper discusses the implementation of mapping and communication for a collaborative robotic agent, using the Ciber-Rato Simulation Tools. Navigation and target localization strategies were also implemented in the discussed agent, however those implementations are further explained in the paper \cite{varelaepontes}.
+This paper discusses the implementation of mapping and communication for a collaborative robotic agent, using the Ciber-Rato Simulation Tools. Navigation and target localization strategies were also implemented in the discussed agent, however those implementations are further explained in the paper by Pontes and Varela \cite{varelaepontes}.
 We focused on developing an interesting solution for a maze solver agent and explore the collaboration between robots with similar architectures.
 \end{abstract}
 
@@ -25,10 +25,10 @@ In this project, we faced the challenge of developing a collaborative robotic ag
 
 At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem, so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent's efficiency.
 
-In this paper, first we present the simulation system architecture. Then the agent architecture and design are analysed, mainly focusing in the mapping and communication strategies, since navigation and target localization strategies are further discussed in the paper \cite{varelaepointes}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
+In this paper, first we present the simulation system architecture. Then the agent architecture and design are analyzed, mainly focusing in the mapping and communication strategies, since navigation and target localization strategies are further discussed in the paper by Pontes and Varela \cite{varelaepontes}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
 
 \section{Simulation System Architecture}
-To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and a allows the developed algorithms to be tested\cite{Lau2002}. 
+To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and a allows the developed algorithms to be tested \cite{Lau2002}. 
 
 The simulation environment is composed by a Simulator, a Simulation Viewer and Virtual Robots. The first is responsible for modeling all the hardware components of the robots, the maze and ensure that all the execution rules are applied. The Simulation Viewer displays the maze, the robots movements and the remaining execution time. The virtual Robots are detailed in the section bellow.
 
@@ -87,7 +87,7 @@ The Mice have two specific goals: locate the target area and place all the agent
 In order to achieve that goal our agents must be able to fully operate in an unstructured environment by avoiding obstacles and finding the beacon in a simple to moderately complex map. 
 However, at the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agents efficiency.
 
-The developed agent architecture is composed by 6 different modules and is represented in figure \ref{fig:robot-arch}.
+The developed agent architecture is composed by 5 different modules and is represented in figure \ref{fig:robot-arch}.
 
 \begin{figure}
   \centering
@@ -204,7 +204,7 @@ The values x and y represent the robot coordinates in the position matrix.
 The values offsetY and offsetX represent the offset of the robot position, calculated with the aid of the GPS in the first cycle, and allow for the robots to establish the teammate position in their own map, which otherwise would be misleading since the arena is randomly positioned in a world, being the origin coordinates (the left, bottom corner) assigned a pair of values in the range 0–1000.
 
 After that, the values from the area are passed, from the top left to the bottom right.
-This allows for the robots to have information about the beacon even if they themselves haven’t seen it and in a scenario where enough messages are transmitted, allows for the robots to perfect each other’s matrixes and map the beacon position much more efficiently.
+This allows for the robots to have information about the beacon even if they themselves haven't seen it and in a scenario where enough messages are transmitted, allows for the robots to perfect each other's matrices and map the beacon position much more efficiently.
 
 
 \section{Results}
@@ -263,7 +263,7 @@ The following figures ( \ref{fig:visualizer1} and \ref{fig:visualizer2} ) repres
 
 In general, the developed agent can solve different types of maps and return home with success. Although it has some problems avoiding some obstacles structures, the results were generally positive.
 
-Regarding the mapping solution, the algorithm builds a good representation of the arena and produces good results that can be used later. As described in the paper by  Varela and Pontes \cite{varelaepontes}, the probabilities matrix was used to calculate the path when returning home after some changes and considerations. In terms of improvements, it would be possible to improve corners detection, allowing a better arena representation.
+Regarding the mapping solution, the algorithm builds a good representation of the arena and produces good results that can be used later. As described in the paper by Varela and Pontes \cite{varelaepontes}, the probabilities matrix was used to calculate the path when returning home after some changes and considerations. In terms of improvements, it would be possible to improve corners detection, allowing a better arena representation.
 
 As for the communication module, the approaches chosen have proven to improve the team's overall performance, allowing them to share information and knowledge about the external environment. Since the probabilities matrix is used mainly to calculate the return home path, and every robot will know at least one path home, we focused on sharing the beacon position knowledge to improve the performance in the first part of the competition. This way, improvements could be made to the sensors message, even though a functional version is implemented and working, to increase the amount of information transmitted, thus increasing the optimality of the return home path.
 
