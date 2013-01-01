@@ -1,5 +1,11 @@
 \begin{thebibliography}{1}
 
+\bibitem{varelaepontes}
+Pontes, P., Varela, T.:
+\newblock {A Collaborative Robotic Agent for the CiberRato Competition —
+  Navigation and Target Localization}.
+\newblock (2012)
+
 \bibitem{Lau2002}
 Lau, N., Pereira, A., Melo, A.:
 \newblock {Ciber-rato: Um ambiente de simula\c{c}ao de robots m\'{o}veis e
@@ -10,5 +16,11 @@ Lau, N., Pereira, A., Melo, A.:
 {Departamento de Electr\'{o}nica}, T.o.e.I., de~Aveiro, U.:
 \newblock {CiberRato 2011 Rules and Technical Specifications}.
 \newblock (2011)
+
+\bibitem{Ribeiro2002}
+Ribeiro, P.:
+\newblock {YAM (Yet Another Mouse) - Um Robot Virtual com Planeamento de
+  Caminho a Longo Prazo}.
+\newblock (2002)
 
 \end{thebibliography}
