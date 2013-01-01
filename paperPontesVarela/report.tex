@@ -14,7 +14,7 @@ Navigation and Target Localization}
 \begin{document}
 \maketitle
 \begin{abstract}
-This paper discusses the implementation of navigation and target localization strategies for a  collaborative robotic agent, using the Ciber-Rato Simulation Tools. Communication and mapping strategies were also implemented in the discussed agent, however those implementations are further explained in the paper \cite{MoreiraBabo2012}.
+This paper discusses the implementation of navigation and target localization strategies for a  collaborative robotic agent, using the Ciber-Rato Simulation Tools. Communication and mapping strategies were also implemented in the discussed agent, however those implementations are further explained in the paper by Moreira and Babo \cite{MoreiraBabo2012}.
 We focused on developing an interesting solution for a maze solver agent and explore the collaboration between robots with similar architectures.
 \end{abstract}
 
@@ -25,7 +25,7 @@ In this project, we faced the challenge of developing a collaborative robotic ag
 
 At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem, so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent's efficiency.
 
-In this paper, first we present the simulation system architecture. Then the agent architecture and design are analysed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{MoreiraBabo2012}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
+In this paper, first we present the simulation system architecture. Then the agent architecture and design are analysed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper by Moreira and Babo \cite{MoreiraBabo2012}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
 
 \section{Simulation System Architecture}
 To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and allows the developed algorithms to be tested\cite{Lau2002}. 
@@ -87,7 +87,7 @@ The Mice have two specific goals: locate the target area and place all the agent
 In order to achieve that goal our agents must be able to fully operate in an unstructured environment by avoiding obstacles and finding the beacon in a simple to moderately complex map. 
 However, at the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem and so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agents efficiency.
 
-The developed agent architecture is composed by 6 different modules and is represented in figure \ref{fig:robot-arch}.
+The developed agent architecture is composed by 5 different modules and is represented in figure \ref{fig:robot-arch}.
 
 \begin{figure}
   \centering
