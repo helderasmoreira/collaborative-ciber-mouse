@@ -1,51 +1,8 @@
-This is BibTeX, Version 0.99d (TeX Live 2012/Debian)
-Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
-The top-level auxiliary file: report.aux
+This is BibTeX, Version 0.99dThe top-level auxiliary file: report.aux
 The style file: splncs.bst
 Database file #1: report.bib
 Warning--I didn't find a database entry for "varelaepontes"
 Warning--I didn't find a database entry for "varelaepointes"
 Warning--I didn't find a database entry for "Ribeiro2002"
 Warning--empty journal in DepartamentodeElectronica2011
-You've used 2 entries,
-            2087 wiz_defined-function locations,
-            505 strings with 4132 characters,
-and the built_in function-call counts, 461 in all, are:
-= -- 40
-> -- 19
-< -- 1
-+ -- 7
-- -- 5
-* -- 35
-:= -- 74
-add.period$ -- 2
-call.type$ -- 2
-change.case$ -- 2
-chr.to.int$ -- 0
-cite$ -- 3
-duplicate$ -- 25
-empty$ -- 42
-format.name$ -- 5
-if$ -- 102
-int.to.chr$ -- 0
-int.to.str$ -- 2
-missing$ -- 2
-newline$ -- 13
-num.names$ -- 2
-pop$ -- 7
-preamble$ -- 1
-purify$ -- 0
-quote$ -- 0
-skip$ -- 11
-stack$ -- 0
-substring$ -- 16
-swap$ -- 10
-text.length$ -- 1
-text.prefix$ -- 0
-top$ -- 0
-type$ -- 0
-warning$ -- 1
-while$ -- 5
-width$ -- 3
-write$ -- 23
 (There were 4 warnings)

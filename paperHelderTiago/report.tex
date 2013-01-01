@@ -259,17 +259,6 @@ The following figures ( \ref{fig:visualizer1} and \ref{fig:visualizer2} ) repres
   \label{fig:visualizer2}
 \end{figure}
 
-
-\subsection{Limitations and Benefits}
-This reactive architecture includes some limitations, such as:
-
-\begin{itemize}
-  \item if the robot is following the beacon and there is an concave obstacle in the way, most of the times, the robot will be stuck around the same place with conflicting orders to follow the beacon and to avoid the obstacle in front. The rule to only follow the beacon on every 50 iterations was developed to try to circumvent this cases and provided promising results;
-  \item by not being able to store the world state the robot wanders around the map without knowing if it has already been there, and this can also create cycles, specially if the robot is surrounded by walls and there is only one way out.
-\end{itemize}
-
-The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
-
 \section{Conclusion and Future Work}
 
 In general, the developed agent can solve different types of maps and return home with success. Although it has some problems avoiding some obstacles structures, the results were generally positive.
