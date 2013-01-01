@@ -6,8 +6,8 @@
 \usepackage{nameref}
 
 \title{Collabot}
-\subtitle{A Collaborative Robotic Agent for the CiberRato Competition}
-\author{Hélder Moreira \and Tiago Babo}
+\subtitle{A Collaborative Robotic Agent for the CiberRato Competition - Mapping and Communication}
+\author{H\'{e}lder Moreira \and Tiago Babo}
 \institute{Faculdade de Engenharia da Universidade do Porto}
 
 %
@@ -100,11 +100,11 @@ Bellow, the description of each module:
 
 \begin{itemize}
   \item[\textbf{Compute Probabilities}]
-  lorem ipsum
+  An observer that receives information from the sensors and updates the agent’s wall probability matrix.
   \item[\textbf{Communication}]
   Handles the communication betweeen the agent and the simulator, sending and receiving messages and updating the agent's knowledge accordingly. 
   \item[\textbf{Path Planning}]
-  lorem ipsum
+  Traces the way back to the starting position after the agent reaches the objective.
   \item[\textbf{Visualizers}]
   Responsible for the visualizers that show the robot's internal information.
   \item[\textbf{Utils}]
@@ -258,17 +258,6 @@ The following figures ( \ref{fig:visualizer1} and \ref{fig:visualizer2} ) repres
   \caption{Robot 2 beacon visualizer}
   \label{fig:visualizer2}
 \end{figure}
-
-
-\subsection{Limitations and Benefits}
-This reactive architecture includes some limitations, such as:
-
-\begin{itemize}
-  \item if the robot is following the beacon and there is an concave obstacle in the way, most of the times, the robot will be stuck around the same place with conflicting orders to follow the beacon and to avoid the obstacle in front. The rule to only follow the beacon on every 50 iterations was developed to try to circumvent this cases and provided promising results;
-  \item by not being able to store the world state the robot wanders around the map without knowing if it has already been there, and this can also create cycles, specially if the robot is surrounded by walls and there is only one way out.
-\end{itemize}
-
-The benefits of this type of architecture are that the robot is able to quickly react to dynamic changes in the environment, such as the introduction of a new robot in the system, and also able to react to some environment variable that the robot's programmer has not foreseen.
 
 \section{Conclusion and Future Work}
 
