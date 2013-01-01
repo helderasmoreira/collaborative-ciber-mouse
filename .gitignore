@@ -15,6 +15,7 @@ nbproject/
 *.log
 *.bbl
 *.blg
+/paperPontesVarela/*.out
 
 *.synctex.gz
 

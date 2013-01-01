@@ -2,6 +2,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{textcomp}       % additional symbols using companion encoding TS1
+\usepackage{hyperref}
 
 \title{Collabot}
 \subtitle{A Collaborative Robotic Agent for the CiberRato Competition ---\\
@@ -13,7 +14,7 @@ Navigation and Target Localization}
 \begin{document}
 \maketitle
 \begin{abstract}
-This paper discusses the implementation of navigation and target localization strategies for a  collaborative robotic agent, using the Ciber-Rato Simulation Tools. Communication and mapping strategies were also implemented in the discussed agent, however those implementations are further explained in the paper \cite{baboehelder}.
+This paper discusses the implementation of navigation and target localization strategies for a  collaborative robotic agent, using the Ciber-Rato Simulation Tools. Communication and mapping strategies were also implemented in the discussed agent, however those implementations are further explained in the paper \cite{MoreiraBabo2012}.
 We focused on developing an interesting solution for a maze solver agent and explore the collaboration between robots with similar architectures.
 \end{abstract}
 
@@ -24,7 +25,7 @@ In this project, we faced the challenge of developing a collaborative robotic ag
 
 At the starting point, the agents have no previous information about the world state, namely the target position, maze's topology and even his or other mice positions. Therefore, a simple reactive robot architecture was not suitable for this problem, so proper communication, mapping, navigation and target localization strategies were be developed in order to maximize the agent's efficiency.
 
-In this paper, first we present the simulation system architecture. Then the agent architecture and design are analysed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{baboehelder}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
+In this paper, first we present the simulation system architecture. Then the agent architecture and design are analysed, mainly focusing in the navigation and target localization strategies, since communication and mapping strategies are further discussed in the paper \cite{MoreiraBabo2012}. After that, the results of the developed strategies are discussed. Finally, in the last section, are presented the main conclusions and some possible future developments.
 
 \section{Simulation System Architecture}
 To develop this project the Ciber-Rato Simulation Tools, 2012 edition, were chosen as a simulation platform. This platform allows the developers to focus only on the development of an efficient agent algorithm, eliminating the problems and challenges associated with real robots construction by providing a simulation environment that models all the hardware components of the robots and allows the developed algorithms to be tested\cite{Lau2002}. 
@@ -177,7 +178,7 @@ Finally, in order to ensure that is always possible to travel through the calcul
 
 The path planning module requires a proper world state representation when calculating the shortest path, otherwise the algorithm may calculate paths that are impossible for a robot to cross (i.e. If a cell that contains a obstacle is present in the calculated path). Therefore, to create a more robust test set, two different solutions were explored:
 \begin{enumerate}
-\item The first was to use the computed probabilities matrix. Originally all the cells of the matrix have the value of 0.5, meaning that the probability of that cell having or not an obstacle is the same. While the robot moves through the arena the values of the matrix are updated. A higher value, means that the probability of having a obstacle in that cell is higher. The algorithm used to update this matrix is further explained in the paper \cite{baboehelder}. Nevertheless, while using this algorithm it is important to ensure that the calculated path always keeps a sufficient distance from the wall, thus it is required to enlarge the walls when using this strategy.
+\item The first was to use the computed probabilities matrix. Originally all the cells of the matrix have the value of 0.5, meaning that the probability of that cell having or not an obstacle is the same. While the robot moves through the arena the values of the matrix are updated. A higher value, means that the probability of having a obstacle in that cell is higher. The algorithm used to update this matrix is further explained in the paper \cite{MoreiraBabo2012}. Nevertheless, while using this algorithm it is important to ensure that the calculated path always keeps a sufficient distance from the wall, thus it is required to enlarge the walls when using this strategy.
 
 \item The second strategy chosen was to use only the points that were crossed by the robot to calculate the path. With this strategy, the problems related to the sensors noise, or errors in the calculation of the location of the obstacles in the map are avoided, since the robots, only travel through the same tracks they have already crossed. Furthermore, in this strategy, the enlargement of the walls is not required, and the path planning executes faster. However, by not taking all the information available into account, the calculated path may also not be the shortest one.
 \end{enumerate}
